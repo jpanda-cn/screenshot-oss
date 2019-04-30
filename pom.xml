@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>cn.jpanda</groupId>
+    <artifactId>screenshot-oss</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <!--配置资源属性-->
+    <properties>
+        <!-- JDK版本-->
+        <jdk.version>1.8</jdk.version>
+        <!-- Junit 版本-->
+        <junit.junit.version>4.12</junit.junit.version>
+        <!-- 阿里云OSS SDK 版本 -->
+        <com.aliyun.oss.aliyun-sdk-oss.version>2.8.2</com.aliyun.oss.aliyun-sdk-oss.version>
+        <!-- lombok版本 -->
+        <org.projectlombok.lombok.version>1.16.20</org.projectlombok.lombok.version>
+    </properties>
+
+    <!-- 依赖管理-->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.junit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.aliyun.oss</groupId>
+                <artifactId>aliyun-sdk-oss</artifactId>
+                <version>${com.aliyun.oss.aliyun-sdk-oss.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${org.projectlombok.lombok.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <!-- 依赖配置 -->
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>2.27.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.aliyun.oss</groupId>
+            <artifactId>aliyun-sdk-oss</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <testResources>
+            <testResource>
+                <directory>src/test/java/</directory>
+                <includes>
+                    <include>**/*.properties</include>
+                </includes>
+                <filtering>false</filtering>
+            </testResource>
+        </testResources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+
+</project>
