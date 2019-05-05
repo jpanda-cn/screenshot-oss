@@ -1,6 +1,7 @@
 package cn.jpanda.screenshot.oss.core.configuration;
 
 import cn.jpanda.screenshot.oss.core.capture.ScreenCapture;
+import cn.jpanda.screenshot.oss.core.context.ViewContext;
 import cn.jpanda.screenshot.oss.core.persistence.DataPersistenceStrategy;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,6 +35,13 @@ public class Configuration {
     @Getter
     @Setter
     private ScreenCapture screenCapture;
+
+    /**
+     * 视图上下文
+     */
+    @Getter
+    @Setter
+    private ViewContext viewContext;
 
     /**
      * 获取主配置文件的完全名称
