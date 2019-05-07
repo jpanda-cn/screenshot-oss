@@ -5,6 +5,7 @@ import cn.jpanda.screenshot.oss.core.capture.DefaultScreenCapture;
 import cn.jpanda.screenshot.oss.core.configuration.Configuration;
 import cn.jpanda.screenshot.oss.core.context.DefaultViewContext;
 import cn.jpanda.screenshot.oss.core.context.FXAnnotationSameNameFXMLSearch;
+import cn.jpanda.screenshot.oss.core.log.*;
 import cn.jpanda.screenshot.oss.core.persistence.CachedPropertiesVisitor;
 import cn.jpanda.screenshot.oss.core.persistence.DefaultPropertiesVisitor;
 import cn.jpanda.screenshot.oss.core.persistence.PropertiesDataPersistenceStrategy;
@@ -21,6 +22,8 @@ public abstract class BootStrap extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        // 初始化日志
+        initLog();
         // 初始化工作目录
         loadCurrentWorkDir();
         // 初始化主配置文件名称
@@ -38,6 +41,11 @@ public abstract class BootStrap extends Application {
         doStart();
     }
 
+    protected void initLog() {
+        DefaultOutLogConfig defaultOutLogConfig = new DefaultOutLogConfig(Loglevel.TRACE);
+        LogFactory logFactory = new DefaultOutLogFactory(defaultOutLogConfig);
+        LogHolder.getInstance().initLogFactory(logFactory);
+    }
 
     protected void loadCurrentWorkDir() {
         configuration.setCurrentWorkDir(JarUtils.getCurrentJarDirectory());
@@ -61,10 +69,11 @@ public abstract class BootStrap extends Application {
     }
 
     protected void registryScene() {
+        Log log = LogHolder.getInstance().getLogFactory().getLog("class scan");
         // 注册所有的场景
         for (Class clazz : new DefaultClassScan(new ViewAndImplInitClassScanFilter()).scan(getClass()).loadResult()) {
             if (Initializable.class.isAssignableFrom(clazz)) {
-                System.out.println(clazz);
+                log.trace(clazz.getCanonicalName());
                 configuration.getViewContext().registry(clazz);
             }
         }

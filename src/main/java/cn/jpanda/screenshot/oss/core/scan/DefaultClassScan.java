@@ -1,8 +1,8 @@
 package cn.jpanda.screenshot.oss.core.scan;
 
+import cn.jpanda.screenshot.oss.core.log.Log;
+import cn.jpanda.screenshot.oss.core.log.LogHolder;
 import lombok.SneakyThrows;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.io.File;
 import java.net.JarURLConnection;
@@ -20,7 +20,7 @@ import java.util.jar.JarFile;
  * 默认的类扫描器
  */
 public class DefaultClassScan implements ClassScan {
-    private Log log = LogFactory.getLog(getClass());
+    private Log log = LogHolder.getInstance().getLogFactory().getLog(getClass());
     /**
      * 文件协议名称
      */
@@ -42,7 +42,6 @@ public class DefaultClassScan implements ClassScan {
     }
 
     public DefaultClassScan(ClassLoader classLoader, ClassScanFilter filter) {
-        log.trace(String.format("init ClassLoadScan with:%s and %s", classLoader.getClass().getCanonicalName(), filter.getClass().getCanonicalName()));
         this.classLoader = classLoader;
         this.filter = filter;
     }
@@ -55,7 +54,6 @@ public class DefaultClassScan implements ClassScan {
     @Override
     public ClassScan scan(String packageName) {
         classes = new HashSet<>();
-        log.trace(String.format("start class scan with package named:%s ", packageName));
         loadClass(packageName);
         return this;
     }
@@ -75,7 +73,6 @@ public class DefaultClassScan implements ClassScan {
             if (null == currentUrl) {
                 continue;
             }
-            log.trace(String.format("handler url:%s", currentUrl.getPath()));
             handler(currentUrl, packageName);
         }
     }
@@ -84,12 +81,10 @@ public class DefaultClassScan implements ClassScan {
     protected void handler(URL url, String packageName) {
         switch (url.getProtocol()) {
             case JAR_PROTOCOL_NAME: {
-                log.trace(String.format("%s is Jar", url.getPath()));
                 handlerJar(url, packageName);
                 break;
             }
             case FILE_PROTOCOL_NAME: {
-                log.trace(String.format("%s is file", url.getPath()));
                 handlerFile(url, packageName);
                 break;
             }
@@ -101,7 +96,6 @@ public class DefaultClassScan implements ClassScan {
 
     @SneakyThrows
     protected void handlerJar(URL url, String packageName) {
-        log.trace(String.format("connection to %s ...", url.getPath()));
         JarURLConnection jarURLConnection = (JarURLConnection) url.openConnection();
         if (null == jarURLConnection) {
             return;
@@ -115,15 +109,13 @@ public class DefaultClassScan implements ClassScan {
             JarEntry jarEntry = jarEntryEnumeration.nextElement();
             String jarEntryName = jarEntry.getName();
             if (jarEntryName.endsWith(".class")) {
-                System.out.println(jarEntryName);
+                log.trace(jarEntryName);
                 String className = jarEntryName.substring(0, jarEntryName.lastIndexOf(".")).replaceAll("/", ".");
                 if (className.startsWith(packageName)) {
-                    log.trace(String.format(String.format("registry class named %s", className)));
                     addClassByName(className);
                 }
                 continue;
             }
-            log.trace(String.format("the file named %s is not class file", jarEntryName));
         }
 
     }
@@ -140,7 +132,6 @@ public class DefaultClassScan implements ClassScan {
         File dir = path.toFile();
         // 文件不存在，文件非目录，文件不可读
         if (!dir.exists() || !dir.isDirectory() || !dir.canRead()) {
-            log.trace(String.format("dir:%s can`t handler", dir.getName()));
             return;
         }
         File[] subFiles = dir.listFiles(pathname -> pathname.isDirectory() || (pathname.isFile() && pathname.getName().endsWith(CLASS_PROTOCOL_NAME)));
@@ -149,22 +140,18 @@ public class DefaultClassScan implements ClassScan {
         }
         for (File file : subFiles) {
             if (file.isDirectory()) {
-                log.trace(String.format("handler %s dir`s subDir %s", url.getPath(), file.getName()));
                 handler(new URL(url.getProtocol(), url.getHost(), url.getPort(), file.getPath()), packageName + "." + file.getName());
                 continue;
             }
             if (file.getName().endsWith(".class")) {
-                log.trace(String.format("handler class file with package:%s and class named: %s", packageName, file.getName()));
                 handlerClassFile(packageName, file.getName().substring(0, file.getName().length() - 6));
                 continue;
             }
-            log.info(String.format("continue %s/%s", packageName, file.getName()));
         }
     }
 
     protected void handlerClassFile(String packageName, String fileName) {
         String className = packageName + "." + fileName;
-        log.trace(String.format("will registry class %s", className));
         addClassByName(className);
     }
 
@@ -180,7 +167,6 @@ public class DefaultClassScan implements ClassScan {
 
     @SneakyThrows
     protected Class className2Class(String className) {
-        log.trace(String.format("load class named %s", className));
         return classLoader.loadClass(className);
     }
 }

@@ -2,12 +2,14 @@ package cn.jpanda.screenshot.oss.core.persistence;
 
 import cn.jpanda.screenshot.oss.common.utils.ReflectionUtils;
 import cn.jpanda.screenshot.oss.common.utils.StringUtils;
+import cn.jpanda.screenshot.oss.core.log.Log;
+import cn.jpanda.screenshot.oss.core.log.LogHolder;
 
 import java.lang.reflect.Field;
 import java.util.Properties;
 
 public class PropertiesDataPersistenceStrategy implements DataPersistenceStrategy {
-
+    private Log log = LogHolder.getInstance().getLogFactory().getLog(getClass());
     /**
      * 对应的配置文件名称
      */
@@ -21,9 +23,11 @@ public class PropertiesDataPersistenceStrategy implements DataPersistenceStrateg
         this.propertiesFileName = propertiesFileName;
         this.propertiesVisitor = propertiesVisitor;
     }
-    public Persistence load(Class<? extends Persistence> type) {
+
+    public <T extends Persistence> T load(Class<T> type) {
+        log.trace("will load profile:{}",propertiesFileName);
         Properties properties = propertiesVisitor.loadProperties(propertiesFileName);
-        return readProperties2TargetType(properties, type);
+        return (T)readProperties2TargetType(properties, type);
     }
 
     public boolean store(Persistence persistence) {
@@ -42,7 +46,7 @@ public class PropertiesDataPersistenceStrategy implements DataPersistenceStrateg
             // 读取指定的属性
             String value = properties.getProperty(prefix + "." + field.getName());
             if (StringUtils.isNotEmpty(value)) {
-                ReflectionUtils.setValue(field, obj, StringUtils.cast2BasicType(value, field.getType()));
+                ReflectionUtils.setValue(field, obj, StringUtils.cast2CommonType(value, field.getType()));
             }
         }
         return obj;

@@ -95,9 +95,11 @@ public final class StringUtils {
      * @return 转换后的数据
      */
     @SuppressWarnings("unchecked")
-    public static <T> T cast2BasicType(String source, Class<T> targetClass) {
+    public static <T> T cast2CommonType(String source, Class<T> targetClass) {
 
-
+        if (targetClass.equals(String.class)) {
+            return (T)source;
+        }
         if (!BASIC_TYPE_MAP.containsKey(targetClass) && !BASIC_TYPE_MAP.containsValue(targetClass)) {
             throw new IllegalArgumentException("targetClass not Basic Type");
         }
@@ -142,6 +144,7 @@ public final class StringUtils {
 
     /**
      * 获取字符串，如果指定的字符串为空，则返回 replaceStr ,可能 为{@code null}.
+     *
      * @param defaultStr 默认字符串
      * @param replaceStr 替换字符串
      * @return 返回指定的字符串或替换后的字符串

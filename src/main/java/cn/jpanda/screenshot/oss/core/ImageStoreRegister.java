@@ -6,4 +6,8 @@ public class ImageStoreRegister {
      */
     private String name;
 
+    /**
+     * 图片存储模块
+     */
+    private ImageStore imageStore;
 }

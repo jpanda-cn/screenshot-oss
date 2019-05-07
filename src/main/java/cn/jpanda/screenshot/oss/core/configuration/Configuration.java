@@ -3,10 +3,13 @@ package cn.jpanda.screenshot.oss.core.configuration;
 import cn.jpanda.screenshot.oss.core.capture.ScreenCapture;
 import cn.jpanda.screenshot.oss.core.context.ViewContext;
 import cn.jpanda.screenshot.oss.core.persistence.DataPersistenceStrategy;
+import cn.jpanda.screenshot.oss.core.persistence.Persistence;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.File;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Configuration {
 
@@ -43,10 +46,27 @@ public class Configuration {
     @Setter
     private ViewContext viewContext;
 
+    @Getter
+    @Setter
+    private Map<Class<? extends Persistence>, Persistence> persistences = new ConcurrentHashMap<>();
+
     /**
      * 获取主配置文件的完全名称
      */
     public String getMainConfigFileFullName() {
         return currentWorkDir + File.separator + mainConfigFileName;
+    }
+
+    public <T extends Persistence> T getPersistence(Class<T> p) {
+        if (persistences.containsKey(p)) {
+            return (T) persistences.get(p);
+        }
+        Persistence persistence = dataPersistenceStrategy.load(p);
+        persistences.put(p, persistence);
+        return (T) persistence;
+    }
+
+    public void storePersistence(Persistence p) {
+        dataPersistenceStrategy.store(p);
     }
 }

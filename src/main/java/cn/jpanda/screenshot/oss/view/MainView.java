@@ -3,21 +3,30 @@ package cn.jpanda.screenshot.oss.view;
 import cn.jpanda.screenshot.oss.core.BootStrap;
 import cn.jpanda.screenshot.oss.core.annotations.FX;
 import cn.jpanda.screenshot.oss.core.configuration.Configuration;
-import cn.jpanda.screenshot.oss.core.persistence.Persistence;
+import cn.jpanda.screenshot.oss.core.log.Log;
+import cn.jpanda.screenshot.oss.core.log.LogHolder;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
 @FX
 public class MainView implements Initializable {
-    Configuration configuration = BootStrap.configuration;
+
+    private Log log = LogHolder.getInstance().getLogFactory().getLog(getClass());
+
+    private Configuration configuration = BootStrap.configuration;
+
+    private MainViewConfig mainViewConfig;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // 加载配置
-        Persistence mainViewConfig = configuration.getDataPersistenceStrategy().load(MainViewConfig.class);
-        ((MainViewConfig)mainViewConfig).setTest(123);
-        configuration.getDataPersistenceStrategy().store(mainViewConfig);
+        mainViewConfig = configuration.getDataPersistenceStrategy().load(MainViewConfig.class);
     }
+
 }

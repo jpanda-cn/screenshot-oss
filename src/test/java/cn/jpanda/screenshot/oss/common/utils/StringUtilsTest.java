@@ -89,35 +89,38 @@ public class StringUtilsTest {
     }
 
     @Test
-    public void cast2BasicType() {
+    public void cast2CommonType() {
         // 转换为基本类型
-        assert 1 == StringUtils.cast2BasicType("1", byte.class);
-        assert new Byte("1").equals(StringUtils.cast2BasicType("1", Byte.class));
+        assert 1 == StringUtils.cast2CommonType("1", byte.class);
+        assert new Byte("1").equals(StringUtils.cast2CommonType("1", Byte.class));
 
-        assert 1 == StringUtils.cast2BasicType("1", short.class);
-        assert new Short("1").equals(StringUtils.cast2BasicType("1", Short.class));
+        assert 1 == StringUtils.cast2CommonType("1", short.class);
+        assert new Short("1").equals(StringUtils.cast2CommonType("1", Short.class));
 
-        assert 1 == StringUtils.cast2BasicType("1", int.class);
-        assert new Integer("1").equals(StringUtils.cast2BasicType("1", Integer.class));
+        assert 1 == StringUtils.cast2CommonType("1", int.class);
+        assert new Integer("1").equals(StringUtils.cast2CommonType("1", Integer.class));
 
-        assert 1 == StringUtils.cast2BasicType("1", long.class);
-        assert new Long("1").equals(StringUtils.cast2BasicType("1", Long.class));
+        assert 1 == StringUtils.cast2CommonType("1", long.class);
+        assert new Long("1").equals(StringUtils.cast2CommonType("1", Long.class));
 
-        assert 1 == StringUtils.cast2BasicType("1", double.class);
-        assert new Double("1").equals(StringUtils.cast2BasicType("1", Double.class));
+        assert 1 == StringUtils.cast2CommonType("1", double.class);
+        assert new Double("1").equals(StringUtils.cast2CommonType("1", Double.class));
 
-        assert 1 == StringUtils.cast2BasicType("1", float.class);
-        assert new Float("1").equals(StringUtils.cast2BasicType("1", Float.class));
+        assert 1 == StringUtils.cast2CommonType("1", float.class);
+        assert new Float("1").equals(StringUtils.cast2CommonType("1", Float.class));
 
-        assert StringUtils.cast2BasicType("1", boolean.class);
-        assert StringUtils.cast2BasicType("1", Boolean.class);
+        assert StringUtils.cast2CommonType("1", boolean.class);
+        assert StringUtils.cast2CommonType("1", Boolean.class);
 
-        assert new Character('1').charValue() == StringUtils.cast2BasicType("1", char.class);
-        assert new Character('1').equals(StringUtils.cast2BasicType("1", Character.class));
+        assert new Character('1').charValue() == StringUtils.cast2CommonType("1", char.class);
+        assert new Character('1').equals(StringUtils.cast2CommonType("1", Character.class));
+
+        final String str="good panda";
+        assert str.equals(StringUtils.cast2CommonType(str,String.class));
 
         thrown.expect(IllegalArgumentException.class);
-        StringUtils.cast2BasicType("123", Object.class);
-        StringUtils.cast2BasicType(null, int.class);
+        StringUtils.cast2CommonType("123", Object.class);
+        StringUtils.cast2CommonType(null, int.class);
     }
 
     @Test

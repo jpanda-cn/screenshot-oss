@@ -5,5 +5,14 @@ import lombok.Data;
 
 @Data
 public class MainViewConfig implements Persistence {
-    private Integer test;
+
+    private Long useCount = 0L;
+    /**
+     * 是否使用主控密码
+     */
+    private boolean usePassword;
+    /**
+     * 主控密码
+     */
+    private String password;
 }

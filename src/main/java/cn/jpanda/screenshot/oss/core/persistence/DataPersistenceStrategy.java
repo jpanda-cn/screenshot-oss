@@ -10,7 +10,7 @@ public interface DataPersistenceStrategy {
      * @param type 加载数据的依据
      * @return 持久化的数据
      */
-    Persistence load(Class<? extends Persistence> type);
+    <T extends Persistence>T load(Class<T> type);
 
     /**
      * 存储指定类型的用户数据
