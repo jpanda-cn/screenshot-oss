@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="120.0" prefWidth="325.0" style="-fx-background-color: #081421;" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.jpanda.screenshot.oss.view.tray.CanvasCutTrayView">
+    <Button fx:id="roundness" layoutX="10.0" layoutY="15.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0" onMouseClicked="#doRoundness">
+    <graphic>
+        <ImageView fitHeight="25.0" fitWidth="25.0">
+            <Image url="@/images/tray/roundness.png" />
+        </ImageView>
+    </graphic>
+    </Button>
+    <Button fx:id="rectangle" layoutX="55.0" layoutY="15.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0">
+        <graphic>
+            <ImageView fitHeight="25.0" fitWidth="25.0">
+                <Image url="@/images/tray/rectangle.png" />
+            </ImageView>
+        </graphic>
+    </Button>
+    <Button fx:id="arrow" layoutX="100.0" layoutY="15.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0">
+        <graphic>
+            <ImageView fitHeight="25.0" fitWidth="25.0">
+                <Image url="@/images/tray/arrow.png" />
+            </ImageView>
+        </graphic>
+    </Button>
+    <Button fx:id="pen" layoutX="145.0" layoutY="15.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0">
+        <graphic>
+            <ImageView fitHeight="25.0" fitWidth="25.0">
+                <Image url="@/images/tray/pen.png" />
+            </ImageView>
+        </graphic>
+    </Button>
+    <Button fx:id="text" layoutX="190.0" layoutY="15.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0">
+        <graphic>
+            <ImageView fitHeight="25.0" fitWidth="25.0">
+                <Image url="@/images/tray/text.png" />
+            </ImageView>
+        </graphic>
+    </Button>
+    <Button fx:id="cancel" layoutX="235.0" layoutY="15.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0">
+        <graphic>
+            <ImageView fitHeight="25.0" fitWidth="25.0">
+                <Image url="@/images/tray/cancel.png" />
+            </ImageView>
+        </graphic>
+    </Button>
+    <Button fx:id="submit" layoutX="280.0" layoutY="15.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0">
+        <graphic>
+            <ImageView fitHeight="25.0" fitWidth="25.0">
+                <Image url="@/images/tray/submit.png" />
+            </ImageView>
+        </graphic>
+    </Button>
+    <AnchorPane fx:id="bar" layoutX="4.0" layoutY="64.0" prefHeight="50.0" prefWidth="325.0" />
+   <Separator layoutX="14.0" layoutY="58.0" prefHeight="4.0" prefWidth="305.0" />
+</AnchorPane>
