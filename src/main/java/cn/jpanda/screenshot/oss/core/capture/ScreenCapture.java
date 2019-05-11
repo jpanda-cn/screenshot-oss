@@ -1,5 +1,6 @@
 package cn.jpanda.screenshot.oss.core.capture;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
@@ -39,7 +40,6 @@ public interface ScreenCapture {
      * @return 截图
      */
     BufferedImage screenshotImage(int index, int x, int y, int width, int height);
-
     /**
      * 获取指定屏幕的全屏截图
      *
@@ -65,4 +65,8 @@ public interface ScreenCapture {
     BufferedImage screenshotImage(int index, int x, int y, double percentWidth, double percentHeight);
 
     int GraphicsDeviceCount();
+
+    GraphicsDevice getTargetGraphicsDevice(final int index);
+
+    int getTargetGraphicsDeviceX(final int index);
 }

@@ -45,9 +45,6 @@ public class DefaultViewContext implements ViewContext {
     @SneakyThrows
     public Scene getScene(Class<? extends Initializable> clazz, boolean isNew, boolean override) {
         String key = generatorViewKey(clazz);
-        if (views.containsKey(key)) {
-            return views.get(key);
-        }
         if (isNew) {
             if (override) {
                 registry(clazz);
@@ -56,6 +53,10 @@ public class DefaultViewContext implements ViewContext {
             }
 
         }
+        if (views.containsKey(key)) {
+            return views.get(key);
+        }
+
         return views.get(key);
     }
 

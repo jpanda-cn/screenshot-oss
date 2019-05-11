@@ -1,7 +1,6 @@
 package cn.jpanda.screenshot.oss.core.context;
 
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -11,10 +10,12 @@ public interface ViewContext {
      * 获取默认的舞台
      */
     Stage getStage();
+
     /**
      * 关闭舞台
      */
     void closeStage();
+
     /**
      * 获取场景
      *
@@ -25,7 +26,7 @@ public interface ViewContext {
     /**
      * 新增一个指定的场景
      */
-    Scene getScene(Class<? extends Initializable> clazz,boolean isNew,boolean override);
+    Scene getScene(Class<? extends Initializable> clazz, boolean isNew, boolean override);
 
     /**
      * 注册场景
@@ -33,7 +34,6 @@ public interface ViewContext {
      * @param clazz Scene实现类
      */
     boolean registry(Class<? extends Initializable> clazz);
-
 
 
     /**
@@ -52,4 +52,8 @@ public interface ViewContext {
      * @param stage 舞台
      */
     <T extends Scene> void showScene(T scene, Stage stage);
+
+    default void showScene(Class<? extends Initializable> clazz) {
+        showScene(getScene(clazz));
+    }
 }

@@ -1,4 +1,4 @@
-package cn.jpanda.screenshot.oss.view;
+package cn.jpanda.screenshot.oss.view.main;
 
 import cn.jpanda.screenshot.oss.core.persistence.Persistence;
 import lombok.Data;
@@ -11,8 +11,4 @@ public class MainViewConfig implements Persistence {
      * 是否使用主控密码
      */
     private boolean usePassword;
-    /**
-     * 主控密码
-     */
-    private String password;
 }

@@ -20,18 +20,18 @@ public class DefaultScreenCapture implements ScreenCapture {
         // 获取指定的屏幕设备
         GraphicsDevice graphicsDevice = getTargetGraphicsDevice(index);
         Robot robot = new Robot(graphicsDevice);
-        return robot.createScreenCapture(new Rectangle(x, y, width, height));
+        return robot.createScreenCapture(new Rectangle(getTargetGraphicsDeviceX(index) + x, y, width, height));
     }
 
     @Override
     @SneakyThrows
     public BufferedImage screenshotImage(int index, int x, int y, double percentWidth, double percentHeight) {
         GraphicsDevice graphicsDevice = getTargetGraphicsDevice(index);
-        Dimension dimension = graphicsDevice.getDefaultConfiguration().getBounds().getSize();
-        final int width = (int) (dimension.width * percentWidth);
-        final int height = (int) (dimension.height * percentHeight);
+        Rectangle bounds = graphicsDevice.getDefaultConfiguration().getBounds();
+        final int width = (int) (bounds.width * percentWidth);
+        final int height = (int) (bounds.height * percentHeight);
         Robot robot = new Robot(graphicsDevice);
-        return robot.createScreenCapture(new Rectangle(x, y, width, height));
+        return robot.createScreenCapture(new Rectangle(getTargetGraphicsDeviceX(index) + x, y, width, height));
     }
 
     @Override
@@ -39,10 +39,22 @@ public class DefaultScreenCapture implements ScreenCapture {
         return graphicsDevices.length;
     }
 
-    protected GraphicsDevice getTargetGraphicsDevice(final int index) {
+    @Override
+    public GraphicsDevice getTargetGraphicsDevice(final int index) {
         if (index >= graphicsDevices.length) {
             throw new GraphicsDeviceNotFoundRuntimeException(String.format("can not find graphics device with index %d", index));
         }
         return graphicsDevices[index];
+    }
+
+    public int getTargetGraphicsDeviceX(final int index) {
+        if (index >= graphicsDevices.length) {
+            throw new GraphicsDeviceNotFoundRuntimeException(String.format("can not find graphics device with index %d", index));
+        }
+        int x = 0;
+        for (int i = 0; i < index; i++) {
+            x += graphicsDevices[i].getDefaultConfiguration().getBounds().getWidth();
+        }
+        return x;
     }
 }

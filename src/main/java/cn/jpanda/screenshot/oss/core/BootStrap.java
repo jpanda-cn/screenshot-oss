@@ -6,39 +6,69 @@ import cn.jpanda.screenshot.oss.core.configuration.Configuration;
 import cn.jpanda.screenshot.oss.core.context.DefaultViewContext;
 import cn.jpanda.screenshot.oss.core.context.FXAnnotationSameNameFXMLSearch;
 import cn.jpanda.screenshot.oss.core.log.*;
-import cn.jpanda.screenshot.oss.core.persistence.CachedPropertiesVisitor;
-import cn.jpanda.screenshot.oss.core.persistence.DefaultPropertiesVisitor;
-import cn.jpanda.screenshot.oss.core.persistence.PropertiesDataPersistenceStrategy;
-import cn.jpanda.screenshot.oss.core.persistence.PropertiesVisitor;
-import cn.jpanda.screenshot.oss.core.scan.DefaultClassScan;
-import cn.jpanda.screenshot.oss.core.scan.ViewAndImplInitClassScanFilter;
+import cn.jpanda.screenshot.oss.core.persistence.*;
+import cn.jpanda.screenshot.oss.core.persistence.interceptor.GetValueInterceptor;
+import cn.jpanda.screenshot.oss.core.persistence.interceptor.SetValueInterceptor;
+import cn.jpanda.screenshot.oss.core.persistence.interceptor.encrypt.EncryptGetValueInterceptor;
+import cn.jpanda.screenshot.oss.core.persistence.interceptor.encrypt.EncryptSetValueInterceptor;
+import cn.jpanda.screenshot.oss.core.scan.BootStrapClassScanRegistry;
+import cn.jpanda.screenshot.oss.core.scan.SceneBeanRegistry;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.stage.Stage;
 
 public abstract class BootStrap extends Application {
     public static Configuration configuration = new Configuration();
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
+        // 加载视图上下文
+        loadViewContext(primaryStage);
+        bootstrap();
         // 初始化日志
+        if (doBootStrap()) {
+            // 启用方法
+            doStart();
+        }
+    }
+
+    /**
+     * 程序引导入口
+     */
+    protected void bootstrap() {
+        // 初始化日志工具
         initLog();
         // 初始化工作目录
         loadCurrentWorkDir();
         // 初始化主配置文件名称
         loadMainConfigFileName();
+        registryValueInterceptor();
+        // 初始化类加载器，获取类加载器并执行注册操作
+        // 初始化全局配置文件
+        configuration.setBootstrapDataPersistenceStrategy(new PropertiesDataPersistenceStrategy(configuration.getConfigFile("bootsrap.properties"), new DefaultPropertiesVisitor(), configuration));
+        configuration.setBootstrapPersistence(configuration.getBootstrapDataPersistenceStrategy().load(BootstrapPersistence.class));
         // 加载配置文件持久操作策略类
         loadDataPersistenceStrategy();
         // 加载屏幕截图实现类
         loadScreenCapture();
-        // 加载视图上下文
-        loadViewContext(primaryStage);
-        // 注册场景
-        registryScene();
+        // 类扫描加载注册器
+        doBeanRegistry();
+    }
 
-        // 启用方法
-        doStart();
+
+    protected void doBeanRegistry() {
+        BootStrapClassScanRegistry bootStrapClassScanRegistry = new BootStrapClassScanRegistry();
+        registryBeanRegistry(bootStrapClassScanRegistry);
+        bootStrapClassScanRegistry.doRegistry(getClass());
+    }
+
+    protected void registryValueInterceptor() {
+        configuration.registryInterceptor(SetValueInterceptor.class, new EncryptSetValueInterceptor(configuration));
+        configuration.registryInterceptor(GetValueInterceptor.class, new EncryptGetValueInterceptor(configuration));
+    }
+
+    protected void registryBeanRegistry(BootStrapClassScanRegistry bootStrapClassScanRegistry) {
+        bootStrapClassScanRegistry.add(new SceneBeanRegistry(configuration));
     }
 
     protected void initLog() {
@@ -57,7 +87,7 @@ public abstract class BootStrap extends Application {
 
     protected void loadDataPersistenceStrategy() {
         PropertiesVisitor propertiesVisitor = new CachedPropertiesVisitor(new DefaultPropertiesVisitor());
-        configuration.setDataPersistenceStrategy(new PropertiesDataPersistenceStrategy(configuration.getMainConfigFileFullName(), propertiesVisitor));
+        configuration.setDataPersistenceStrategy(new PropertiesDataPersistenceStrategy(configuration.getMainConfigFileFullName(), propertiesVisitor, configuration));
     }
 
     protected void loadScreenCapture() {
@@ -68,16 +98,7 @@ public abstract class BootStrap extends Application {
         configuration.setViewContext(new DefaultViewContext(primaryStage, new FXAnnotationSameNameFXMLSearch(FXMLLoader.getDefaultClassLoader())));
     }
 
-    protected void registryScene() {
-        Log log = LogHolder.getInstance().getLogFactory().getLog("class scan");
-        // 注册所有的场景
-        for (Class clazz : new DefaultClassScan(new ViewAndImplInitClassScanFilter()).scan(getClass()).loadResult()) {
-            if (Initializable.class.isAssignableFrom(clazz)) {
-                log.trace(clazz.getCanonicalName());
-                configuration.getViewContext().registry(clazz);
-            }
-        }
-    }
+    protected abstract boolean doBootStrap();
 
     protected abstract void doStart();
 }

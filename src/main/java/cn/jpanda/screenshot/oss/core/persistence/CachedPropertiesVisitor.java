@@ -28,6 +28,7 @@ public class CachedPropertiesVisitor implements PropertiesVisitor {
 
     @Override
     public void store(Properties properties, String propertiesURL) {
+        loadedProperties.remove(propertiesURL);
         delegation.store(properties, propertiesURL);
     }
 }
