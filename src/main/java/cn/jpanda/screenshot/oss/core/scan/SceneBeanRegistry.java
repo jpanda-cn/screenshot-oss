@@ -20,7 +20,7 @@ public class SceneBeanRegistry implements BeanRegistry {
     public void doRegistry(Class c) {
         if (Initializable.class.isAssignableFrom(c)) {
             log.trace("registry scene bean:{}", c.getCanonicalName());
-            configuration.getViewContext().registry(c);
+//            configuration.getViewContext().registry(c);
         }
     }
 }

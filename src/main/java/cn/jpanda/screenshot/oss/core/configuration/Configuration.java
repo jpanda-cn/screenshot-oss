@@ -1,14 +1,17 @@
 package cn.jpanda.screenshot.oss.core.configuration;
 
+import cn.jpanda.screenshot.oss.core.ClipboardCallbackRegistryManager;
+import cn.jpanda.screenshot.oss.core.ImageStoreRegisterManager;
 import cn.jpanda.screenshot.oss.core.capture.ScreenCapture;
 import cn.jpanda.screenshot.oss.core.context.ViewContext;
 import cn.jpanda.screenshot.oss.core.persistence.BootstrapPersistence;
 import cn.jpanda.screenshot.oss.core.persistence.DataPersistenceStrategy;
-import cn.jpanda.screenshot.oss.core.persistence.interceptor.Interceptor;
 import cn.jpanda.screenshot.oss.core.persistence.Persistence;
+import cn.jpanda.screenshot.oss.core.persistence.interceptor.Interceptor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +34,14 @@ public class Configuration {
     @Getter
     @Setter
     private String mainConfigFileName;
+
+    /**
+     * 系统引导配置类
+     */
+    @Getter
+    @Setter
+    private BootstrapPersistence bootstrapPersistence;
+
     /**
      * 数据持久化策略
      */
@@ -46,13 +57,6 @@ public class Configuration {
     private Persistence persistence;
 
     /**
-     * 系统引导配置类
-     */
-    @Getter
-    @Setter
-    private BootstrapPersistence bootstrapPersistence;
-
-    /**
      * 桌面截图获取接口
      */
     @Getter
@@ -65,6 +69,23 @@ public class Configuration {
     @Getter
     @Setter
     private ViewContext viewContext;
+
+    // 当前使用的图片存储类
+    @Getter
+    @Setter
+    private String imageStore = "本地存储";
+    @Getter
+    @Setter
+    private String clipboardCallback = "地址";
+    @Getter
+    @Setter
+    private String imageSuffix = "png";
+
+    @Getter
+    private ImageStoreRegisterManager imageStoreRegisterManager = new ImageStoreRegisterManager();
+
+    @Getter
+    private ClipboardCallbackRegistryManager clipboardCallbackRegistryManager = new ClipboardCallbackRegistryManager();
 
     @Getter
     @Setter
@@ -80,6 +101,7 @@ public class Configuration {
         interceptorMap.put(clazz, interceptors);
     }
 
+    @SuppressWarnings("unchecked")
     public <T extends Interceptor> List<T> getInterceptor(Class<? extends Interceptor> c) {
         return (List<T>) interceptorMap.getOrDefault(c, new ArrayList<>());
     }
@@ -100,13 +122,14 @@ public class Configuration {
         return currentWorkDir + File.separator + name;
     }
 
+    @SuppressWarnings("unchecked")
     public <T extends Persistence> T getPersistence(Class<T> p) {
         if (persistences.containsKey(p)) {
             return (T) persistences.get(p);
         }
-        Persistence persistence = dataPersistenceStrategy.load(p);
+        T persistence = dataPersistenceStrategy.load(p);
         persistences.put(p, persistence);
-        return (T) persistence;
+        return persistence;
     }
 
     public void storePersistence(Persistence p) {
@@ -129,5 +152,9 @@ public class Configuration {
     public void updateUserCount() {
         bootstrapPersistence.updateUseCount();
         getBootstrapDataPersistenceStrategy().store(bootstrapPersistence);
+    }
+
+    public void store(BufferedImage image) {
+        imageStoreRegisterManager.getImageStore(imageStore).store(image);
     }
 }

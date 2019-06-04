@@ -1,8 +1,7 @@
 package cn.jpanda.screenshot.oss.view.snapshot;
 
+import cn.jpanda.screenshot.oss.service.snapshot.RoutingSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.view.tray.CanvasCutTrayView;
-import javafx.beans.binding.Bindings;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
@@ -15,6 +14,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 
+import static cn.jpanda.screenshot.oss.common.utils.MathUtils.min;
+import static cn.jpanda.screenshot.oss.common.utils.MathUtils.subAbs;
 import static cn.jpanda.screenshot.oss.core.BootStrap.configuration;
 
 
@@ -22,82 +23,80 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
     private Paint masking;
     private double startX;
     private double startY;
-    private DrawRectangle last;
+    private Bounds last;
     private GraphicsContext graphicsContext;
     private Parent toolbar;
     private Pane pane;
     private Rectangle cutRec;
+    private Group group;
+
+    private boolean start = true;
 
     public CanvasDrawEventHandler(Paint masking, GraphicsContext graphicsContext) {
+        // 蒙版清晰度
         this.masking = masking;
+        // Canvas绘图
         this.graphicsContext = graphicsContext;
+        // Canvas所属容器
         pane = ((Pane) (graphicsContext.getCanvas().getParent()));
+        // 加载工具托盘
         Scene scene = configuration.getViewContext().getScene(CanvasCutTrayView.class, true, false);
         toolbar = scene.getRoot();
-        cutRec = new Rectangle(0, 0, 0, 0);
     }
 
     @Override
     public void handle(MouseEvent event) {
 
         if (MouseEvent.MOUSE_PRESSED.equals(event.getEventType())) {
-            initParam(event);
+            // 理论上,每一次点击，都会生成一个新的区域，同时移除老的截图区域的内容。
+//            initParam(event);
+            start = true;
         } else if (MouseEvent.MOUSE_DRAGGED.equals(event.getEventType())) {
+            if (start) {
+                initParam(event);
+                start = false;
+            }
             draw(event);
         } else if (MouseEvent.MOUSE_RELEASED.equals(event.getEventType())) {
             // 生成一个截图区域
             // 这个区域下方生成一个工具组
             beforeDone(pane);
+        } else {
         }
     }
 
     protected void initParam(MouseEvent event) {
-        pane.getChildren().remove(toolbar);
+        // 移除之前的截图区域
+        if (group != null) {
+            pane.getChildren().remove(group);
+        }
+        // 重新绘制整个蒙版
+        drawMasking(new Bounds(0, 0, graphicsContext.getCanvas().getWidth(), graphicsContext.getCanvas().getHeight()));
+        // 生成一个截图区域
+        // 为截图区域生成一个容器
+        cutRec = new Rectangle(0, 0, 0, 0);
+        cutRec.visibleProperty().setValue(false);
+
+        // 每次点击都要清理到原有的工具栏
+//        AnchorPane cutPane = new AnchorPane(cutRec);
+        group = new Group(cutRec, toolbar);
+        // 添加工具托盘和截图位置
+        pane.getChildren().addAll(group);
+        // 绑定托盘和截图区域的关系
+        new CutRecChangeListenerRegistry(cutRec, toolbar).doRegistry();
+
+        //  在这里，截图区域单属一个容器，工具托盘和截图容器共同存放在一个容器内。
+        // 获取鼠标点击位置，该位置用于初始化截图区域的坐标
         startX = event.getScreenX();
         startY = event.getScreenY();
-        drawMasking(new DrawRectangle(0, 0, graphicsContext.getCanvas().getWidth(), graphicsContext.getCanvas().getHeight()));
-        last = new DrawRectangle(startX, startY, 0, 0);
-        cutRec.xProperty().set(last.getX());
-        cutRec.yProperty().set(last.getY());
-        cutRec.widthProperty().set(last.getWidth());
-        cutRec.heightProperty().set(last.getHeight());
-        cutRec.visibleProperty().setValue(true);
-        cutRec.visibleProperty().setValue(false);
-        // 每次点击都要清理到原有的工具栏
-        toolbar.visibleProperty().bind(cutRec.visibleProperty());
+        // 更新上一个截图位置的区域
+        last = new Bounds(startX, startY, 0, 0);
     }
 
-    protected void beforeDone(Pane p) {
-        if (last.getWidth() > 0 && last.getHeight() > 0) {
-            Group group = new Group();
-            p.getChildren().add(group);
-
-            // 生成需要处理区域的矩形
-            cutRec.xProperty().set(last.getX());
-            cutRec.yProperty().set(last.getY());
-            cutRec.widthProperty().set(last.getWidth());
-            cutRec.heightProperty().set(last.getHeight());
-            cutRec.visibleProperty().setValue(true);
-            cutRec.setCursor(Cursor.CROSSHAIR);
-            cutRec.setFill(Color.rgb(0, 0, 0, 0));
-
-            CanvasProperties canvasProperties = new CanvasProperties(graphicsContext, cutRec);
-            // 默认注册拖动事件
-            cutRec.addEventHandler(Event.ANY, new DragSizeSnapshotCanvasEventHandler(canvasProperties, this));
-
-            // 设置工具位置
-            // 绑定数据
-            toolbar.visibleProperty().bind(cutRec.visibleProperty());
-            toolbar.layoutXProperty().bind(cutRec.xProperty());
-            toolbar.layoutYProperty().bind(Bindings.add(cutRec.yProperty(), cutRec.heightProperty()));
-            group.getChildren().addAll(cutRec, toolbar);
-            // 存放截图相关数据
-            group.getScene().getWindow().getProperties().put(CanvasProperties.class, canvasProperties);
-        }
-    }
 
     protected void draw(MouseEvent event) {
         // 判断需要新增和移除的矩形区域
+        // 获取鼠标当前位置
         double x = event.getScreenX();
         double y = event.getScreenY();
         double currentX = min(startX, x);
@@ -105,43 +104,57 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
         double width = subAbs(x, startX);
         double height = subAbs(y, startY);
         // 计算需要进行绘制的区域
-        DrawRectangle newDraw = new DrawRectangle(currentX, currentY, width, height);
+        Bounds newDraw = new Bounds(currentX, currentY, width, height);
         draw(newDraw);
+        last = newDraw;
     }
 
-    public void draw(DrawRectangle drawRectangle) {
-        doDraw(drawRectangle);
-        last = drawRectangle;
+    public void draw(Bounds bounds) {
+        doDraw(bounds);
     }
 
-    private void doDraw(DrawRectangle newDraw) {
-        drawMasking(new DrawRectangle(0, 0, graphicsContext.getCanvas().getWidth(), graphicsContext.getCanvas().getHeight()));
+    private void doDraw(Bounds newDraw) {
+        // 绘制蒙版
+        drawMasking(new Bounds(0, 0, graphicsContext.getCanvas().getWidth(), graphicsContext.getCanvas().getHeight()));
+        // 绘制截图区域
         drawCut(newDraw);
     }
 
 
-    private void drawMasking(DrawRectangle rectangle) {
+    private void drawMasking(Bounds rectangle) {
         graphicsContext.clearRect(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight());
         graphicsContext.setFill(masking);
         graphicsContext.fillRect(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight());
     }
 
-    private void drawCut(DrawRectangle rectangle) {
+    private void drawCut(Bounds rectangle) {
         graphicsContext.clearRect(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight());
         graphicsContext.setFill(Color.TRANSPARENT);
+        graphicsContext.setStroke(Color.RED);
         graphicsContext.strokeRect(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight());
         graphicsContext.fillRect(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight());
     }
 
-    private double subAbs(double v1, double v2) {
-        return v1 > v2 ? v1 - v2 : v2 - v1;
-    }
+    protected void beforeDone(Pane p) {
+        if (start){
+            return;
+        }
+        // 鼠标划选了一个区域
+        if (last.getWidth() > 0 && last.getHeight() > 0) {
+            // 生成需要处理区域的矩形
+            cutRec.xProperty().set(last.getX());
+            cutRec.yProperty().set(last.getY());
+            cutRec.widthProperty().set(last.getWidth());
+            cutRec.heightProperty().set(last.getHeight());
+            cutRec.visibleProperty().setValue(true);
+            cutRec.setCursor(Cursor.CROSSHAIR);
+            cutRec.setFill(Color.TRANSPARENT);
 
-    private double min(double v1, double v2) {
-        return v1 > v2 ? v2 : v1;
-    }
-
-    private double max(double v1, double v2) {
-        return v1 < v2 ? v2 : v1;
+            CanvasProperties canvasProperties = new CanvasProperties(graphicsContext, cutRec);
+            // 为截图区域注册事件
+            cutRec.addEventHandler(MouseEvent.ANY, new RoutingSnapshotCanvasEventHandler(canvasProperties, this));
+            // 存放截图相关数据
+            pane.getScene().getWindow().getProperties().put(CanvasProperties.class, canvasProperties);
+        }
     }
 }

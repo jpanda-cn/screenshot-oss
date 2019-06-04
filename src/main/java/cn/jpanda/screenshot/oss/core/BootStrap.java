@@ -13,9 +13,15 @@ import cn.jpanda.screenshot.oss.core.persistence.interceptor.encrypt.EncryptGetV
 import cn.jpanda.screenshot.oss.core.persistence.interceptor.encrypt.EncryptSetValueInterceptor;
 import cn.jpanda.screenshot.oss.core.scan.BootStrapClassScanRegistry;
 import cn.jpanda.screenshot.oss.core.scan.SceneBeanRegistry;
+import cn.jpanda.screenshot.oss.store.ClipboardCallbackRegister;
+import cn.jpanda.screenshot.oss.store.TextClipboardCallback;
+import cn.jpanda.screenshot.oss.view.image.LocalFileImageStoreConfig;
+import cn.jpanda.screenshot.oss.view.image.LocalImageStore;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
+
+import java.nio.file.Paths;
 
 public abstract class BootStrap extends Application {
     public static Configuration configuration = new Configuration();
@@ -42,6 +48,7 @@ public abstract class BootStrap extends Application {
         loadCurrentWorkDir();
         // 初始化主配置文件名称
         loadMainConfigFileName();
+        // 注册属性拦截器
         registryValueInterceptor();
         // 初始化类加载器，获取类加载器并执行注册操作
         // 初始化全局配置文件
@@ -51,10 +58,20 @@ public abstract class BootStrap extends Application {
         loadDataPersistenceStrategy();
         // 加载屏幕截图实现类
         loadScreenCapture();
+        registryImageStoreChannel(configuration.getImageStoreRegisterManager());
+        registryClipboardCallback(configuration.getClipboardCallbackRegistryManager());
         // 类扫描加载注册器
         doBeanRegistry();
+
     }
 
+    protected void registryClipboardCallback(ClipboardCallbackRegistryManager clipboardCallbackRegistryManager) {
+        clipboardCallbackRegistryManager.registry(ClipboardCallbackRegister.builder().name("地址").clipboardCallback(new TextClipboardCallback()).build());
+    }
+
+    protected void registryImageStoreChannel(ImageStoreRegisterManager imageStoreRegisterManager) {
+        imageStoreRegisterManager.registry(ImageStoreRegister.builder().name("本地存储").imageStore(new LocalImageStore()).imageConfig(LocalFileImageStoreConfig.class).build());
+    }
 
     protected void doBeanRegistry() {
         BootStrapClassScanRegistry bootStrapClassScanRegistry = new BootStrapClassScanRegistry();
@@ -78,7 +95,7 @@ public abstract class BootStrap extends Application {
     }
 
     protected void loadCurrentWorkDir() {
-        configuration.setCurrentWorkDir(JarUtils.getCurrentJarDirectory());
+        configuration.setCurrentWorkDir(Paths.get(JarUtils.getCurrentJarDirectory()).toFile().getAbsolutePath());
     }
 
     protected void loadMainConfigFileName() {

@@ -2,7 +2,6 @@ package cn.jpanda.screenshot.oss.core.context;
 
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import lombok.SneakyThrows;
@@ -45,6 +44,7 @@ public class DefaultViewContext implements ViewContext {
     @SneakyThrows
     public Scene getScene(Class<? extends Initializable> clazz, boolean isNew, boolean override) {
         String key = generatorViewKey(clazz);
+
         if (isNew) {
             if (override) {
                 registry(clazz);
@@ -55,6 +55,8 @@ public class DefaultViewContext implements ViewContext {
         }
         if (views.containsKey(key)) {
             return views.get(key);
+        }else {
+            registry(clazz);
         }
 
         return views.get(key);

@@ -20,7 +20,7 @@ public class EncryptGetValueInterceptor implements GetValueInterceptor {
     public String interceptor(Field field, String object) {
         if (field.isAnnotationPresent(Encrypt.class)) {
             if (configuration.usePassword() && StringUtils.isNotEmpty(configuration.getPassword())) {
-                return DESUtils.decrypt(configuration.getPassword().getBytes(), object.getBytes());
+                return DESUtils.decrypt(object.getBytes(),configuration.getPassword().getBytes() );
             }
         }
         return object;

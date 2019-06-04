@@ -11,4 +11,5 @@ public class MainViewConfig implements Persistence {
      * 是否使用主控密码
      */
     private boolean usePassword;
+
 }

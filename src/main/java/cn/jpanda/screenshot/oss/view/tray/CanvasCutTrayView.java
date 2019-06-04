@@ -1,18 +1,22 @@
 package cn.jpanda.screenshot.oss.view.tray;
 
+import cn.jpanda.screenshot.oss.core.BootStrap;
 import cn.jpanda.screenshot.oss.core.annotations.FX;
+import cn.jpanda.screenshot.oss.core.configuration.Configuration;
+import cn.jpanda.screenshot.oss.core.context.ViewContext;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
-import javafx.event.EventHandler;
+import cn.jpanda.screenshot.oss.view.tray.subs.TrayColorView;
+import cn.jpanda.screenshot.oss.view.tray.subs.TrayPointView;
+import com.sun.istack.internal.Nullable;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Cursor;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -22,6 +26,10 @@ import java.util.ResourceBundle;
  */
 @FX
 public class CanvasCutTrayView implements Initializable {
+
+    private Configuration configuration = BootStrap.configuration;
+    @FXML
+    public Button drag;
     @FXML
     public Button roundness;
     @FXML
@@ -43,47 +51,83 @@ public class CanvasCutTrayView implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        bar.getChildren().addListener((ListChangeListener<Node>) c -> c.getList().forEach((n) -> {
+            n.visibleProperty().setValue(true);
+        }));
     }
 
     private void initRectangle() {
         canvasProperties = (CanvasProperties) submit.getScene().getWindow().getProperties().get(CanvasProperties.class);
     }
 
-    public void doRoundness(MouseEvent event) {
-        Rectangle rectangle = canvasProperties.getCutRectangle();
-        rectangle.setCursor(Cursor.CROSSHAIR);
+    // 画圆
+    public void doRoundness() {
         // 尝试初始化
         initRectangle();
-            Canvas canvas = new Canvas(rectangle.getWidth(), rectangle.getHeight());
-            canvas.layoutXProperty().bindBidirectional(rectangle.xProperty());
-            canvas.layoutYProperty().bindBidirectional(rectangle.yProperty());
-            canvas.widthProperty().bindBidirectional(rectangle.widthProperty());
-            canvas.heightProperty().bindBidirectional(rectangle.heightProperty());
-            rectangle.toBack();
-            canvas.toFront();
-            canvas.setCursor(Cursor.CROSSHAIR);
-            canvas.addEventHandler(MouseEvent.ANY, new EventHandler<MouseEvent>() {
-                private double startX;
-                private double startY;
-                private double lastX;
-                private double lastY;
-
-                @Override
-                public void handle(MouseEvent event) {
-                    if (event.getEventType().equals(MouseEvent.MOUSE_PRESSED)) {
-                        startX = event.getScreenX();
-                        startY = event.getScreenY();
-                        lastX = startX;
-                        lastY = startY;
-                    } else if (event.getEventType().equals(MouseEvent.MOUSE_DRAGGED)) {
-                        GraphicsContext
-                                g = canvas.getGraphicsContext2D();
-                        g.clearRect(startX, startY, lastX, lastY);
-                        g.setFill(Color.RED);
-                        g.fillRect(startX, startY, event.getScreenX() - startY, event.getScreenY() - startY);
-                    }
-                }
-            });
-        }
+        canvasProperties.setCutInnerType(CutInnerType.ROUNDNESS);
+        ViewContext v = configuration.getViewContext();
+        Pane points = (Pane) v.getScene(TrayPointView.class).getRoot();
+        Pane colors = (Pane) v.getScene(TrayColorView.class).getRoot();
+        add2Bar(new HBox(points, colors));
+        // 为圆形框内的每个元素添加事件
     }
+
+    public void doRectangle() {
+        // 尝试初始化
+        initRectangle();
+        canvasProperties.setCutInnerType(CutInnerType.RECTANGLE);
+        // 生成左侧大小按钮
+        ViewContext v = configuration.getViewContext();
+        Pane points = (Pane) v.getScene(TrayPointView.class).getRoot();
+        Pane colors = (Pane) v.getScene(TrayColorView.class).getRoot();
+        add2Bar(new HBox(points, colors));
+        // 为圆形框内的每个元素添加事件
+    }
+
+    public void doArrow() {
+        initRectangle();
+        canvasProperties.setCutInnerType(CutInnerType.ARROW);
+        ViewContext v = configuration.getViewContext();
+        Pane points = (Pane) v.getScene(TrayPointView.class).getRoot();
+        Pane colors = (Pane) v.getScene(TrayColorView.class).getRoot();
+        add2Bar(new HBox(points, colors));
+    }
+
+    public void doPen() {
+        initRectangle();
+        canvasProperties.setCutInnerType(CutInnerType.PEN);
+        ViewContext v = configuration.getViewContext();
+        Pane points = (Pane) v.getScene(TrayPointView.class).getRoot();
+        Pane colors = (Pane) v.getScene(TrayColorView.class).getRoot();
+        add2Bar(new HBox(points, colors));
+    }
+
+
+    // 拖动
+    public void doDrag() {
+        initRectangle();
+        canvasProperties.setCutInnerType(CutInnerType.DRAG);
+        add2Bar(new HBox());
+    }
+
+    public void add2Bar(@Nullable Node... nodes) {
+        ObservableList<Node> child = bar.getChildren();
+        if (child != null && child.size() > 0) {
+            child.forEach((n) -> {
+                n.visibleProperty().setValue(false);
+            });
+            child.clear();
+
+        }
+        if (nodes == null || nodes.length == 0) {
+            return;
+        }
+        for (Node n : nodes) {
+            if (n == null) {
+                continue;
+            }
+            bar.getChildren().add(n);
+        }
+
+    }
+}

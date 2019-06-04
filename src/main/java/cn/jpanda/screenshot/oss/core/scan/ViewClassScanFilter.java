@@ -18,7 +18,6 @@ public class ViewClassScanFilter implements ClassScanFilter {
      * 需要跳过处理的注解类型
      */
     private List<Class<? extends Annotation>> shouldContinueAnnotationType = Arrays.asList(Documented.class, Retention.class, Target.class);
-
     @Override
     public boolean doFilter(Class clazz) {
         if (Annotation.class.isAssignableFrom(clazz)) {

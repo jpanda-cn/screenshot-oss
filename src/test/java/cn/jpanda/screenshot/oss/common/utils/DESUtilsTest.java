@@ -1,5 +1,6 @@
 package cn.jpanda.screenshot.oss.common.utils;
 
+import lombok.SneakyThrows;
 import org.junit.Test;
 
 import javax.crypto.BadPaddingException;
@@ -33,7 +34,7 @@ public class DESUtilsTest {
 
     @Test
     public void decrypt() throws NoSuchPaddingException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidKeySpecException {
-
+        System.out.println(DESUtils.decrypt(CIPHERTEXT.getBytes(), SECRET_KEY.getBytes()));
         assert CONTENT.equals(DESUtils.decrypt(CIPHERTEXT.getBytes(), SECRET_KEY.getBytes()));
     }
 

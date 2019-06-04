@@ -1,7 +1,16 @@
 package cn.jpanda.screenshot.oss.core;
 
+import cn.jpanda.screenshot.oss.store.ImageStore;
 import javafx.fxml.Initializable;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ImageStoreRegister {
     /**
      * 渠道名称，比如阿里OSS,七牛OSS,本地存储
@@ -16,6 +25,5 @@ public class ImageStoreRegister {
     /**
      * 图片配置模块
      */
-    private Initializable imageConfig;
-
+    private Class<? extends Initializable> imageConfig;
 }
