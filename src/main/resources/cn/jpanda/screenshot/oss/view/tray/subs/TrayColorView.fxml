@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.HBox?>
+<HBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="cn.jpanda.screenshot.oss.view.tray.subs.TrayColorView">
+    <Button fx:id="red" onMouseClicked="#red">
+        <graphic>
+            <ImageView fitHeight="25.0" fitWidth="25.0">
+                <Image url="@/images/tray/color/red.png"/>
+            </ImageView>
+        </graphic>
+    </Button>
+    <Button fx:id="yellow" onMouseClicked="#yellow">
+        <graphic>
+            <ImageView fitHeight="25.0" fitWidth="25.0">
+                <Image url="@/images/tray/color/yellow.png"/>
+            </ImageView>
+        </graphic>
+    </Button>
+    <Button fx:id="blue" onMouseClicked="#blue">
+        <graphic>
+            <ImageView fitHeight="25.0" fitWidth="25.0">
+                <Image url="@/images/tray/color/blue.png"/>
+            </ImageView>
+        </graphic>
+    </Button>
+    <Button fx:id="green" onMouseClicked="#green">
+        <graphic>
+            <ImageView fitHeight="25.0" fitWidth="25.0">
+                <Image url="@/images/tray/color/green.png"/>
+            </ImageView>
+        </graphic>
+    </Button>
+    <Button fx:id="black" onMouseClicked="#black">
+        <graphic>
+            <ImageView fitHeight="25.0" fitWidth="25.0">
+                <Image url="@/images/tray/color/black.png"/>
+            </ImageView>
+        </graphic>
+    </Button>
+    <Button fx:id="white" onMouseClicked="#white">
+        <graphic>
+            <ImageView fitHeight="25.0" fitWidth="25.0">
+                <Image url="@/images/tray/color/white.png"/>
+            </ImageView>
+        </graphic>
+    </Button>
+</HBox>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane prefHeight="121.0" prefWidth="283.0" xmlns="http://javafx.com/javafx/10.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="cn.jpanda.screenshot.oss.view.image.LocalFileImageStoreConfig">
+    <!-- 打开一个文件菜单，获取一个保存地址-->
+    <Label layoutX="26.0" layoutY="39.0" text="路径"/>
+    <TextField fx:id="show" layoutX="60.0" layoutY="35.0"/>
+    <Button fx:id="chose" layoutX="234.0" layoutY="35.0" mnemonicParsing="false" text="..." onMouseClicked="#chose"/>
+    <Button fx:id="cancel" layoutX="50.0" layoutY="77.0" mnemonicParsing="false" text="取消" onMouseClicked="#cancel"/>
+    <Button fx:id="save" layoutX="166.0" layoutY="77.0" mnemonicParsing="false" text="保存" onMouseClicked="#save"/>
+</AnchorPane>

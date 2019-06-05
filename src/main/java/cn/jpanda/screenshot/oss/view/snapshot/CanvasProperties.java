@@ -17,12 +17,6 @@ public class CanvasProperties {
      * 全局的画布对象
      */
     private GraphicsContext globalGraphicsContext;
-
-    /**
-     * 截图区域的画布对象
-     */
-    private GraphicsContext cutGc;
-
     /**
      * 截图容器
      */
@@ -43,12 +37,6 @@ public class CanvasProperties {
         this.globalGraphicsContext = globalGraphicsContext;
         this.cutRectangle = cutRectangle;
         cutPane = ((Group) (cutRectangle.getParent()));
-        // 生成截图区域内的画板
-        Canvas canvas = new Canvas();
-        cutGc = canvas.getGraphicsContext2D();
-        cutPane.getChildren().addAll(canvas);
-        canvas.toBack();
-
     }
 
     public TrayConfig getTrayConfig(CutInnerType key) {

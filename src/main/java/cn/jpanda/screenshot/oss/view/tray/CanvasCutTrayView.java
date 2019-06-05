@@ -102,6 +102,14 @@ public class CanvasCutTrayView implements Initializable {
         add2Bar(new HBox(points, colors));
     }
 
+    public void doText() {
+        initRectangle();
+        canvasProperties.setCutInnerType(CutInnerType.TEXT);
+        ViewContext v = configuration.getViewContext();
+        Pane points = (Pane) v.getScene(TrayPointView.class).getRoot();
+        Pane colors = (Pane) v.getScene(TrayColorView.class).getRoot();
+        add2Bar(new HBox(points, colors));
+    }
 
     // 拖动
     public void doDrag() {
