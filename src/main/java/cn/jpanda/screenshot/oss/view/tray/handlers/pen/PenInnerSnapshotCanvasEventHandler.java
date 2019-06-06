@@ -49,8 +49,8 @@ public class PenInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEvent
         GraphicsContext gc = canvas.getGraphicsContext2D();
         // 生成一个新的矩形
         // 配置矩形颜色和宽度
-        gc.setLineWidth(config.getStroke());
-        gc.setStroke(config.getStrokeColor());
+        gc.setLineWidth(config.getStroke().get());
+        gc.setStroke(config.getStrokeColor().get());
 
     }
 

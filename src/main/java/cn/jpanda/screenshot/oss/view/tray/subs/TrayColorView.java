@@ -44,6 +44,6 @@ public class TrayColorView implements Initializable {
 
     private void changeColor(Color color) {
         CanvasProperties canvasProperties = (CanvasProperties) red.getScene().getWindow().getProperties().get(CanvasProperties.class);
-        canvasProperties.getCurrentConfig().setStrokeColor(color);
+        canvasProperties.getCurrentConfig().getStrokeColor().set(color);
     }
 }

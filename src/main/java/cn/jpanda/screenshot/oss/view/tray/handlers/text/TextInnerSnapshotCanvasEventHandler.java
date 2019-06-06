@@ -4,14 +4,17 @@ import cn.jpanda.screenshot.oss.service.snapshot.inner.InnerSnapshotCanvasEventH
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import cn.jpanda.screenshot.oss.view.tray.CutInnerType;
+import cn.jpanda.screenshot.oss.view.tray.handlers.ShapeCovertHelper;
 import cn.jpanda.screenshot.oss.view.tray.handlers.TrayConfig;
+import cn.jpanda.screenshot.oss.view.tray.handlers.rectangle.DragRectangleEventHandler;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
-import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Text;
 
 
 /**
@@ -22,8 +25,8 @@ import javafx.scene.text.Text;
  */
 public class TextInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEventHandler {
     private Group group;
-    private TextField text;
-    private Rectangle rec;
+    private ScrollFreeTextArea2 text;
+    private Rectangle dragRec;
 
     public TextInnerSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler) {
         super(canvasProperties, canvasDrawEventHandler);
@@ -36,45 +39,68 @@ public class TextInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEven
 
     @Override
     protected void press(MouseEvent event) {
-        if (group != null) {
-            group.setMouseTransparent(true);
-            if (rec != null) {
-                rec.setStroke(Color.TRANSPARENT);
-            }
-        }   // 展示文字的矩形
-        text = new TextField();
+        clear();
+        initText(event);
+        //  在外部添加一个矩形框
+        dragRec = ShapeCovertHelper.toRectangle(text);
+        dragRec.fillProperty().set(Color.TRANSPARENT);
+        dragRec.strokeProperty().set(Color.RED);
+        // 宽度+10 ，前5后5用于移动
+        dragRec.xProperty().addListener((observable, oldValue, newValue) -> dragRec.maxWidth(rectangle.widthProperty().add(rectangle.xProperty()).subtract(newValue.doubleValue()).get()));
+        dragRec.yProperty().addListener((observable, oldValue, newValue) -> dragRec.maxHeight(rectangle.heightProperty().add(rectangle.yProperty()).subtract(newValue.doubleValue()).get()));
+        dragRec.widthProperty().bind(text.widthProperty().add(10));
+        dragRec.heightProperty().bind(text.heightProperty().add(10));
+
+        text.layoutXProperty().bind(dragRec.xProperty().add(5));
+        text.layoutYProperty().bind(dragRec.yProperty().add(5));
+        text.maxWidthProperty().bind(rectangle.widthProperty().add(rectangle.xProperty()).subtract(text.layoutXProperty()).subtract(5));
+        text.maxHeightProperty().bind(rectangle.heightProperty().add(rectangle.yProperty()).subtract(text.layoutYProperty()).subtract(5));
+//        text.prefWidthProperty().bind(dragRec.widthProperty());
+//        text.prefHeightProperty().bind(dragRec.heightProperty());
+        // 调整初始高度
+        group.getChildren().addAll(dragRec);
+        dragRec.toBack();
+        // 添加一个拖动事件
+        dragRec.addEventFilter(MouseEvent.ANY, new DragRectangleEventHandler(dragRec, rectangle, null));
+    }
+
+
+    private void initText(MouseEvent event) {
+        // 配置类
         TrayConfig config = canvasProperties.getTrayConfig(CutInnerType.TEXT);
-        text.fontProperty().set(config.getFont());
 
-
-        // 绘制矩形
-        rec = new Rectangle();
-        rec.fillProperty().set(Color.TRANSPARENT);
-        rec.xProperty().set(event.getScreenX());
-        rec.yProperty().set(event.getScreenY());
-        rec.strokeProperty().set(Color.RED);
-        rec.widthProperty().bind(text.widthProperty());
-        rec.heightProperty().bind(text.heightProperty());
+        text = new ScrollFreeTextArea2();
+        text.getStylesheets().add("/css/text-area-transparent.css");
 
         // 放置文本框
-        text.setStyle("-fx-background-color: transparent");
-//        text.opacityProperty().set(0.3);
-        text.layoutXProperty().bind(rec.xProperty());
-        text.layoutYProperty().bind(rec.yProperty());
-        Text t2 = new Text();
-        t2.fillProperty().set(config.getStrokeColor());
-        t2.layoutXProperty().bind(rec.xProperty());
-        t2.layoutYProperty().bind(rec.yProperty());
-        t2.wrappingWidthProperty().bind(text.widthProperty());
-        t2.textProperty().bind(text.textProperty());
-        group = new Group(text, rec, t2);
-        t2.toBack();
-        text.toFront();
+        text.layoutXProperty().set(event.getScreenX());
+        text.layoutYProperty().set(event.getScreenY());
+        // 调整高度
+        group = new Group(text);
         canvasProperties.getCutPane().getChildren().addAll(group);
-        text.requestFocus();
+        text.getLabel().textFillProperty().set(Color.TRANSPARENT);
+        config.getStrokeColor().addListener((ChangeListener<Paint>) (observable, oldValue, newValue) -> {
+            String rgb = color2RGBA((Color) newValue);
+            text.getTextArea().setStyle(String.format("-fx-text-fill: %s", rgb));
+        });
+        text.getTextArea().fontProperty().bind(config.getFont());
+        text.getLabel().fontProperty().bind(config.getFont());
+        text.getTextArea().requestFocus();
+    }
 
-
-//        text.setStyle("color: " + color2RGBA(config.getStrokeColor()));
+    private void clear() {
+        if (group != null) {
+            group.setMouseTransparent(true);
+        }
+        // 移除绑定关系
+        if (text != null) {
+            text.getTextArea().fontProperty().unbind();
+            text.getLabel().fontProperty().unbind();
+        }
+        if (dragRec != null) {
+            dragRec.strokeProperty().set(Color.TRANSPARENT);
+            dragRec.visibleProperty().setValue(false);
+        }
     }
 
     private String color2RGBA(Color color) {
@@ -82,6 +108,7 @@ public class TextInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEven
         double g = color.getGreen();
         double b = color.getBlue();
         double a = color.getOpacity();
-        return String.format("rgba(%f,%f,%f,%f)", r, g, b, a);
+        return String.format("rgba(%f,%f,%f,%f)", r * 255, g * 255, b * 255, a);
     }
+
 }

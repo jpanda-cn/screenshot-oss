@@ -6,6 +6,7 @@ import cn.jpanda.screenshot.oss.core.configuration.Configuration;
 import cn.jpanda.screenshot.oss.core.context.ViewContext;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import cn.jpanda.screenshot.oss.view.tray.subs.TrayColorView;
+import cn.jpanda.screenshot.oss.view.tray.subs.TrayFontView;
 import cn.jpanda.screenshot.oss.view.tray.subs.TrayPointView;
 import com.sun.istack.internal.Nullable;
 import javafx.collections.ListChangeListener;
@@ -106,9 +107,9 @@ public class CanvasCutTrayView implements Initializable {
         initRectangle();
         canvasProperties.setCutInnerType(CutInnerType.TEXT);
         ViewContext v = configuration.getViewContext();
-        Pane points = (Pane) v.getScene(TrayPointView.class).getRoot();
+        Pane fonts = (Pane) v.getScene(TrayFontView.class).getRoot();
         Pane colors = (Pane) v.getScene(TrayColorView.class).getRoot();
-        add2Bar(new HBox(points, colors));
+        add2Bar(new HBox( fonts,colors));
     }
 
     // 拖动

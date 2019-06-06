@@ -41,8 +41,8 @@ public class ArrowInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEve
         TrayConfig config = canvasProperties.getTrayConfig(CutInnerType.ARROW);
         // 生成一个新的矩形
         // 配置矩形颜色和宽度
-        arrow.setStrokeWidth(config.getStroke());
-        arrow.setStroke(config.getStrokeColor());
+        arrow.strokeWidthProperty().bind(config.getStroke());
+        arrow.strokeProperty().bind(config.getStrokeColor());
         arrow.startXProperty().set(x);
         arrow.startYProperty().set(y);
         arrow.endXProperty().set(x);

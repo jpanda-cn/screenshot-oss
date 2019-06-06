@@ -84,7 +84,7 @@ public class LimitRectangleEventHandler extends GeneralSplitMouseEventHandler {
         if (parent == null) {
             return true;
         }
-        return x >= parent.xProperty().get();
+        return x >= parent.xProperty().get() && x <= parent.xProperty().add(parent.widthProperty()).subtract(rectangle.widthProperty()).get();
     }
 
     protected boolean checkOutSubsX(double x) {
@@ -100,7 +100,7 @@ public class LimitRectangleEventHandler extends GeneralSplitMouseEventHandler {
         if (parent == null) {
             return true;
         }
-        return y >= parent.yProperty().get();
+        return y >= parent.yProperty().get() && y <= parent.yProperty().add(parent.heightProperty()).subtract(rectangle.heightProperty()).get();
     }
 
     protected boolean checkOutSubsY(double y) {

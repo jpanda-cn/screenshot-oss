@@ -42,6 +42,6 @@ public class TrayPointView implements Initializable {
 
     private void changeStokeSize(double size) {
         CanvasProperties canvasProperties = (CanvasProperties) smallPoint.getScene().getWindow().getProperties().get(CanvasProperties.class);
-        canvasProperties.getCurrentConfig().setStroke(size);
+        canvasProperties.getCurrentConfig().getStroke().set(size);
     }
 }

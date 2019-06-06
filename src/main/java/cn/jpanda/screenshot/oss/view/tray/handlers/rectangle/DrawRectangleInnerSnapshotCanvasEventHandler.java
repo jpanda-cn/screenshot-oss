@@ -32,18 +32,13 @@ public class DrawRectangleInnerSnapshotCanvasEventHandler extends InnerSnapshotC
     @Override
     protected void press(MouseEvent event) {
         // 鼠标按下时，清理之前生成的矩形组的事件
-        if (rectangleGroup != null) {
-            rectangleGroup.setMouseTransparent(true);
-            if (dragRectangle != null) {
-                dragRectangle.visibleProperty().setValue(false);
-            }
-        }
+        clear();
         TrayConfig config = canvasProperties.getTrayConfig(CutInnerType.RECTANGLE);
         // 生成一个新的矩形
         currentRectangle = new Rectangle(0, 0);
         // 配置矩形颜色和宽度
-        currentRectangle.setStrokeWidth(config.getStroke());
-        currentRectangle.setStroke(config.getStrokeColor());
+        currentRectangle.strokeWidthProperty().bind(config.getStroke());
+        currentRectangle.strokeProperty().bind(config.getStrokeColor());
         currentRectangle.setFill(Color.TRANSPARENT);
         // 记录鼠标开始节点
         x = event.getScreenX();
@@ -78,5 +73,21 @@ public class DrawRectangleInnerSnapshotCanvasEventHandler extends InnerSnapshotC
         dragRectangle.addEventFilter(MouseEvent.ANY, new DragRectangleEventHandler(dragRectangle, rectangle, null));
         // 添加变更大小事件
         new RectangleAddTag2ResizeBinding(dragRectangle, rectangle).bind();
+        dragRectangle.requestFocus();
+        dragRectangle.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) {
+                clear();
+            }
+        });
+    }
+
+    private void clear() {
+        // 鼠标按下时，清理之前生成的矩形组的事件
+        if (rectangleGroup != null) {
+            rectangleGroup.setMouseTransparent(true);
+            if (dragRectangle != null) {
+                dragRectangle.visibleProperty().setValue(false);
+            }
+        }
     }
 }
