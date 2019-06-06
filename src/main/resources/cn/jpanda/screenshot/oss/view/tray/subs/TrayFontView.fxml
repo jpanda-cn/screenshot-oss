@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.layout.HBox?>
+<HBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="cn.jpanda.screenshot.oss.view.tray.subs.TrayFontView">
+    <ChoiceBox fx:id="fontFamily" prefHeight="32" prefWidth="82.0"/>
+    <ChoiceBox fx:id="size" prefHeight="32" prefWidth="20.0"/>
+</HBox>
