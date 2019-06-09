@@ -63,6 +63,16 @@ public class CutView implements Initializable {
         stage.showAndWait();
     }
 
+    public void toChoseScreen(){
+        Stage stage = new Stage();
+        stage.initOwner(configuration.getViewContext().getStage());
+        stage.setX(Math.max(stage.getOwner().xProperty().getValue(),0));
+        stage.setY(Math.max(stage.getOwner().yProperty().getValue(),0));
+        stage.initStyle(StageStyle.UNDECORATED);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setScene(configuration.getViewContext().getScene(ChoseScreenView.class, true, false));
+        stage.showAndWait();
+    }
     public void toKeySettings(KeyEvent event) {
         if (event.getCode().equals(KeyCode.SPACE) || event.getCode().equals(KeyCode.ENTER)) {
             toSettings();
