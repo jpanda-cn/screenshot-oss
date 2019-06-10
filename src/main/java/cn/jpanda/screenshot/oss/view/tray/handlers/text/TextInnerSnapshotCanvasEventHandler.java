@@ -8,7 +8,6 @@ import cn.jpanda.screenshot.oss.view.tray.handlers.ShapeCovertHelper;
 import cn.jpanda.screenshot.oss.view.tray.handlers.TrayConfig;
 import cn.jpanda.screenshot.oss.view.tray.handlers.rectangle.DragRectangleEventHandler;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.input.MouseEvent;
@@ -25,7 +24,7 @@ import javafx.scene.shape.Rectangle;
  */
 public class TextInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEventHandler {
     private Group group;
-    private ScrollFreeTextArea2 text;
+    private TextRectangle text;
     private Rectangle dragRec;
 
     public TextInnerSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler) {
@@ -46,17 +45,18 @@ public class TextInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEven
         dragRec.fillProperty().set(Color.TRANSPARENT);
         dragRec.strokeProperty().set(Color.RED);
         // 宽度+10 ，前5后5用于移动
-        dragRec.xProperty().addListener((observable, oldValue, newValue) -> dragRec.maxWidth(rectangle.widthProperty().add(rectangle.xProperty()).subtract(newValue.doubleValue()).get()));
-        dragRec.yProperty().addListener((observable, oldValue, newValue) -> dragRec.maxHeight(rectangle.heightProperty().add(rectangle.yProperty()).subtract(newValue.doubleValue()).get()));
+//        dragRec.xProperty().addListener((observable, oldValue, newValue) -> {
+
+//            dragRec.maxWidth(rectangle.widthProperty().add(rectangle.xProperty()).subtract(newValue.doubleValue()).get());
+//        });
+//        dragRec.yProperty().addListener((observable, oldValue, newValue) -> dragRec.maxHeight(rectangle.heightProperty().add(rectangle.yProperty()).subtract(newValue.doubleValue()).get()));
         dragRec.widthProperty().bind(text.widthProperty().add(10));
         dragRec.heightProperty().bind(text.heightProperty().add(10));
 
         text.layoutXProperty().bind(dragRec.xProperty().add(5));
         text.layoutYProperty().bind(dragRec.yProperty().add(5));
-        text.maxWidthProperty().bind(rectangle.widthProperty().add(rectangle.xProperty()).subtract(text.layoutXProperty()).subtract(5));
-        text.maxHeightProperty().bind(rectangle.heightProperty().add(rectangle.yProperty()).subtract(text.layoutYProperty()).subtract(5));
-//        text.prefWidthProperty().bind(dragRec.widthProperty());
-//        text.prefHeightProperty().bind(dragRec.heightProperty());
+//        text.maxWidthProperty().bind(rectangle.widthProperty().add(rectangle.xProperty()).subtract(text.layoutXProperty()).subtract(5));
+//        text.maxHeightProperty().bind(rectangle.heightProperty().add(rectangle.yProperty()).subtract(text.layoutYProperty()).subtract(5));
         // 调整初始高度
         group.getChildren().addAll(dragRec);
         dragRec.toBack();
@@ -69,7 +69,7 @@ public class TextInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEven
         // 配置类
         TrayConfig config = canvasProperties.getTrayConfig(CutInnerType.TEXT);
 
-        text = new ScrollFreeTextArea2();
+        text = new TextRectangle(rectangle);
         text.getStylesheets().add("/css/text-area-transparent.css");
 
         // 放置文本框
@@ -78,13 +78,11 @@ public class TextInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEven
         // 调整高度
         group = new Group(text);
         canvasProperties.getCutPane().getChildren().addAll(group);
-        text.getLabel().textFillProperty().set(Color.TRANSPARENT);
         config.getStrokeColor().addListener((ChangeListener<Paint>) (observable, oldValue, newValue) -> {
             String rgb = color2RGBA((Color) newValue);
             text.getTextArea().setStyle(String.format("-fx-text-fill: %s", rgb));
         });
         text.getTextArea().fontProperty().bind(config.getFont());
-        text.getLabel().fontProperty().bind(config.getFont());
         text.getTextArea().requestFocus();
     }
 
@@ -95,7 +93,7 @@ public class TextInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEven
         // 移除绑定关系
         if (text != null) {
             text.getTextArea().fontProperty().unbind();
-            text.getLabel().fontProperty().unbind();
+//            text.getLabel().fontProperty().unbind();
         }
         if (dragRec != null) {
             dragRec.strokeProperty().set(Color.TRANSPARENT);

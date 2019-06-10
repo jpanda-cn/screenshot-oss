@@ -1,6 +1,7 @@
 package cn.jpanda.screenshot.oss.view.tray.handlers;
 
 import javafx.scene.Node;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Rectangle;
@@ -30,6 +31,10 @@ public class ShapeCovertHelper {
         return new Rectangle(pane.layoutXProperty().get(), pane.layoutYProperty().get(), pane.widthProperty().get(), pane.heightProperty().get());
     }
 
+    public static Rectangle toRectangle(TextArea pane) {
+        return new Rectangle(pane.layoutXProperty().get(), pane.layoutYProperty().get(), pane.widthProperty().get(), pane.heightProperty().get());
+    }
+
     public static Rectangle toRectangle(Node node) {
         if (node instanceof Ellipse) {
             return toRectangle((Ellipse) node);
@@ -37,6 +42,8 @@ public class ShapeCovertHelper {
             return toRectangle((Rectangle) node);
         } else if (node instanceof Pane) {
             return toRectangle((Pane) node);
+        } else if (node instanceof TextArea) {
+            return toRectangle((TextArea) node);
         }
         return null;
     }
