@@ -1,3 +1,15 @@
 .text-area, .text-area .viewport, .text-area .content {
-    -fx-background-color: transparent ;
+    -fx-background-color: transparent;
+    -fx-padding: 0;
 }
+
+.scroll-pane {
+    -fx-vbar-policy: never;
+    -fx-hbar-policy: never;
+}
+/*.scroll-bar{*/
+    /*-fx-padding: 0;*/
+/*}*/
+/*.text-area .scroll-bar:vertical:disabled {*/
+    /*-fx-opacity: 0;*/
+/*}*/

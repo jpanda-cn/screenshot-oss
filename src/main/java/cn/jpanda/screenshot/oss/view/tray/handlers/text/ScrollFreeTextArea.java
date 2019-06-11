@@ -1,6 +1,7 @@
 package cn.jpanda.screenshot.oss.view.tray.handlers.text;
 
 import cn.jpanda.screenshot.oss.common.utils.StringUtils;
+import com.sun.javafx.scene.control.skin.TextAreaSkin;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Insets;
