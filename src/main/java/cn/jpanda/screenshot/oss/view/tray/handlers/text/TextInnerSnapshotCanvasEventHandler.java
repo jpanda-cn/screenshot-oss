@@ -1,19 +1,17 @@
 package cn.jpanda.screenshot.oss.view.tray.handlers.text;
 
 import cn.jpanda.screenshot.oss.service.snapshot.inner.InnerSnapshotCanvasEventHandler;
+import cn.jpanda.screenshot.oss.shape.TextRectangle;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import cn.jpanda.screenshot.oss.view.tray.CutInnerType;
-import cn.jpanda.screenshot.oss.view.tray.handlers.ShapeCovertHelper;
 import cn.jpanda.screenshot.oss.view.tray.handlers.TrayConfig;
-import cn.jpanda.screenshot.oss.view.tray.handlers.rectangle.DragRectangleEventHandler;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-import javafx.scene.shape.Rectangle;
 
 
 /**
@@ -25,7 +23,7 @@ import javafx.scene.shape.Rectangle;
 public class TextInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEventHandler {
     private Group group;
     private TextRectangle text;
-    private Rectangle dragRec;
+    private boolean onShowing = false;
 
     public TextInnerSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler) {
         super(canvasProperties, canvasDrawEventHandler);
@@ -38,67 +36,57 @@ public class TextInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEven
 
     @Override
     protected void press(MouseEvent event) {
-        clear();
+        if (onShowing) {
+            clear();
+            return;
+        }
         initText(event);
-        //  在外部添加一个矩形框
-        dragRec = ShapeCovertHelper.toRectangle(text);
-        dragRec.fillProperty().set(Color.TRANSPARENT);
-        dragRec.strokeProperty().set(Color.RED);
-        // 宽度+10 ，前5后5用于移动
-//        dragRec.xProperty().addListener((observable, oldValue, newValue) -> {
-
-//            dragRec.maxWidth(rectangle.widthProperty().add(rectangle.xProperty()).subtract(newValue.doubleValue()).get());
-//        });
-//        dragRec.yProperty().addListener((observable, oldValue, newValue) -> dragRec.maxHeight(rectangle.heightProperty().add(rectangle.yProperty()).subtract(newValue.doubleValue()).get()));
-        dragRec.widthProperty().bind(text.widthProperty().add(10));
-        dragRec.heightProperty().bind(text.heightProperty().add(10));
-
-        text.layoutXProperty().bind(dragRec.xProperty().add(5));
-        text.layoutYProperty().bind(dragRec.yProperty().add(5));
-//        text.maxWidthProperty().bind(rectangle.widthProperty().add(rectangle.xProperty()).subtract(text.layoutXProperty()).subtract(5));
-//        text.maxHeightProperty().bind(rectangle.heightProperty().add(rectangle.yProperty()).subtract(text.layoutYProperty()).subtract(5));
-        // 调整初始高度
-        group.getChildren().addAll(dragRec);
-        dragRec.toBack();
-        // 添加一个拖动事件
-        dragRec.addEventFilter(MouseEvent.ANY, new DragRectangleEventHandler(dragRec, rectangle, null));
+        onShowing = true;
     }
 
 
     private void initText(MouseEvent event) {
         // 配置类
         TrayConfig config = canvasProperties.getTrayConfig(CutInnerType.TEXT);
-
         text = new TextRectangle(rectangle);
-        text.getStylesheets().add("/css/text-area-transparent.css");
+        // 需要手动初始化一下颜色
+        text.getTextArea().setStyle(String.format("-fx-text-fill: %s", color2RGBA(config.getStrokeColor().get())));
+        text.getTextArea().fontProperty().set(config.getFont().getValue());
+
+        // 绑定
+        config.getStrokeColor().addListener((ChangeListener<Paint>) (observable, oldValue, newValue) -> {
+            text.getTextArea().setStyle(String.format("-fx-text-fill: %s", color2RGBA((Color) newValue)));
+        });
+        text.getTextArea().fontProperty().bind(config.getFont());
+
 
         // 放置文本框
-        text.layoutXProperty().set(event.getScreenX());
-        text.layoutYProperty().set(event.getScreenY());
+        text.getExtBorder().xProperty().set(event.getScreenX());
+        text.getExtBorder().yProperty().set(event.getScreenY());
         // 调整高度
         group = new Group(text);
         canvasProperties.getCutPane().getChildren().addAll(group);
-        config.getStrokeColor().addListener((ChangeListener<Paint>) (observable, oldValue, newValue) -> {
-            String rgb = color2RGBA((Color) newValue);
-            text.getTextArea().setStyle(String.format("-fx-text-fill: %s", rgb));
-        });
-        text.getTextArea().fontProperty().bind(config.getFont());
         text.getTextArea().requestFocus();
+        text.getTextArea().focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) {
+                clear();
+            }
+        });
     }
 
     private void clear() {
         if (group != null) {
             group.setMouseTransparent(true);
+            canvasProperties.putGroup(group);
         }
         // 移除绑定关系
         if (text != null) {
+            text.getTextArea().editableProperty().setValue(false);
             text.getTextArea().fontProperty().unbind();
-//            text.getLabel().fontProperty().unbind();
+            text.getExtBorder().fillProperty().set(Color.TRANSPARENT);
+            text.getExtBorder().visibleProperty().setValue(false);
         }
-        if (dragRec != null) {
-            dragRec.strokeProperty().set(Color.TRANSPARENT);
-            dragRec.visibleProperty().setValue(false);
-        }
+        onShowing = false;
     }
 
     private String color2RGBA(Color color) {

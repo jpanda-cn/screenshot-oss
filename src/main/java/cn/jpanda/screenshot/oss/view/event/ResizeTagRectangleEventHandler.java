@@ -2,7 +2,7 @@ package cn.jpanda.screenshot.oss.view.event;
 
 import cn.jpanda.screenshot.oss.common.utils.MathUtils;
 import cn.jpanda.screenshot.oss.view.snapshot.handlers.ResizeType;
-import cn.jpanda.screenshot.oss.view.tray.handlers.LimitRectangleEventHandler;
+import cn.jpanda.screenshot.oss.common.toolkit.LimitRectangleEventHandler;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
 

@@ -33,6 +33,10 @@ public class Bounds {
         return new Bounds(cx - rx, cy - ry, rx * 2, ry * 2);
     }
 
+    public Rectangle toRectangle() {
+        return new Rectangle(x, y, width, height);
+    }
+
     public double getEndX() {
         return x + width;
     }

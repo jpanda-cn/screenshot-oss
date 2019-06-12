@@ -136,7 +136,7 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
     }
 
     protected void beforeDone(Pane p) {
-        if (start){
+        if (start) {
             return;
         }
         // 鼠标划选了一个区域

@@ -12,4 +12,9 @@ public class MainViewConfig implements Persistence {
      */
     private boolean usePassword;
 
+    /**
+     * 是否使用截图预览
+     */
+    private boolean preview = true;
+
 }

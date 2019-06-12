@@ -1,4 +1,4 @@
-package cn.jpanda.screenshot.oss.view.tray.handlers;
+package cn.jpanda.screenshot.oss.common.toolkit;
 
 import cn.jpanda.screenshot.oss.view.event.ResizeTagRectangleEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.handlers.ResizeType;

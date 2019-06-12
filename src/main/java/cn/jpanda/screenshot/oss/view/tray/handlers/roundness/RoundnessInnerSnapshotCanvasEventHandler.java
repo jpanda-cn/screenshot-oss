@@ -4,9 +4,11 @@ import cn.jpanda.screenshot.oss.common.utils.MathUtils;
 import cn.jpanda.screenshot.oss.service.snapshot.inner.InnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
-import cn.jpanda.screenshot.oss.view.tray.handlers.EllipseRectangleBinding;
-import cn.jpanda.screenshot.oss.view.tray.handlers.RectangleAddTag2ResizeBinding;
-import cn.jpanda.screenshot.oss.view.tray.handlers.rectangle.DragRectangleEventHandler;
+import cn.jpanda.screenshot.oss.view.tray.CutInnerType;
+import cn.jpanda.screenshot.oss.common.toolkit.EllipseRectangleBinding;
+import cn.jpanda.screenshot.oss.common.toolkit.RectangleAddTag2ResizeBinding;
+import cn.jpanda.screenshot.oss.view.tray.handlers.TrayConfig;
+import cn.jpanda.screenshot.oss.common.toolkit.DragRectangleEventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.input.MouseEvent;
@@ -37,9 +39,11 @@ public class RoundnessInnerSnapshotCanvasEventHandler extends InnerSnapshotCanva
         if (event.getEventType().equals(MouseEvent.MOUSE_PRESSED)) {
             // 鼠标按下时，确认
             clear();
+            TrayConfig config = canvasProperties.getTrayConfig(CutInnerType.ROUNDNESS);
             ellipse = new Ellipse(0, 0, 0, 0);
-            ellipse.setStroke(Color.RED);
             ellipse.setFill(Color.rgb(0, 0, 0, 0));
+            ellipse.strokeProperty().bind(config.getStrokeColor());
+            ellipse.strokeWidthProperty().bind(config.getStroke());
             // 记录鼠标开始节点
             x = event.getScreenX();
             y = event.getScreenY();
@@ -81,7 +85,7 @@ public class RoundnessInnerSnapshotCanvasEventHandler extends InnerSnapshotCanva
                     clear();
                 }
             });
-
+            canvasProperties.putGroup(ellipseGroup);
             // 移除矩形内部事件
             // 为圆形添加事件，该事件确保在鼠标移动到圆形边界时，展示移动样式的鼠标，如果此时拖动，则移动该圆形的位置
         }
@@ -92,6 +96,8 @@ public class RoundnessInnerSnapshotCanvasEventHandler extends InnerSnapshotCanva
             ellipseGroup.setMouseTransparent(true);
             if (outRectangle != null) {
                 outRectangle.visibleProperty().setValue(false);
+                ellipse.strokeProperty().unbind();
+                ellipse.strokeWidthProperty().unbind();
             }
         }
     }

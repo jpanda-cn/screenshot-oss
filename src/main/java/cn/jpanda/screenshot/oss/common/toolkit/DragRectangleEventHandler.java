@@ -1,6 +1,6 @@
-package cn.jpanda.screenshot.oss.view.tray.handlers.rectangle;
+package cn.jpanda.screenshot.oss.common.toolkit;
 
-import cn.jpanda.screenshot.oss.view.tray.handlers.LimitRectangleEventHandler;
+import cn.jpanda.screenshot.oss.common.toolkit.LimitRectangleEventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;

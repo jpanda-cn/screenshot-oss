@@ -7,9 +7,11 @@ import cn.jpanda.screenshot.oss.core.annotations.FX;
 import cn.jpanda.screenshot.oss.core.configuration.Configuration;
 import cn.jpanda.screenshot.oss.core.log.Log;
 import cn.jpanda.screenshot.oss.core.log.LogHolder;
+import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
@@ -28,6 +30,12 @@ public class MainView implements Initializable {
     public ChoiceBox imageSave;
     public ChoiceBox clipboard;
     public Label shotKey;
+    /**
+     * 截图预览
+     */
+    @FXML
+    public CheckBox preview;
+
     private Log log = LogHolder.getInstance().getLogFactory().getLog(getClass());
 
     private Configuration configuration = BootStrap.configuration;
@@ -40,6 +48,7 @@ public class MainView implements Initializable {
         mainViewConfig = configuration.getDataPersistenceStrategy().load(MainViewConfig.class);
         loadImageSave();
         loadClipboard();
+        loadPreView();
     }
 
     @SuppressWarnings("unchecked")
@@ -58,6 +67,10 @@ public class MainView implements Initializable {
         clipboard.getSelectionModel().select(configuration.getClipboardCallback());
     }
 
+    private void loadPreView() {
+        preview.selectedProperty().setValue(mainViewConfig.isPreview());
+    }
+
     public void editImageStore(MouseEvent event) {
         // 获取当前选择的图片存储方式
         String name = (String) imageSave.getValue();
@@ -70,6 +83,14 @@ public class MainView implements Initializable {
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setScene(scene);
         stage.showAndWait();
+    }
+
+    public void editPreView() {
+        boolean isPreview = preview.selectedProperty().get();
+        if (mainViewConfig.isPreview() != isPreview) {
+            mainViewConfig.setPreview(isPreview);
+            configuration.storePersistence(mainViewConfig);
+        }
     }
 
     public void back() {
