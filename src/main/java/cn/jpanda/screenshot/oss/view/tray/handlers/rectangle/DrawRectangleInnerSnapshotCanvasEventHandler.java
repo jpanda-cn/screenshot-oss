@@ -1,11 +1,12 @@
 package cn.jpanda.screenshot.oss.view.tray.handlers.rectangle;
 
+import cn.jpanda.screenshot.oss.common.toolkit.DragRectangleEventHandler;
 import cn.jpanda.screenshot.oss.service.snapshot.inner.InnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import cn.jpanda.screenshot.oss.view.tray.CutInnerType;
-import cn.jpanda.screenshot.oss.view.tray.handlers.RectangleAddTag2ResizeBinding;
-import cn.jpanda.screenshot.oss.view.tray.handlers.RectangleBinding;
+import cn.jpanda.screenshot.oss.common.toolkit.RectangleAddTag2ResizeBinding;
+import cn.jpanda.screenshot.oss.common.toolkit.RectangleBinding;
 import cn.jpanda.screenshot.oss.view.tray.handlers.TrayConfig;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
@@ -79,6 +80,7 @@ public class DrawRectangleInnerSnapshotCanvasEventHandler extends InnerSnapshotC
                 clear();
             }
         });
+        canvasProperties.putGroup(rectangleGroup);
     }
 
     private void clear() {
@@ -87,6 +89,8 @@ public class DrawRectangleInnerSnapshotCanvasEventHandler extends InnerSnapshotC
             rectangleGroup.setMouseTransparent(true);
             if (dragRectangle != null) {
                 dragRectangle.visibleProperty().setValue(false);
+                currentRectangle.strokeProperty().unbind();
+                currentRectangle.strokeWidthProperty().unbind();
             }
         }
     }

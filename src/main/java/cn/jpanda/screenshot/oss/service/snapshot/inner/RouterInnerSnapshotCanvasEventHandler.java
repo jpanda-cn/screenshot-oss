@@ -3,8 +3,8 @@ package cn.jpanda.screenshot.oss.service.snapshot.inner;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import cn.jpanda.screenshot.oss.view.tray.handlers.arrow.ArrowInnerSnapshotCanvasEventHandler;
-import cn.jpanda.screenshot.oss.view.tray.handlers.drag.DragInnerSnapshotCanvasEventHandler;
-import cn.jpanda.screenshot.oss.view.tray.handlers.pen.PenInnerSnapshotCanvasEventHandler;
+import cn.jpanda.screenshot.oss.view.tray.handlers.drag.LimitDragInnerSnapshotCanvasEventHandler;
+import cn.jpanda.screenshot.oss.view.tray.handlers.pen.PathPenInnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.view.tray.handlers.rectangle.DrawRectangleInnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.view.tray.handlers.roundness.RoundnessInnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.view.tray.handlers.text.TextInnerSnapshotCanvasEventHandler;
@@ -12,7 +12,7 @@ import javafx.scene.input.MouseEvent;
 
 public class RouterInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEventHandler {
     // 拖动
-    private DragInnerSnapshotCanvasEventHandler dragSnapshotCanvasEventHandler;
+    private LimitDragInnerSnapshotCanvasEventHandler dragSnapshotCanvasEventHandler;
     /**
      * 绘制圆形
      */
@@ -30,7 +30,7 @@ public class RouterInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEv
     /**
      * 画笔
      */
-    private PenInnerSnapshotCanvasEventHandler penInnerSnapshotCanvasEventHandler;
+    private PathPenInnerSnapshotCanvasEventHandler penInnerSnapshotCanvasEventHandler;
 
     /**
      * 文字
@@ -39,11 +39,11 @@ public class RouterInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEv
 
     public RouterInnerSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler) {
         super(canvasProperties, canvasDrawEventHandler);
-        dragSnapshotCanvasEventHandler = new DragInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler);
+        dragSnapshotCanvasEventHandler = new LimitDragInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler);
         roundnessInnerSnapshotCanvasEventHandler = new RoundnessInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler);
         rectangleInnerSnapshotCanvasEventHandler = new DrawRectangleInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler);
         arrowInnerSnapshotCanvasEventHandler = new ArrowInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler);
-        penInnerSnapshotCanvasEventHandler = new PenInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler);
+        penInnerSnapshotCanvasEventHandler = new PathPenInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler);
         textInnerSnapshotCanvasEventHandler = new TextInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler);
     }
 
@@ -70,11 +70,11 @@ public class RouterInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEv
                 penInnerSnapshotCanvasEventHandler.handle(event);
                 break;
             }
-            case TEXT:{
+            case TEXT: {
                 textInnerSnapshotCanvasEventHandler.handle(event);
                 break;
             }
-            case RESIZE:{
+            case RESIZE: {
 
                 break;
             }

@@ -1,4 +1,4 @@
-package cn.jpanda.screenshot.oss.view.tray.handlers;
+package cn.jpanda.screenshot.oss.common.toolkit;
 
 import javafx.scene.Group;
 import javafx.scene.paint.Color;

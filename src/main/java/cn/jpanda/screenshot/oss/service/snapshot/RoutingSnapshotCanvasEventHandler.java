@@ -18,7 +18,7 @@ public class RoutingSnapshotCanvasEventHandler extends AbstractSnapshotCanvasEve
     public RoutingSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler) {
         super(canvasProperties, canvasDrawEventHandler);
         inner = new RouterInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler);
-        resize = new ResizeSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler);
+        resize = new LimitResizeSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler);
     }
 
     @Override

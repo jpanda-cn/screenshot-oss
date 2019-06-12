@@ -1,4 +1,4 @@
-package cn.jpanda.screenshot.oss.view.tray.handlers.arrow;
+package cn.jpanda.screenshot.oss.shape;
 
 import javafx.scene.Group;
 import javafx.scene.shape.Line;

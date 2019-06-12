@@ -7,20 +7,22 @@ import cn.jpanda.screenshot.oss.view.tray.CutInnerType;
 import cn.jpanda.screenshot.oss.view.tray.handlers.TrayConfig;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
-
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
 
 /**
- * 画笔绘制事件
- * 在截图区域内，生成一个Canvas
+ * 通过{@link Path}实现画笔功能
+ *
+ * @author Hanqi <jpanda@aliyun.com>
+ * @since 2019/6/12 17:05
  */
-public class PenInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEventHandler {
+public class PathPenInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEventHandler {
     private Group group;
-    private Canvas canvas;
+    private Path path;
 
-    public PenInnerSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler) {
+    public PathPenInnerSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler) {
         super(canvasProperties, canvasDrawEventHandler);
     }
 
@@ -31,43 +33,47 @@ public class PenInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEvent
 
     @Override
     protected void press(MouseEvent event) {
+
         x = event.getScreenX();
         y = event.getScreenY();
         if (group != null) {
             group.setMouseTransparent(true);
         }
-        canvas = new Canvas();
-        canvas.layoutXProperty().bind(rectangle.xProperty());
-        canvas.layoutYProperty().bind(rectangle.yProperty());
-        canvas.widthProperty().bind(rectangle.widthProperty());
-        canvas.heightProperty().bind(rectangle.heightProperty());
-
-        group = new Group(canvas);
+        path = new Path();
+        path.getElements().add(new MoveTo(x, y));
+        group = new Group(path);
         canvasProperties.getCutPane().getChildren().add(group);
-
         TrayConfig config = canvasProperties.getTrayConfig(CutInnerType.PEN);
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        // 生成一个新的矩形
-        // 配置矩形颜色和宽度
-        gc.setLineWidth(config.getStroke().get());
-        gc.setStroke(config.getStrokeColor().get());
-
+        path.strokeWidthProperty().set(config.getStroke().getValue());
+        path.strokeWidthProperty().bind(config.getStroke());
+        path.strokeProperty().set(config.getStrokeColor().getValue());
+        path.strokeProperty().bind(config.getStrokeColor());
     }
 
     @Override
     protected void drag(MouseEvent event) {
+
         double cx = event.getScreenX();
         double cy = event.getScreenY();
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.strokeLine(x - canvas.getLayoutX(), y - canvas.getLayoutY(), cx - canvas.getLayoutX(), cy - canvas.getLayoutY());
-        x = cx;
-        y = cy;
+        if (rectangle.contains(cx, cy)) {
+            path.getElements().add(new LineTo(cx, cy));
+        }
     }
+
 
     @Override
     protected void release(MouseEvent event) {
+        clear();
+    }
+
+    protected void clear() {
         if (group != null) {
             group.setMouseTransparent(true);
+            canvasProperties.putGroup(group);
+        }
+        if (path != null) {
+            path.strokeProperty().unbind();
+            path.strokeWidthProperty().unbind();
         }
     }
 }

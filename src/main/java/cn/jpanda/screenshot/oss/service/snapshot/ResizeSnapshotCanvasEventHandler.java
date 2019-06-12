@@ -1,13 +1,16 @@
 package cn.jpanda.screenshot.oss.service.snapshot;
 
+import cn.jpanda.screenshot.oss.common.toolkit.ShapeCovertHelper;
 import cn.jpanda.screenshot.oss.common.utils.MathUtils;
+import cn.jpanda.screenshot.oss.view.snapshot.Bounds;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
-import cn.jpanda.screenshot.oss.view.snapshot.Bounds;
 import cn.jpanda.screenshot.oss.view.snapshot.handlers.ResizeType;
 import javafx.scene.Cursor;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.shape.Rectangle;
+
+import java.util.List;
 
 public class ResizeSnapshotCanvasEventHandler extends AbstractSnapshotCanvasEventHandler {
     private double ow;
@@ -25,6 +28,7 @@ public class ResizeSnapshotCanvasEventHandler extends AbstractSnapshotCanvasEven
 
 
     public void resize(MouseEvent event) {
+        // 获取当前所有子节点
         if (event.getEventType().equals(MouseEvent.MOUSE_MOVED)) {
             // 判断如何展示
             double mouseX = event.getScreenX();
@@ -126,6 +130,7 @@ public class ResizeSnapshotCanvasEventHandler extends AbstractSnapshotCanvasEven
                 }
 
             }
+            // 使用LimitRectangleEventHandler来修正数据
             canvasDrawEventHandler.draw(new Bounds(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight()));
         }
 

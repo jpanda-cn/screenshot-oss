@@ -1,6 +1,7 @@
 package cn.jpanda.screenshot.oss.view.tray.handlers.arrow;
 
 import cn.jpanda.screenshot.oss.service.snapshot.inner.InnerSnapshotCanvasEventHandler;
+import cn.jpanda.screenshot.oss.shape.Arrow;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import cn.jpanda.screenshot.oss.view.tray.CutInnerType;
@@ -61,6 +62,6 @@ public class ArrowInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEve
 
     @Override
     protected void release(MouseEvent event) {
-        super.release(event);
+        canvasProperties.putGroup(group);
     }
 }

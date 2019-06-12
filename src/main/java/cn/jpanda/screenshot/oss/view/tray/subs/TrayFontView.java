@@ -37,7 +37,7 @@ public class TrayFontView implements Initializable {
         List<Integer> l = new ArrayList<>(73 - 10);
         IntStream.range(10, 73).forEach(l::add);
         size.getItems().addAll(l);
-        size.getSelectionModel().select(16);
+        size.getSelectionModel().select((int) Font.getDefault().getSize());
         size.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> changeSize(newValue));
     }
 

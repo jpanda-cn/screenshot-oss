@@ -1,4 +1,4 @@
-package cn.jpanda.screenshot.oss.view.tray.handlers;
+package cn.jpanda.screenshot.oss.common.toolkit;
 
 import cn.jpanda.screenshot.oss.view.event.GeneralSplitMouseEventHandler;
 import javafx.scene.input.MouseEvent;
@@ -7,6 +7,10 @@ import javafx.scene.shape.Rectangle;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * 限制矩形空间坐标的事件处理器
+ * 指定的矩形的大小以及坐标的变更将会受限于他所属的矩形范围内，以及其内部包含的其他图形
+ */
 public class LimitRectangleEventHandler extends GeneralSplitMouseEventHandler {
     /**
      * 变更的矩形
