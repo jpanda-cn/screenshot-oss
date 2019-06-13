@@ -13,10 +13,15 @@ import cn.jpanda.screenshot.oss.core.persistence.interceptor.encrypt.EncryptGetV
 import cn.jpanda.screenshot.oss.core.persistence.interceptor.encrypt.EncryptSetValueInterceptor;
 import cn.jpanda.screenshot.oss.core.scan.BootStrapClassScanRegistry;
 import cn.jpanda.screenshot.oss.core.scan.SceneBeanRegistry;
-import cn.jpanda.screenshot.oss.store.ClipboardCallbackRegister;
-import cn.jpanda.screenshot.oss.store.TextClipboardCallback;
+import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallbackRegister;
+import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallbackRegistryManager;
+import cn.jpanda.screenshot.oss.store.clipboard.ImageClipboardCallback;
+import cn.jpanda.screenshot.oss.store.clipboard.LocalPathClipboardCallback;
+import cn.jpanda.screenshot.oss.store.save.ImageStoreRegister;
+import cn.jpanda.screenshot.oss.store.save.ImageStoreRegisterManager;
+import cn.jpanda.screenshot.oss.store.save.NothingImageStore;
 import cn.jpanda.screenshot.oss.view.image.LocalFileImageStoreConfig;
-import cn.jpanda.screenshot.oss.view.image.LocalImageStore;
+import cn.jpanda.screenshot.oss.store.save.LocalImageStore;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
@@ -66,11 +71,13 @@ public abstract class BootStrap extends Application {
     }
 
     protected void registryClipboardCallback(ClipboardCallbackRegistryManager clipboardCallbackRegistryManager) {
-        clipboardCallbackRegistryManager.registry(ClipboardCallbackRegister.builder().name("地址").clipboardCallback(new TextClipboardCallback()).build());
+        clipboardCallbackRegistryManager.registry(ClipboardCallbackRegister.builder().name("地址").clipboardCallback(new LocalPathClipboardCallback()).build());
+        clipboardCallbackRegistryManager.registry(ClipboardCallbackRegister.builder().name("图片").clipboardCallback(new ImageClipboardCallback()).build());
     }
 
     protected void registryImageStoreChannel(ImageStoreRegisterManager imageStoreRegisterManager) {
         imageStoreRegisterManager.registry(ImageStoreRegister.builder().name("本地存储").imageStore(new LocalImageStore()).imageConfig(LocalFileImageStoreConfig.class).build());
+        imageStoreRegisterManager.registry(ImageStoreRegister.builder().name("不存储").imageStore(new NothingImageStore()).build());
     }
 
     protected void doBeanRegistry() {

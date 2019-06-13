@@ -1,7 +1,7 @@
 package cn.jpanda.screenshot.oss.common.toolkit;
 
-import cn.jpanda.screenshot.oss.view.event.ResizeTagRectangleEventHandler;
-import cn.jpanda.screenshot.oss.view.snapshot.handlers.ResizeType;
+import cn.jpanda.screenshot.oss.service.handlers.ResizeTagRectangleEventHandler;
+import cn.jpanda.screenshot.oss.common.enums.ResizeType;
 import javafx.beans.binding.Bindings;
 import javafx.scene.Cursor;
 import javafx.scene.Group;

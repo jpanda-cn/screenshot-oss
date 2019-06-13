@@ -1,6 +1,6 @@
 package cn.jpanda.screenshot.oss.common.toolkit;
 
-import cn.jpanda.screenshot.oss.view.event.GeneralSplitMouseEventHandler;
+import cn.jpanda.screenshot.oss.service.handlers.GeneralSplitMouseEventHandler;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
 

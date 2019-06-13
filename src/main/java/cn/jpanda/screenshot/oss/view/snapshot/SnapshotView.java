@@ -4,6 +4,8 @@ import cn.jpanda.screenshot.oss.core.BootStrap;
 import cn.jpanda.screenshot.oss.core.annotations.FX;
 import cn.jpanda.screenshot.oss.core.capture.ScreenCapture;
 import cn.jpanda.screenshot.oss.core.configuration.Configuration;
+import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
+import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -30,23 +32,16 @@ import java.util.ResourceBundle;
 @FX
 public class SnapshotView implements Initializable {
     private Configuration configuration = BootStrap.configuration;
-    private SnapshotProperties snapshotProperties;
+    private GlobalConfigPersistence globalConfigPersistence;
     private ScreenCapture screenCapture;
 
     @FXML
     private ImageView imageView;
 
-    private BufferedImage getDesktopSnapshot() {
-        GraphicsDevice graphicsDevice = screenCapture.getTargetGraphicsDevice(snapshotProperties.getScreenIndex());
-        Dimension dimension = graphicsDevice.getDefaultConfiguration().getBounds().getSize();
-        return screenCapture.screenshotImage(snapshotProperties.getScreenIndex(), (int) dimension.getWidth(), (int) dimension.getHeight());
-    }
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         screenCapture = configuration.getScreenCapture();
-        snapshotProperties = configuration.getPersistence(SnapshotProperties.class);
-
+        globalConfigPersistence = configuration.getPersistence(GlobalConfigPersistence.class);
         BufferedImage image = getDesktopSnapshot();
         WritableImage writableImage = new WritableImage(image.getWidth(), image.getHeight());
         SwingFXUtils.toFXImage(image, writableImage);
@@ -76,6 +71,12 @@ public class SnapshotView implements Initializable {
                 saveAndClose(canvas);
             }
         });
+    }
+
+    private BufferedImage getDesktopSnapshot() {
+        GraphicsDevice graphicsDevice = screenCapture.getTargetGraphicsDevice(globalConfigPersistence.getScreenIndex());
+        Dimension dimension = graphicsDevice.getDefaultConfiguration().getBounds().getSize();
+        return screenCapture.screenshotImage(globalConfigPersistence.getScreenIndex(), (int) dimension.getWidth(), (int) dimension.getHeight());
     }
 
     protected void saveAndClose(Canvas canvas) {

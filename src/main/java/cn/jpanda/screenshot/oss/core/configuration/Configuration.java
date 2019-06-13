@@ -1,13 +1,15 @@
 package cn.jpanda.screenshot.oss.core.configuration;
 
-import cn.jpanda.screenshot.oss.core.ClipboardCallbackRegistryManager;
-import cn.jpanda.screenshot.oss.core.ImageStoreRegisterManager;
+import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.capture.ScreenCapture;
 import cn.jpanda.screenshot.oss.core.context.ViewContext;
 import cn.jpanda.screenshot.oss.core.persistence.BootstrapPersistence;
 import cn.jpanda.screenshot.oss.core.persistence.DataPersistenceStrategy;
 import cn.jpanda.screenshot.oss.core.persistence.Persistence;
 import cn.jpanda.screenshot.oss.core.persistence.interceptor.Interceptor;
+import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
+import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallbackRegistryManager;
+import cn.jpanda.screenshot.oss.store.save.ImageStoreRegisterManager;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -71,15 +73,9 @@ public class Configuration {
     private ViewContext viewContext;
 
     // 当前使用的图片存储类
-    @Getter
-    @Setter
-    private String imageStore = "本地存储";
-    @Getter
-    @Setter
-    private String clipboardCallback = "地址";
-    @Getter
-    @Setter
-    private String imageSuffix = "png";
+    private String DEFAULT_IMAGE_STORE = "本地存储";
+    private String DEFAULT_CLIPBOARD_CALLBACK = "地址";
+    private String DEFAULT_IMAGE_SUFFIX = "png";
 
     @Getter
     private ImageStoreRegisterManager imageStoreRegisterManager = new ImageStoreRegisterManager();
@@ -155,6 +151,61 @@ public class Configuration {
     }
 
     public void store(BufferedImage image) {
-        imageStoreRegisterManager.getImageStore(imageStore).store(image);
+        // 存储图片
+        String path = imageStoreRegisterManager.getImageStore(getImageStore()).store(image);
+        // 回调剪切板
+        getClipboardCallbackRegistryManager().get(getClipboardCallback()).callback(image, path);
+    }
+
+    public String getImageStore() {
+
+        GlobalConfigPersistence globalConfigPersistence = getPersistence(GlobalConfigPersistence.class);
+        String imageStore = globalConfigPersistence.getImageStore();
+        if (StringUtils.isNotEmpty(imageStore) && imageStoreRegisterManager.getNames().contains(imageStore)) {
+            return imageStore;
+        }
+        return this.DEFAULT_IMAGE_STORE;
+    }
+
+    public void setImageStore(String imageStore) {
+        GlobalConfigPersistence globalConfigPersistence = getPersistence(GlobalConfigPersistence.class);
+        if (StringUtils.isNotEmpty(imageStore) && imageStoreRegisterManager.getNames().contains(imageStore)) {
+            globalConfigPersistence.setImageStore(imageStore);
+            storePersistence(globalConfigPersistence);
+        }
+    }
+
+    public String getClipboardCallback() {
+        GlobalConfigPersistence globalConfigPersistence = getPersistence(GlobalConfigPersistence.class);
+        String clipboardCallback = globalConfigPersistence.getClipboardCallback();
+        if (StringUtils.isNotEmpty(clipboardCallback) && clipboardCallbackRegistryManager.getNames().contains(clipboardCallback)) {
+            return clipboardCallback;
+        }
+        return this.DEFAULT_CLIPBOARD_CALLBACK;
+    }
+
+    public void setClipboardCallback(String clipboardCallback) {
+        GlobalConfigPersistence globalConfigPersistence = getPersistence(GlobalConfigPersistence.class);
+        if (StringUtils.isNotEmpty(clipboardCallback) && clipboardCallbackRegistryManager.getNames().contains(clipboardCallback)) {
+            globalConfigPersistence.setClipboardCallback(clipboardCallback);
+            storePersistence(globalConfigPersistence);
+        }
+    }
+
+    public String getImageSuffix() {
+        GlobalConfigPersistence globalConfigPersistence = getPersistence(GlobalConfigPersistence.class);
+        String imageSuffix = globalConfigPersistence.getImageSuffix();
+        if (StringUtils.isNotEmpty(imageSuffix)) {
+            return imageSuffix;
+        }
+        return DEFAULT_IMAGE_SUFFIX;
+    }
+
+    public void setImageSuffix(String imageSuffix) {
+        GlobalConfigPersistence globalConfigPersistence = getPersistence(GlobalConfigPersistence.class);
+        if (StringUtils.isNotEmpty(imageSuffix)) {
+            globalConfigPersistence.setImageSuffix(imageSuffix);
+            storePersistence(globalConfigPersistence);
+        }
     }
 }

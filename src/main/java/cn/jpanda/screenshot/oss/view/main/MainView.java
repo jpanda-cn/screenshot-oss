@@ -1,12 +1,13 @@
 package cn.jpanda.screenshot.oss.view.main;
 
 import cn.jpanda.screenshot.oss.core.BootStrap;
-import cn.jpanda.screenshot.oss.core.ClipboardCallbackRegistryManager;
-import cn.jpanda.screenshot.oss.core.ImageStoreRegisterManager;
 import cn.jpanda.screenshot.oss.core.annotations.FX;
 import cn.jpanda.screenshot.oss.core.configuration.Configuration;
 import cn.jpanda.screenshot.oss.core.log.Log;
 import cn.jpanda.screenshot.oss.core.log.LogHolder;
+import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
+import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallbackRegistryManager;
+import cn.jpanda.screenshot.oss.store.save.ImageStoreRegisterManager;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
@@ -16,7 +17,6 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -40,12 +40,12 @@ public class MainView implements Initializable {
 
     private Configuration configuration = BootStrap.configuration;
 
-    private MainViewConfig mainViewConfig;
+    private GlobalConfigPersistence globalConfigPersistence;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // 加载配置
-        mainViewConfig = configuration.getDataPersistenceStrategy().load(MainViewConfig.class);
+        globalConfigPersistence = configuration.getDataPersistenceStrategy().load(GlobalConfigPersistence.class);
         loadImageSave();
         loadClipboard();
         loadPreView();
@@ -57,25 +57,46 @@ public class MainView implements Initializable {
         ImageStoreRegisterManager imageStoreRegisterManager = configuration.getImageStoreRegisterManager();
         imageSave.getItems().addAll(imageStoreRegisterManager.getNames());
         imageSave.getSelectionModel().select(configuration.getImageStore());
+        // 判断是否有对应的配置界面，决定是否展示配置按钮
+        edit.visibleProperty().setValue(imageStoreRegisterManager.getConfig(configuration.getImageStore()) != null);
+        imageSave.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue instanceof String) {
+                if (!configuration.getImageStore().equalsIgnoreCase((String) newValue)) {
+                    configuration.setImageStore((String) newValue);
+                    // 判断是否有对应的配置界面，决定是否展示配置按钮
+                    edit.visibleProperty().setValue(imageStoreRegisterManager.getConfig((String) newValue) != null);
+                }
+            }
+        });
     }
-
     @SuppressWarnings("unchecked")
     private void loadClipboard() {
         // 初始化保存到剪切板的内容
         ClipboardCallbackRegistryManager clipboardCallbackRegistryManager = configuration.getClipboardCallbackRegistryManager();
         clipboard.getItems().addAll(clipboardCallbackRegistryManager.getNames());
         clipboard.getSelectionModel().select(configuration.getClipboardCallback());
+        clipboard.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue instanceof String) {
+                if (!configuration.getClipboardCallback().equalsIgnoreCase((String) newValue)) {
+                    configuration.setClipboardCallback((String) newValue);
+                    // 刷新配置
+                }
+            }
+        });
     }
 
     private void loadPreView() {
-        preview.selectedProperty().setValue(mainViewConfig.isPreview());
+        preview.selectedProperty().setValue(globalConfigPersistence.isPreview());
     }
 
-    public void editImageStore(MouseEvent event) {
+    public void editImageStore() {
         // 获取当前选择的图片存储方式
         String name = (String) imageSave.getValue();
         ImageStoreRegisterManager imageStoreRegisterManager = configuration.getImageStoreRegisterManager();
         Class<? extends Initializable> config = imageStoreRegisterManager.getConfig(name);
+        if (config == null) {
+            return;
+        }
         Scene scene = configuration.getViewContext().getScene(config);
         Stage stage = new Stage();
         stage.getIcons().addAll(configuration.getViewContext().getStage().getIcons());
@@ -87,9 +108,9 @@ public class MainView implements Initializable {
 
     public void editPreView() {
         boolean isPreview = preview.selectedProperty().get();
-        if (mainViewConfig.isPreview() != isPreview) {
-            mainViewConfig.setPreview(isPreview);
-            configuration.storePersistence(mainViewConfig);
+        if (globalConfigPersistence.isPreview() != isPreview) {
+            globalConfigPersistence.setPreview(isPreview);
+            configuration.storePersistence(globalConfigPersistence);
         }
     }
 

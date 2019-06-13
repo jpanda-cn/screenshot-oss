@@ -4,11 +4,12 @@ import cn.jpanda.screenshot.oss.core.BootStrap;
 import cn.jpanda.screenshot.oss.core.annotations.FX;
 import cn.jpanda.screenshot.oss.core.configuration.Configuration;
 import cn.jpanda.screenshot.oss.core.context.ViewContext;
-import cn.jpanda.screenshot.oss.view.main.MainViewConfig;
+import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import cn.jpanda.screenshot.oss.view.tray.subs.TrayColorView;
 import cn.jpanda.screenshot.oss.view.tray.subs.TrayFontView;
 import cn.jpanda.screenshot.oss.view.tray.subs.TrayPointView;
+import cn.jpanda.screenshot.oss.view.tray.toolkits.CutInnerType;
 import com.sun.istack.internal.Nullable;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -58,7 +59,7 @@ public class CanvasCutTrayView implements Initializable {
     public AnchorPane bar;
 
     private volatile CanvasProperties canvasProperties;
-    private MainViewConfig mainViewConfig;
+    private GlobalConfigPersistence globalConfigPersistence;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -70,7 +71,7 @@ public class CanvasCutTrayView implements Initializable {
     private void initRectangle() {
         canvasProperties = (CanvasProperties) submit.getScene().getWindow().getProperties().get(CanvasProperties.class);
         // 加载配置
-        mainViewConfig = configuration.getDataPersistenceStrategy().load(MainViewConfig.class);
+        globalConfigPersistence = configuration.getDataPersistenceStrategy().load(GlobalConfigPersistence.class);
     }
 
     // 画圆
@@ -159,7 +160,7 @@ public class CanvasCutTrayView implements Initializable {
         // 关闭
         Stage stage = ((Stage) scene.getWindow());
         stage.close();
-        if (mainViewConfig.isPreview()) {
+        if (globalConfigPersistence.isPreview()) {
             // 从剪切板搞定图片
             stage = new Stage();
             stage.getIcons().add(new Image("/logo.png"));

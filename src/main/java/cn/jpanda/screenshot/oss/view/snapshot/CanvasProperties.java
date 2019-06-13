@@ -1,7 +1,7 @@
 package cn.jpanda.screenshot.oss.view.snapshot;
 
-import cn.jpanda.screenshot.oss.view.tray.CutInnerType;
-import cn.jpanda.screenshot.oss.view.tray.handlers.TrayConfig;
+import cn.jpanda.screenshot.oss.view.tray.toolkits.CutInnerType;
+import cn.jpanda.screenshot.oss.view.tray.toolkits.TrayConfig;
 import javafx.scene.Group;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.shape.Rectangle;

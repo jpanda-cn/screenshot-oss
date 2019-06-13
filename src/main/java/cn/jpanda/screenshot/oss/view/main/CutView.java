@@ -3,7 +3,7 @@ package cn.jpanda.screenshot.oss.view.main;
 import cn.jpanda.screenshot.oss.core.BootStrap;
 import cn.jpanda.screenshot.oss.core.annotations.View;
 import cn.jpanda.screenshot.oss.core.configuration.Configuration;
-import cn.jpanda.screenshot.oss.view.snapshot.KeyExitStageEventHandler;
+import cn.jpanda.screenshot.oss.service.handlers.KeyExitStageEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.SnapshotView;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
