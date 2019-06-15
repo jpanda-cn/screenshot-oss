@@ -5,8 +5,10 @@ import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.configuration.Configuration;
 import cn.jpanda.screenshot.oss.core.log.Log;
 import cn.jpanda.screenshot.oss.core.log.LogHolder;
-import cn.jpanda.screenshot.oss.core.persistence.interceptor.GetValueInterceptor;
-import cn.jpanda.screenshot.oss.core.persistence.interceptor.SetValueInterceptor;
+import cn.jpanda.screenshot.oss.newcore.interceptor.ValueInterceptor;
+import cn.jpanda.screenshot.oss.newcore.persistence.strategy.DataPersistenceStrategy;
+import cn.jpanda.screenshot.oss.newcore.persistence.Persistence;
+import cn.jpanda.screenshot.oss.newcore.persistence.visitor.PropertiesVisitor;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -24,8 +26,7 @@ public class PropertiesDataPersistenceStrategy implements DataPersistenceStrateg
     private PropertiesVisitor propertiesVisitor;
 
     private Configuration configuration;
-    private List<SetValueInterceptor> setValueInterceptors;
-    private List<GetValueInterceptor> getValueInterceptors;
+    private List<ValueInterceptor> interceptors;
 
     public PropertiesDataPersistenceStrategy(String propertiesFileName, PropertiesVisitor propertiesVisitor, Configuration configuration) {
         this.propertiesFileName = propertiesFileName;
@@ -55,8 +56,8 @@ public class PropertiesDataPersistenceStrategy implements DataPersistenceStrateg
             // 读取指定的属性
             String value = properties.getProperty(prefix + "." + field.getName());
             if (StringUtils.isNotEmpty(value)) {
-                for (GetValueInterceptor interceptor : getGetValueInterceptors()) {
-                    value = interceptor.interceptor(field, value);
+                for (ValueInterceptor interceptor : interceptors) {
+                    value = interceptor.get(field, value);
                 }
                 ReflectionUtils.setValue(field, obj, StringUtils.cast2CommonType(value, field.getType()));
             }
@@ -72,8 +73,8 @@ public class PropertiesDataPersistenceStrategy implements DataPersistenceStrateg
             String key = prefix + "." + field.getName();
             String value = StringUtils.toString(ReflectionUtils.readValue(field, persistence));
             if (StringUtils.isNotEmpty(value)) {
-                for (SetValueInterceptor interceptor : getSetValueInterceptors()) {
-                    value = interceptor.interceptor(field, value);
+                for (ValueInterceptor interceptor : interceptors) {
+                    value = interceptor.set(field, value);
                 }
                 properties.setProperty(key, value);
             } else {
@@ -83,11 +84,11 @@ public class PropertiesDataPersistenceStrategy implements DataPersistenceStrateg
         return properties;
     }
 
-    public List<SetValueInterceptor> getSetValueInterceptors() {
-        return configuration.getInterceptor(SetValueInterceptor.class);
-    }
-
-    public List<GetValueInterceptor> getGetValueInterceptors() {
-        return getValueInterceptors = configuration.getInterceptor(GetValueInterceptor.class);
-    }
+//    public List<SetValueValueInterceptor> getSetValueInterceptors() {
+//        return configuration.getInterceptor(SetValueValueInterceptor.class);
+//    }
+//
+//    public List<GetValueValueInterceptor> getGetValueInterceptors() {
+//        return getValueInterceptors = configuration.getInterceptor(GetValueValueInterceptor.class);
+//    }
 }

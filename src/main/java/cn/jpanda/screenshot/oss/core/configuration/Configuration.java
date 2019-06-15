@@ -4,9 +4,9 @@ import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.capture.ScreenCapture;
 import cn.jpanda.screenshot.oss.core.context.ViewContext;
 import cn.jpanda.screenshot.oss.core.persistence.BootstrapPersistence;
-import cn.jpanda.screenshot.oss.core.persistence.DataPersistenceStrategy;
-import cn.jpanda.screenshot.oss.core.persistence.Persistence;
-import cn.jpanda.screenshot.oss.core.persistence.interceptor.Interceptor;
+import cn.jpanda.screenshot.oss.newcore.persistence.strategy.DataPersistenceStrategy;
+import cn.jpanda.screenshot.oss.newcore.persistence.Persistence;
+import cn.jpanda.screenshot.oss.newcore.interceptor.ValueInterceptor;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
 import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallbackRegistryManager;
 import cn.jpanda.screenshot.oss.store.save.ImageStoreRegisterManager;
@@ -87,18 +87,18 @@ public class Configuration {
     @Setter
     private Map<Class<? extends Persistence>, Persistence> persistences = new ConcurrentHashMap<>();
 
-    private Map<Class<? extends Interceptor>, List<Interceptor>> interceptorMap = new ConcurrentHashMap<>();
+    private Map<Class<? extends ValueInterceptor>, List<ValueInterceptor>> interceptorMap = new ConcurrentHashMap<>();
 
-    public <T extends Interceptor> void registryInterceptor(Class<? extends Interceptor> clazz, T interceptor) {
-        List<Interceptor> interceptors = getInterceptor(clazz);
-        if (!interceptors.contains(interceptor)) {
-            interceptors.add(interceptor);
+    public <T extends ValueInterceptor> void registryInterceptor(Class<? extends ValueInterceptor> clazz, T interceptor) {
+        List<ValueInterceptor> valueInterceptors = getInterceptor(clazz);
+        if (!valueInterceptors.contains(interceptor)) {
+            valueInterceptors.add(interceptor);
         }
-        interceptorMap.put(clazz, interceptors);
+        interceptorMap.put(clazz, valueInterceptors);
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Interceptor> List<T> getInterceptor(Class<? extends Interceptor> c) {
+    public <T extends ValueInterceptor> List<T> getInterceptor(Class<? extends ValueInterceptor> c) {
         return (List<T>) interceptorMap.getOrDefault(c, new ArrayList<>());
     }
 

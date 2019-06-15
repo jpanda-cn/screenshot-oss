@@ -3,7 +3,6 @@ package cn.jpanda.screenshot.oss.view.password.init;
 import cn.jpanda.screenshot.oss.common.utils.AlertUtils;
 import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.BootStrap;
-import cn.jpanda.screenshot.oss.core.annotations.FX;
 import cn.jpanda.screenshot.oss.core.configuration.Configuration;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -17,7 +16,6 @@ import java.util.ResourceBundle;
 /**
  * 配置密码页面
  */
-@FX
 public class ConfigPassword implements Initializable {
 
     private Configuration configuration = BootStrap.configuration;

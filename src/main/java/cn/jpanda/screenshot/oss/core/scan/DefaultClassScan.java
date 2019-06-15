@@ -2,6 +2,8 @@ package cn.jpanda.screenshot.oss.core.scan;
 
 import cn.jpanda.screenshot.oss.core.log.Log;
 import cn.jpanda.screenshot.oss.core.log.LogHolder;
+import cn.jpanda.screenshot.oss.newcore.scan.ClassScan;
+import cn.jpanda.screenshot.oss.newcore.scan.ClassScanFilter;
 import lombok.SneakyThrows;
 
 import java.io.File;

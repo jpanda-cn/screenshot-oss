@@ -1,6 +1,6 @@
 package cn.jpanda.screenshot.oss.persistences;
 
-import cn.jpanda.screenshot.oss.core.persistence.Persistence;
+import cn.jpanda.screenshot.oss.newcore.persistence.Persistence;
 import lombok.Data;
 
 /**

@@ -3,7 +3,6 @@ package cn.jpanda.screenshot.oss.view.password.enter;
 import cn.jpanda.screenshot.oss.common.utils.AlertUtils;
 import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.BootStrap;
-import cn.jpanda.screenshot.oss.core.annotations.FX;
 import cn.jpanda.screenshot.oss.core.configuration.Configuration;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -17,7 +16,6 @@ import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-@FX
 public class EnterPassword implements Initializable {
     private Configuration configuration = BootStrap.configuration;
     @FXML

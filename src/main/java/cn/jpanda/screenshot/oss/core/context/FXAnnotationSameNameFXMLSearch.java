@@ -1,7 +1,6 @@
 package cn.jpanda.screenshot.oss.core.context;
 
 import cn.jpanda.screenshot.oss.common.utils.StringUtils;
-import cn.jpanda.screenshot.oss.core.annotations.FX;
 
 public class FXAnnotationSameNameFXMLSearch extends SameNameFXMLSearch {
     public FXAnnotationSameNameFXMLSearch(ClassLoader classLoader) {

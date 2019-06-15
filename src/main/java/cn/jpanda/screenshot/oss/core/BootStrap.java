@@ -7,12 +7,11 @@ import cn.jpanda.screenshot.oss.core.context.DefaultViewContext;
 import cn.jpanda.screenshot.oss.core.context.FXAnnotationSameNameFXMLSearch;
 import cn.jpanda.screenshot.oss.core.log.*;
 import cn.jpanda.screenshot.oss.core.persistence.*;
-import cn.jpanda.screenshot.oss.core.persistence.interceptor.GetValueInterceptor;
-import cn.jpanda.screenshot.oss.core.persistence.interceptor.SetValueInterceptor;
-import cn.jpanda.screenshot.oss.core.persistence.interceptor.encrypt.EncryptGetValueInterceptor;
-import cn.jpanda.screenshot.oss.core.persistence.interceptor.encrypt.EncryptSetValueInterceptor;
 import cn.jpanda.screenshot.oss.core.scan.BootStrapClassScanRegistry;
 import cn.jpanda.screenshot.oss.core.scan.SceneBeanRegistry;
+import cn.jpanda.screenshot.oss.newcore.persistence.visitor.CachedPropertiesVisitor;
+import cn.jpanda.screenshot.oss.newcore.persistence.visitor.DefaultPropertiesVisitor;
+import cn.jpanda.screenshot.oss.newcore.persistence.visitor.PropertiesVisitor;
 import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallbackRegister;
 import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallbackRegistryManager;
 import cn.jpanda.screenshot.oss.store.clipboard.ImageClipboardCallback;
@@ -87,8 +86,8 @@ public abstract class BootStrap extends Application {
     }
 
     protected void registryValueInterceptor() {
-        configuration.registryInterceptor(SetValueInterceptor.class, new EncryptSetValueInterceptor(configuration));
-        configuration.registryInterceptor(GetValueInterceptor.class, new EncryptGetValueInterceptor(configuration));
+//        configuration.registryInterceptor(SetValueValueInterceptor.class, new EncryptSetValueValueInterceptor(configuration));
+//        configuration.registryInterceptor(GetValueValueInterceptor.class, new EncryptGetValueValueInterceptor(configuration));
     }
 
     protected void registryBeanRegistry(BootStrapClassScanRegistry bootStrapClassScanRegistry) {
@@ -110,8 +109,8 @@ public abstract class BootStrap extends Application {
     }
 
     protected void loadDataPersistenceStrategy() {
-        PropertiesVisitor propertiesVisitor = new CachedPropertiesVisitor(new DefaultPropertiesVisitor());
-        configuration.setDataPersistenceStrategy(new PropertiesDataPersistenceStrategy(configuration.getMainConfigFileFullName(), propertiesVisitor, configuration));
+//        PropertiesVisitor propertiesVisitor = new CachedPropertiesVisitor(new DefaultPropertiesVisitor());
+//        configuration.setDataPersistenceStrategy(new PropertiesDataPersistenceStrategy(configuration.getMainConfigFileFullName(), propertiesVisitor, configuration));
     }
 
     protected void loadScreenCapture() {

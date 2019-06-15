@@ -1,7 +1,6 @@
 package cn.jpanda.screenshot.oss.view.tray;
 
 import cn.jpanda.screenshot.oss.core.BootStrap;
-import cn.jpanda.screenshot.oss.core.annotations.FX;
 import cn.jpanda.screenshot.oss.core.configuration.Configuration;
 import cn.jpanda.screenshot.oss.core.context.ViewContext;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
@@ -35,7 +34,6 @@ import java.util.ResourceBundle;
 /**
  * 截图托盘
  */
-@FX
 public class CanvasCutTrayView implements Initializable {
 
     private Configuration configuration = BootStrap.configuration;

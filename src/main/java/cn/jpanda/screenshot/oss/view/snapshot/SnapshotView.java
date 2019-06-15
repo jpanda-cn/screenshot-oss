@@ -1,7 +1,6 @@
 package cn.jpanda.screenshot.oss.view.snapshot;
 
 import cn.jpanda.screenshot.oss.core.BootStrap;
-import cn.jpanda.screenshot.oss.core.annotations.FX;
 import cn.jpanda.screenshot.oss.core.capture.ScreenCapture;
 import cn.jpanda.screenshot.oss.core.configuration.Configuration;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
@@ -29,7 +28,6 @@ import java.util.ResourceBundle;
 /**
  * 截图窗口
  */
-@FX
 public class SnapshotView implements Initializable {
     private Configuration configuration = BootStrap.configuration;
     private GlobalConfigPersistence globalConfigPersistence;
