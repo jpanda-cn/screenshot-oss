@@ -5,6 +5,7 @@ import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.newcore.Configuration;
 import cn.jpanda.screenshot.oss.newcore.annotations.Encrypt;
 import cn.jpanda.screenshot.oss.newcore.annotations.Interceptor;
+import cn.jpanda.screenshot.oss.newcore.persistence.BootstrapPersistence;
 import lombok.SneakyThrows;
 
 import java.lang.reflect.Field;
@@ -21,7 +22,8 @@ public class EncryptValueValueInterceptor implements ValueInterceptor {
     }
 
     public boolean should(Field field) {
-        return field.isAnnotationPresent(Encrypt.class) && configuration.isUsePassword() && StringUtils.isNotEmpty(configuration.getPassword());
+        BootstrapPersistence bootstrapPersistence = configuration.getPersistence(BootstrapPersistence.class);
+        return field.isAnnotationPresent(Encrypt.class) && bootstrapPersistence.isUsePassword() && StringUtils.isNotEmpty(configuration.getPassword());
     }
 
     @Override

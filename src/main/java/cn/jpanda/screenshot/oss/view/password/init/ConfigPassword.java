@@ -2,9 +2,9 @@ package cn.jpanda.screenshot.oss.view.password.init;
 
 import cn.jpanda.screenshot.oss.common.utils.AlertUtils;
 import cn.jpanda.screenshot.oss.common.utils.StringUtils;
-import cn.jpanda.screenshot.oss.core.BootStrap;
-import cn.jpanda.screenshot.oss.core.configuration.Configuration;
+import cn.jpanda.screenshot.oss.newcore.Configuration;
 import cn.jpanda.screenshot.oss.newcore.annotations.Controller;
+import cn.jpanda.screenshot.oss.newcore.persistence.BootstrapPersistence;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -20,7 +20,13 @@ import java.util.ResourceBundle;
 @Controller
 public class ConfigPassword implements Initializable {
 
-    private Configuration configuration = BootStrap.configuration;
+    private Configuration configuration;
+
+    private BootstrapPersistence bootstrapPersistence;
+
+    public ConfigPassword(Configuration configuration) {
+        this.configuration = configuration;
+    }
 
     @FXML
     private PasswordField passwordField;
@@ -35,6 +41,7 @@ public class ConfigPassword implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         cancel.textProperty().setValue("跳过");
+        bootstrapPersistence = configuration.getPersistence(BootstrapPersistence.class);
     }
 
     public void savePassword() {
@@ -52,7 +59,8 @@ public class ConfigPassword implements Initializable {
             AlertUtils.alert(Alert.AlertType.ERROR, "两次密码不一致");
             return;
         }
-        configuration.setUsePassword(true);
+        bootstrapPersistence.setUsePassword(true);
+        configuration.storePersistence(bootstrapPersistence);
         configuration.setPassword(password);
         closeConfigPasswordAndReturnMainView();
     }
@@ -74,7 +82,8 @@ public class ConfigPassword implements Initializable {
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent()) {
             if (result.get().getButtonData() == ButtonBar.ButtonData.OK_DONE) {
-                configuration.setUsePassword(false);
+                bootstrapPersistence.setUsePassword(true);
+                configuration.storePersistence(bootstrapPersistence);
                 closeConfigPasswordAndReturnMainView();
             }
         }

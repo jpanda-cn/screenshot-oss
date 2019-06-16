@@ -1,8 +1,6 @@
 package cn.jpanda.screenshot.oss.view.main;
 
-import cn.jpanda.screenshot.oss.core.BootStrap;
-import cn.jpanda.screenshot.oss.core.annotations.View;
-import cn.jpanda.screenshot.oss.core.configuration.Configuration;
+import cn.jpanda.screenshot.oss.newcore.Configuration;
 import cn.jpanda.screenshot.oss.newcore.annotations.Controller;
 import cn.jpanda.screenshot.oss.service.handlers.KeyExitStageEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.SnapshotView;
@@ -22,7 +20,11 @@ import java.util.ResourceBundle;
 
 @Controller
 public class CutView implements Initializable {
-    private Configuration configuration = BootStrap.configuration;
+    private Configuration configuration;
+
+    public CutView(Configuration configuration) {
+        this.configuration = configuration;
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {

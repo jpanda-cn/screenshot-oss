@@ -2,6 +2,7 @@ package cn.jpanda.screenshot.oss.view.main;
 
 import cn.jpanda.screenshot.oss.newcore.Configuration;
 import cn.jpanda.screenshot.oss.newcore.annotations.Controller;
+import cn.jpanda.screenshot.oss.newcore.capture.DefaultScreenCapture;
 import cn.jpanda.screenshot.oss.newcore.capture.ScreenCapture;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
@@ -36,8 +37,7 @@ public class ChoseScreenView implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        ScreenCapture screenCapture = null;
-//        ScreenCapture screenCapture = configuration.getScreenCapture();
+        ScreenCapture screenCapture = new DefaultScreenCapture();
         for (int i = 0; i < screenCapture.GraphicsDeviceCount(); i++) {
             Tab tab = new Tab();
             tab.setText(String.format("屏幕%d", i));

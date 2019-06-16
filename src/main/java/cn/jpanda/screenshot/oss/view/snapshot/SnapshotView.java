@@ -1,8 +1,7 @@
 package cn.jpanda.screenshot.oss.view.snapshot;
 
-import cn.jpanda.screenshot.oss.core.BootStrap;
+import cn.jpanda.screenshot.oss.newcore.Configuration;
 import cn.jpanda.screenshot.oss.newcore.capture.ScreenCapture;
-import cn.jpanda.screenshot.oss.core.configuration.Configuration;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import javafx.embed.swing.SwingFXUtils;
@@ -29,7 +28,7 @@ import java.util.ResourceBundle;
  * 截图窗口
  */
 public class SnapshotView implements Initializable {
-    private Configuration configuration = BootStrap.configuration;
+    private Configuration configuration;
     private GlobalConfigPersistence globalConfigPersistence;
     private ScreenCapture screenCapture;
 

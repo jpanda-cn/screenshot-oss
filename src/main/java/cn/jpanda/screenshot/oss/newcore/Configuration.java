@@ -2,9 +2,10 @@ package cn.jpanda.screenshot.oss.newcore;
 
 import cn.jpanda.screenshot.oss.common.utils.OrderComparator;
 import cn.jpanda.screenshot.oss.core.log.LogFactory;
+import cn.jpanda.screenshot.oss.newcore.controller.ViewContext;
+import cn.jpanda.screenshot.oss.newcore.interceptor.ValueInterceptor;
 import cn.jpanda.screenshot.oss.newcore.persistence.Persistence;
 import cn.jpanda.screenshot.oss.newcore.persistence.strategy.DataPersistenceStrategy;
-import cn.jpanda.screenshot.oss.newcore.interceptor.ValueInterceptor;
 import cn.jpanda.screenshot.oss.newcore.scan.AfterBootstrapLoaderProcess;
 import cn.jpanda.screenshot.oss.newcore.toolkit.BeanInstance;
 import cn.jpanda.screenshot.oss.newcore.toolkit.DefaultBeanInstance;
@@ -13,8 +14,6 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -37,9 +36,6 @@ public class Configuration {
     @Setter
     private String password;
 
-    @Setter
-    @Getter
-    private boolean usePassword;
     /**
      * 程序执行器所处的工作目录
      */
@@ -73,6 +69,12 @@ public class Configuration {
     @Getter
     @Setter
     private DataPersistenceStrategy dataPersistenceStrategy;
+    /**
+     * 视图上下文
+     */
+    @Getter
+    @Setter
+    private ViewContext viewContext;
 
     /**
      * 获取实体对象
