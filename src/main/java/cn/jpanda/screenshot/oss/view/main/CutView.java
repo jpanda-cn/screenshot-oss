@@ -3,6 +3,7 @@ package cn.jpanda.screenshot.oss.view.main;
 import cn.jpanda.screenshot.oss.core.BootStrap;
 import cn.jpanda.screenshot.oss.core.annotations.View;
 import cn.jpanda.screenshot.oss.core.configuration.Configuration;
+import cn.jpanda.screenshot.oss.newcore.annotations.Controller;
 import cn.jpanda.screenshot.oss.service.handlers.KeyExitStageEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.SnapshotView;
 import javafx.beans.value.ChangeListener;
@@ -19,7 +20,7 @@ import javafx.stage.WindowEvent;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-@View
+@Controller
 public class CutView implements Initializable {
     private Configuration configuration = BootStrap.configuration;
 

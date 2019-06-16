@@ -2,7 +2,7 @@ package cn.jpanda.screenshot.oss.view.tray;
 
 import cn.jpanda.screenshot.oss.core.BootStrap;
 import cn.jpanda.screenshot.oss.core.configuration.Configuration;
-import cn.jpanda.screenshot.oss.core.context.ViewContext;
+import cn.jpanda.screenshot.oss.newcore.controller.ViewContext;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import cn.jpanda.screenshot.oss.view.tray.subs.TrayColorView;

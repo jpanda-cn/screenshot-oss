@@ -2,7 +2,7 @@ package cn.jpanda.screenshot.oss;
 
 
 import cn.jpanda.screenshot.oss.core.BootStrap;
-import cn.jpanda.screenshot.oss.core.context.ViewContext;
+import cn.jpanda.screenshot.oss.newcore.controller.ViewContext;
 import cn.jpanda.screenshot.oss.view.main.CutView;
 import cn.jpanda.screenshot.oss.view.password.enter.EnterPassword;
 import cn.jpanda.screenshot.oss.view.password.init.ConfigPassword;

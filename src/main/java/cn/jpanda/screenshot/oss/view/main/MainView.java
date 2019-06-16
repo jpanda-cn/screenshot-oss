@@ -4,6 +4,7 @@ import cn.jpanda.screenshot.oss.core.BootStrap;
 import cn.jpanda.screenshot.oss.core.configuration.Configuration;
 import cn.jpanda.screenshot.oss.core.log.Log;
 import cn.jpanda.screenshot.oss.core.log.LogHolder;
+import cn.jpanda.screenshot.oss.newcore.annotations.Controller;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
 import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallbackRegistryManager;
 import cn.jpanda.screenshot.oss.store.save.ImageStoreRegisterManager;
@@ -22,6 +23,7 @@ import javafx.stage.Stage;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+@Controller
 public class MainView implements Initializable {
 
     public Button edit;
@@ -67,6 +69,7 @@ public class MainView implements Initializable {
             }
         });
     }
+
     @SuppressWarnings("unchecked")
     private void loadClipboard() {
         // 初始化保存到剪切板的内容

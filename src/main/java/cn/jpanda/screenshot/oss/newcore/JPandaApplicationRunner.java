@@ -1,6 +1,11 @@
 package cn.jpanda.screenshot.oss.newcore;
 
+import cn.jpanda.screenshot.oss.newcore.controller.ControllerAnnotationSameNameFXMLSearch;
+import cn.jpanda.screenshot.oss.newcore.controller.DefaultViewContext;
+import cn.jpanda.screenshot.oss.newcore.controller.ViewContext;
 import cn.jpanda.screenshot.oss.newcore.scan.AfterBootstrapLoaderProcess;
+import cn.jpanda.screenshot.oss.view.main.ChoseScreenView;
+import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
 
 /**
@@ -11,6 +16,7 @@ import javafx.stage.Stage;
  */
 public class JPandaApplicationRunner {
     private Configuration configuration;
+    protected ViewContext viewContext;
     protected BootstrapLoader bootstrapLoader = new DefaultBootstrapLoader();
 
     /**
@@ -25,5 +31,7 @@ public class JPandaApplicationRunner {
         // 执行引导程序后置操作
         configuration.getAfterBootstrapLoaderProcesses().forEach(AfterBootstrapLoaderProcess::after);
         // 加载视图上下文，准备处理视图问题
+        viewContext = new DefaultViewContext(stage, new ControllerAnnotationSameNameFXMLSearch(FXMLLoader.getDefaultClassLoader()), configuration);
+        viewContext.showScene(ChoseScreenView.class);
     }
 }

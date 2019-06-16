@@ -1,6 +1,8 @@
 package cn.jpanda.screenshot.oss.core.scan;
 
+import cn.jpanda.screenshot.oss.newcore.BeanRegistry;
 import cn.jpanda.screenshot.oss.newcore.scan.ClassScan;
+import cn.jpanda.screenshot.oss.newcore.scan.DefaultClassScan;
 
 import java.util.ArrayList;
 import java.util.List;

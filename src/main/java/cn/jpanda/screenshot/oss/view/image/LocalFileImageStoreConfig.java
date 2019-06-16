@@ -2,8 +2,8 @@ package cn.jpanda.screenshot.oss.view.image;
 
 import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.BootStrap;
-import cn.jpanda.screenshot.oss.core.annotations.View;
-import cn.jpanda.screenshot.oss.core.configuration.Configuration;
+import cn.jpanda.screenshot.oss.newcore.Configuration;
+import cn.jpanda.screenshot.oss.newcore.annotations.Controller;
 import cn.jpanda.screenshot.oss.persistences.LocalImageStorePersistence;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -21,14 +21,18 @@ import java.util.ResourceBundle;
 /**
  * 本地文件——图片存储配置
  */
-@View
+@Controller
 public class LocalFileImageStoreConfig implements Initializable {
-    private Configuration configuration = BootStrap.configuration;
+    private Configuration configuration;
     public TextField show;
     public Button chose;
     public Button cancel;
     public Button save;
     private LocalImageStorePersistence config;
+
+    public LocalFileImageStoreConfig(Configuration configuration) {
+        this.configuration = configuration;
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -36,7 +40,7 @@ public class LocalFileImageStoreConfig implements Initializable {
         // 加载配置文件
         config = configuration.getPersistence(LocalImageStorePersistence.class);
         if (StringUtils.isEmpty(config.getPath())) {
-            config.setPath(configuration.getCurrentWorkDir() + File.separator + "images/saves" + File.separator);
+            config.setPath(configuration.getWorkPath() + File.separator + "images/saves" + File.separator);
             configuration.storePersistence(config);
         }
         show.textProperty().setValue(config.getPath());

@@ -1,13 +1,15 @@
 package cn.jpanda.screenshot.oss.newcore;
 
 import cn.jpanda.screenshot.oss.JpandaBootstrap;
+import javafx.application.Application;
+import javafx.stage.Stage;
 import org.junit.Test;
 
-public class JPandaApplicationRunnerTest {
+public class JPandaApplicationRunnerTest extends Application {
 
-    @Test
-    public void run() {
+    @Override
+    public void start(Stage primaryStage) throws Exception {
         JPandaApplicationRunner jPandaApplicationRunner = new JPandaApplicationRunner();
-        jPandaApplicationRunner.run(null, JpandaBootstrap.class);
+        jPandaApplicationRunner.run(primaryStage, JpandaBootstrap.class);
     }
 }

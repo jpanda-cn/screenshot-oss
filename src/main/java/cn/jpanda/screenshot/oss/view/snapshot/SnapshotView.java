@@ -1,7 +1,7 @@
 package cn.jpanda.screenshot.oss.view.snapshot;
 
 import cn.jpanda.screenshot.oss.core.BootStrap;
-import cn.jpanda.screenshot.oss.core.capture.ScreenCapture;
+import cn.jpanda.screenshot.oss.newcore.capture.ScreenCapture;
 import cn.jpanda.screenshot.oss.core.configuration.Configuration;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;

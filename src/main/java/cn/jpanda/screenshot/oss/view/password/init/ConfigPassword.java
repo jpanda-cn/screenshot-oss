@@ -4,6 +4,7 @@ import cn.jpanda.screenshot.oss.common.utils.AlertUtils;
 import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.BootStrap;
 import cn.jpanda.screenshot.oss.core.configuration.Configuration;
+import cn.jpanda.screenshot.oss.newcore.annotations.Controller;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -16,6 +17,7 @@ import java.util.ResourceBundle;
 /**
  * 配置密码页面
  */
+@Controller
 public class ConfigPassword implements Initializable {
 
     private Configuration configuration = BootStrap.configuration;

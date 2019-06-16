@@ -1,17 +1,16 @@
 package cn.jpanda.screenshot.oss.core;
 
 import cn.jpanda.screenshot.oss.common.utils.JarUtils;
-import cn.jpanda.screenshot.oss.core.capture.DefaultScreenCapture;
+import cn.jpanda.screenshot.oss.newcore.capture.DefaultScreenCapture;
 import cn.jpanda.screenshot.oss.core.configuration.Configuration;
-import cn.jpanda.screenshot.oss.core.context.DefaultViewContext;
-import cn.jpanda.screenshot.oss.core.context.FXAnnotationSameNameFXMLSearch;
+import cn.jpanda.screenshot.oss.newcore.controller.DefaultViewContext;
+import cn.jpanda.screenshot.oss.newcore.controller.ControllerAnnotationSameNameFXMLSearch;
 import cn.jpanda.screenshot.oss.core.log.*;
-import cn.jpanda.screenshot.oss.core.persistence.*;
 import cn.jpanda.screenshot.oss.core.scan.BootStrapClassScanRegistry;
 import cn.jpanda.screenshot.oss.core.scan.SceneBeanRegistry;
-import cn.jpanda.screenshot.oss.newcore.persistence.visitor.CachedPropertiesVisitor;
+import cn.jpanda.screenshot.oss.newcore.persistence.BootstrapPersistence;
+import cn.jpanda.screenshot.oss.newcore.persistence.strategy.StandardPropertiesDataPersistenceStrategy;
 import cn.jpanda.screenshot.oss.newcore.persistence.visitor.DefaultPropertiesVisitor;
-import cn.jpanda.screenshot.oss.newcore.persistence.visitor.PropertiesVisitor;
 import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallbackRegister;
 import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallbackRegistryManager;
 import cn.jpanda.screenshot.oss.store.clipboard.ImageClipboardCallback;
@@ -56,7 +55,7 @@ public abstract class BootStrap extends Application {
         registryValueInterceptor();
         // 初始化类加载器，获取类加载器并执行注册操作
         // 初始化全局配置文件
-        configuration.setBootstrapDataPersistenceStrategy(new PropertiesDataPersistenceStrategy(configuration.getConfigFile("bootsrap.properties"), new DefaultPropertiesVisitor(), configuration));
+        configuration.setBootstrapDataPersistenceStrategy(new StandardPropertiesDataPersistenceStrategy(new cn.jpanda.screenshot.oss.newcore.Configuration(),new DefaultPropertiesVisitor()));
         configuration.setBootstrapPersistence(configuration.getBootstrapDataPersistenceStrategy().load(BootstrapPersistence.class));
         // 加载配置文件持久操作策略类
         loadDataPersistenceStrategy();
@@ -118,7 +117,7 @@ public abstract class BootStrap extends Application {
     }
 
     protected void loadViewContext(Stage primaryStage) {
-        configuration.setViewContext(new DefaultViewContext(primaryStage, new FXAnnotationSameNameFXMLSearch(FXMLLoader.getDefaultClassLoader())));
+//        configuration.setViewContext(new DefaultViewContext(primaryStage, new ControllerAnnotationSameNameFXMLSearch(FXMLLoader.getDefaultClassLoader())));
     }
 
     protected abstract boolean doBootStrap();

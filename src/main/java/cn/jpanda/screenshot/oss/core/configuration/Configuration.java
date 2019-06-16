@@ -1,9 +1,9 @@
 package cn.jpanda.screenshot.oss.core.configuration;
 
 import cn.jpanda.screenshot.oss.common.utils.StringUtils;
-import cn.jpanda.screenshot.oss.core.capture.ScreenCapture;
-import cn.jpanda.screenshot.oss.core.context.ViewContext;
-import cn.jpanda.screenshot.oss.core.persistence.BootstrapPersistence;
+import cn.jpanda.screenshot.oss.newcore.capture.ScreenCapture;
+import cn.jpanda.screenshot.oss.newcore.controller.ViewContext;
+import cn.jpanda.screenshot.oss.newcore.persistence.BootstrapPersistence;
 import cn.jpanda.screenshot.oss.newcore.persistence.strategy.DataPersistenceStrategy;
 import cn.jpanda.screenshot.oss.newcore.persistence.Persistence;
 import cn.jpanda.screenshot.oss.newcore.interceptor.ValueInterceptor;

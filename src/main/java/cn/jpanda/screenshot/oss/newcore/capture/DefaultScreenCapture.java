@@ -1,4 +1,4 @@
-package cn.jpanda.screenshot.oss.core.capture;
+package cn.jpanda.screenshot.oss.newcore.capture;
 
 import cn.jpanda.screenshot.oss.core.exceptions.GraphicsDeviceNotFoundRuntimeException;
 import lombok.SneakyThrows;

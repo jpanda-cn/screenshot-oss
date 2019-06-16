@@ -2,6 +2,7 @@ package cn.jpanda.screenshot.oss.newcore;
 
 import cn.jpanda.screenshot.oss.common.utils.OrderComparator;
 import cn.jpanda.screenshot.oss.core.log.LogFactory;
+import cn.jpanda.screenshot.oss.newcore.persistence.Persistence;
 import cn.jpanda.screenshot.oss.newcore.persistence.strategy.DataPersistenceStrategy;
 import cn.jpanda.screenshot.oss.newcore.interceptor.ValueInterceptor;
 import cn.jpanda.screenshot.oss.newcore.scan.AfterBootstrapLoaderProcess;
@@ -12,6 +13,8 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -70,6 +73,20 @@ public class Configuration {
     @Getter
     @Setter
     private DataPersistenceStrategy dataPersistenceStrategy;
+
+    /**
+     * 获取实体对象
+     */
+    public <T extends Persistence> T getPersistence(Class<T> p) {
+        return dataPersistenceStrategy.load(p);
+    }
+
+    /**
+     * 保存实体对象
+     */
+    public void storePersistence(Persistence p) {
+        dataPersistenceStrategy.store(p);
+    }
 
     /**
      * 创建一个用于实例化指定类型的Bean实例化工具

@@ -1,7 +1,9 @@
-package cn.jpanda.screenshot.oss.core.context;
+package cn.jpanda.screenshot.oss.newcore.controller;
 
+import cn.jpanda.screenshot.oss.newcore.Configuration;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import lombok.SneakyThrows;
@@ -16,9 +18,12 @@ public class DefaultViewContext implements ViewContext {
 
     private FXMLSearch fxmlSearch;
 
-    public DefaultViewContext(Stage defaultStage, FXMLSearch fxmlSearch) {
+    private Configuration configuration;
+
+    public DefaultViewContext(Stage defaultStage, FXMLSearch fxmlSearch, Configuration configuration) {
         this.defaultStage = defaultStage;
         this.fxmlSearch = fxmlSearch;
+        this.configuration = configuration;
     }
 
     private ConcurrentHashMap<String, Scene> views = new ConcurrentHashMap<>();
@@ -49,13 +54,14 @@ public class DefaultViewContext implements ViewContext {
             if (override) {
                 registry(clazz);
             } else {
-                return new Scene(FXMLLoader.load(fxmlSearch.search(clazz)));
+
+                return loadScene(clazz);
             }
 
         }
         if (views.containsKey(key)) {
             return views.get(key);
-        }else {
+        } else {
             registry(clazz);
         }
 
@@ -66,7 +72,7 @@ public class DefaultViewContext implements ViewContext {
     @Override
     @SneakyThrows
     public boolean registry(Class<? extends Initializable> clazz) {
-        return null != views.put(generatorViewKey(clazz), new Scene(FXMLLoader.load(fxmlSearch.search(clazz))));
+        return null != views.put(generatorViewKey(clazz), loadScene(clazz));
     }
 
     @Override
@@ -77,5 +83,15 @@ public class DefaultViewContext implements ViewContext {
 
     protected String generatorViewKey(Class clazz) {
         return clazz.getCanonicalName();
+    }
+
+    @SneakyThrows
+    protected Parent load(Class<? extends Initializable> clazz) {
+        // 主要作用是为其提供注入Configuration对象的能力
+        return FXMLLoader.load(fxmlSearch.search(clazz), null, null, new InjectControllerCallback(configuration));
+    }
+
+    protected Scene loadScene(Class<? extends Initializable> clazz) {
+        return new Scene(load(clazz));
     }
 }

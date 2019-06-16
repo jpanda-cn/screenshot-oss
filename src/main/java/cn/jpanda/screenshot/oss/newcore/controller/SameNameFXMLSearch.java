@@ -1,4 +1,4 @@
-package cn.jpanda.screenshot.oss.core.context;
+package cn.jpanda.screenshot.oss.newcore.controller;
 
 import lombok.Setter;
 

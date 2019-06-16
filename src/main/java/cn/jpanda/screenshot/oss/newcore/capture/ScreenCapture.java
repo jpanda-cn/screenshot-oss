@@ -1,4 +1,4 @@
-package cn.jpanda.screenshot.oss.core.capture;
+package cn.jpanda.screenshot.oss.newcore.capture;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

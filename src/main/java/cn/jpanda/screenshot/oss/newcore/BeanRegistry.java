@@ -1,4 +1,4 @@
-package cn.jpanda.screenshot.oss.core.scan;
+package cn.jpanda.screenshot.oss.newcore;
 
 /**
  * 实体注册器

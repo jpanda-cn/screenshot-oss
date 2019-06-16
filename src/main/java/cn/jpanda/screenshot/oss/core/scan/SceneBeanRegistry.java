@@ -3,6 +3,7 @@ package cn.jpanda.screenshot.oss.core.scan;
 import cn.jpanda.screenshot.oss.core.configuration.Configuration;
 import cn.jpanda.screenshot.oss.core.log.Log;
 import cn.jpanda.screenshot.oss.core.log.LogHolder;
+import cn.jpanda.screenshot.oss.newcore.BeanRegistry;
 import javafx.fxml.Initializable;
 
 /**

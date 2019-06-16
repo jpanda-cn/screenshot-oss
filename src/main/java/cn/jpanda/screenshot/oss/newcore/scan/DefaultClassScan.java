@@ -1,4 +1,4 @@
-package cn.jpanda.screenshot.oss.core.scan;
+package cn.jpanda.screenshot.oss.newcore.scan;
 
 import cn.jpanda.screenshot.oss.core.log.Log;
 import cn.jpanda.screenshot.oss.core.log.LogHolder;

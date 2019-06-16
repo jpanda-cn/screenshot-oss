@@ -1,7 +1,7 @@
 package cn.jpanda.screenshot.oss.newcore.interceptor;
 
 import cn.jpanda.screenshot.oss.core.log.Log;
-import cn.jpanda.screenshot.oss.core.scan.BeanRegistry;
+import cn.jpanda.screenshot.oss.newcore.BeanRegistry;
 import cn.jpanda.screenshot.oss.newcore.toolkit.BeanInstance;
 import cn.jpanda.screenshot.oss.newcore.Configuration;
 import cn.jpanda.screenshot.oss.newcore.annotations.Component;

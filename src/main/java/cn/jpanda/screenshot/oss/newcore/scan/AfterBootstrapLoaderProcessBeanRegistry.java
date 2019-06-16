@@ -1,6 +1,6 @@
 package cn.jpanda.screenshot.oss.newcore.scan;
 
-import cn.jpanda.screenshot.oss.core.scan.BeanRegistry;
+import cn.jpanda.screenshot.oss.newcore.BeanRegistry;
 import cn.jpanda.screenshot.oss.newcore.Configuration;
 import cn.jpanda.screenshot.oss.newcore.annotations.Component;
 

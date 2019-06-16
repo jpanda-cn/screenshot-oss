@@ -2,6 +2,7 @@ package cn.jpanda.screenshot.oss.core.scan;
 
 import cn.jpanda.screenshot.oss.core.annotations.View;
 import cn.jpanda.screenshot.oss.newcore.scan.ClassScan;
+import cn.jpanda.screenshot.oss.newcore.scan.DefaultClassScan;
 import org.junit.Test;
 
 import java.util.Set;

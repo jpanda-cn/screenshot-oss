@@ -1,9 +1,8 @@
 package cn.jpanda.screenshot.oss.view.main;
 
-import cn.jpanda.screenshot.oss.core.BootStrap;
-import cn.jpanda.screenshot.oss.core.annotations.View;
-import cn.jpanda.screenshot.oss.core.capture.ScreenCapture;
-import cn.jpanda.screenshot.oss.core.configuration.Configuration;
+import cn.jpanda.screenshot.oss.newcore.Configuration;
+import cn.jpanda.screenshot.oss.newcore.annotations.Controller;
+import cn.jpanda.screenshot.oss.newcore.capture.ScreenCapture;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -18,15 +17,27 @@ import java.util.ResourceBundle;
 /**
  * 选择屏幕
  */
-@View
+@Controller
 public class ChoseScreenView implements Initializable {
-    Configuration configuration = BootStrap.configuration;
+    /**
+     * 该属性会自动注入
+     */
+    private Configuration configuration;
+
+    public ChoseScreenView() {
+    }
+
+    public ChoseScreenView(Configuration configuration) {
+        this.configuration = configuration;
+    }
+
     @FXML
     public TabPane tabs;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        ScreenCapture screenCapture = configuration.getScreenCapture();
+        ScreenCapture screenCapture = null;
+//        ScreenCapture screenCapture = configuration.getScreenCapture();
         for (int i = 0; i < screenCapture.GraphicsDeviceCount(); i++) {
             Tab tab = new Tab();
             tab.setText(String.format("屏幕%d", i));
