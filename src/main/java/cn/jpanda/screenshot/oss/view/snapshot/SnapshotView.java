@@ -1,6 +1,7 @@
 package cn.jpanda.screenshot.oss.view.snapshot;
 
 import cn.jpanda.screenshot.oss.newcore.Configuration;
+import cn.jpanda.screenshot.oss.newcore.annotations.Controller;
 import cn.jpanda.screenshot.oss.newcore.capture.ScreenCapture;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
@@ -27,23 +28,28 @@ import java.util.ResourceBundle;
 /**
  * 截图窗口
  */
+@Controller
 public class SnapshotView implements Initializable {
     private Configuration configuration;
     private GlobalConfigPersistence globalConfigPersistence;
     private ScreenCapture screenCapture;
+
+    public SnapshotView(Configuration configuration) {
+        this.configuration = configuration;
+    }
 
     @FXML
     private ImageView imageView;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        screenCapture = configuration.getScreenCapture();
+        screenCapture = configuration.getUniqueBean(ScreenCapture.class);
         globalConfigPersistence = configuration.getPersistence(GlobalConfigPersistence.class);
         BufferedImage image = getDesktopSnapshot();
         WritableImage writableImage = new WritableImage(image.getWidth(), image.getHeight());
         SwingFXUtils.toFXImage(image, writableImage);
         imageView.setImage(writableImage);
-        Dimension dimension = configuration.getScreenCapture().getTargetGraphicsDevice(0).getDefaultConfiguration().getBounds().getSize();
+        Dimension dimension = screenCapture.getTargetGraphicsDevice(0).getDefaultConfiguration().getBounds().getSize();
         javafx.scene.canvas.Canvas canvas = new Canvas(dimension.getWidth(), dimension.getHeight());
         GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
         graphicsContext.setStroke(Color.rgb(50, 161, 255));
@@ -53,7 +59,7 @@ public class SnapshotView implements Initializable {
         graphicsContext.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
         // 黑化之后，剩余的就交给绘制处理器来完成了
-        canvas.addEventHandler(MouseEvent.ANY, new CanvasDrawEventHandler(Color.rgb(0, 0, 0, 0.3), graphicsContext));
+        canvas.addEventHandler(MouseEvent.ANY, new CanvasDrawEventHandler(Color.rgb(0, 0, 0, 0.3), graphicsContext, configuration));
 
         // 双击完成截图
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
@@ -88,7 +94,7 @@ public class SnapshotView implements Initializable {
         BufferedImage bufferedImage = SwingFXUtils.fromFXImage(wImage, null);
         bufferedImage = bufferedImage.getSubimage(rectangle.xProperty().intValue() + 1, rectangle.yProperty().intValue() + 1, rectangle.widthProperty().intValue() - 2, rectangle.heightProperty().intValue() - 2);
         // 将获取到的图片交给图片处理器完成。
-        configuration.store(bufferedImage);
+//        configuration.store(bufferedImage);
         // 关闭
         ((Stage) canvas.getScene().getWindow()).close();
     }

@@ -1,7 +1,7 @@
 package cn.jpanda.screenshot.oss.view.tray;
 
-import cn.jpanda.screenshot.oss.core.BootStrap;
-import cn.jpanda.screenshot.oss.core.configuration.Configuration;
+import cn.jpanda.screenshot.oss.newcore.Configuration;
+import cn.jpanda.screenshot.oss.newcore.annotations.Controller;
 import cn.jpanda.screenshot.oss.newcore.controller.ViewContext;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
@@ -34,9 +34,15 @@ import java.util.ResourceBundle;
 /**
  * 截图托盘
  */
+@Controller
 public class CanvasCutTrayView implements Initializable {
 
-    private Configuration configuration = BootStrap.configuration;
+    private Configuration configuration ;
+
+    public CanvasCutTrayView(Configuration configuration) {
+        this.configuration = configuration;
+    }
+
     @FXML
     public Button drag;
     @FXML
@@ -154,7 +160,7 @@ public class CanvasCutTrayView implements Initializable {
         BufferedImage bufferedImage = SwingFXUtils.fromFXImage(wImage, null);
         bufferedImage = bufferedImage.getSubimage(rectangle.xProperty().intValue() + 1, rectangle.yProperty().intValue() + 1, rectangle.widthProperty().intValue() - 2, rectangle.heightProperty().intValue() - 2);
         // 将获取到的图片交给图片处理器完成。
-        configuration.store(bufferedImage);
+//        configuration.store(bufferedImage);
         // 关闭
         Stage stage = ((Stage) scene.getWindow());
         stage.close();

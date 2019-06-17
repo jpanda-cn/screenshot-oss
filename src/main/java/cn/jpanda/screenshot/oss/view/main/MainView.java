@@ -1,13 +1,13 @@
 package cn.jpanda.screenshot.oss.view.main;
 
-import cn.jpanda.screenshot.oss.core.BootStrap;
-import cn.jpanda.screenshot.oss.core.configuration.Configuration;
-import cn.jpanda.screenshot.oss.core.log.Log;
-import cn.jpanda.screenshot.oss.core.log.LogHolder;
+import cn.jpanda.screenshot.oss.common.enums.ClipboardType;
+import cn.jpanda.screenshot.oss.common.enums.ImageType;
+import cn.jpanda.screenshot.oss.newcore.Configuration;
 import cn.jpanda.screenshot.oss.newcore.annotations.Controller;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
 import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallbackRegistryManager;
-import cn.jpanda.screenshot.oss.store.save.ImageStoreRegisterManager;
+import cn.jpanda.screenshot.oss.store.img.ImageStoreRegisterManager;
+import cn.jpanda.screenshot.oss.store.img.NoImageStoreConfig;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
@@ -21,13 +21,20 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 @Controller
 public class MainView implements Initializable {
+    private Configuration configuration;
+
+    public MainView(Configuration configuration) {
+        this.configuration = configuration;
+    }
 
     public Button edit;
     public ChoiceBox imageSave;
+    @FXML
     public ChoiceBox clipboard;
     public Label shotKey;
     /**
@@ -36,16 +43,16 @@ public class MainView implements Initializable {
     @FXML
     public CheckBox preview;
 
-    private Log log = LogHolder.getInstance().getLogFactory().getLog(getClass());
-
-    private Configuration configuration = BootStrap.configuration;
-
+    private ImageStoreRegisterManager imageStoreRegisterManager;
+    private ClipboardCallbackRegistryManager clipboardCallbackRegistryManager;
     private GlobalConfigPersistence globalConfigPersistence;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // 加载配置
-        globalConfigPersistence = configuration.getDataPersistenceStrategy().load(GlobalConfigPersistence.class);
+        imageStoreRegisterManager = configuration.getUniqueBean(ImageStoreRegisterManager.class);
+        clipboardCallbackRegistryManager = configuration.getUniqueBean(ClipboardCallbackRegistryManager.class);
+        globalConfigPersistence = configuration.getPersistence(GlobalConfigPersistence.class);
         loadImageSave();
         loadClipboard();
         loadPreView();
@@ -53,37 +60,90 @@ public class MainView implements Initializable {
 
     @SuppressWarnings("unchecked")
     private void loadImageSave() {
-        // 初始化存储方式列表
-        ImageStoreRegisterManager imageStoreRegisterManager = configuration.getImageStoreRegisterManager();
-        imageSave.getItems().addAll(imageStoreRegisterManager.getNames());
-        imageSave.getSelectionModel().select(configuration.getImageStore());
-        // 判断是否有对应的配置界面，决定是否展示配置按钮
-        edit.visibleProperty().setValue(imageStoreRegisterManager.getConfig(configuration.getImageStore()) != null);
+        // 监听事件
         imageSave.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue instanceof String) {
-                if (!configuration.getImageStore().equalsIgnoreCase((String) newValue)) {
-                    configuration.setImageStore((String) newValue);
+                if (!globalConfigPersistence.getImageStore().equalsIgnoreCase((String) newValue)) {
+                    globalConfigPersistence.setImageStore((String) newValue);
                     // 判断是否有对应的配置界面，决定是否展示配置按钮
-                    edit.visibleProperty().setValue(imageStoreRegisterManager.getConfig((String) newValue) != null);
+                    Class<? extends Initializable> conf = imageStoreRegisterManager.getConfig((String) newValue);
+                    edit.disableProperty().setValue((conf == null || conf.equals(NoImageStoreConfig.class)));
+                    // 联动，剪切板的内容同步发生变化
+                    ImageType type = imageStoreRegisterManager.getType((String) newValue);
+                    List<String> cls;
+                    switch (type) {
+                        case NO_PATH: {
+                            cls = clipboardCallbackRegistryManager.getNamesByType(ClipboardType.NOT_NEED);
+                            break;
+                        }
+                        case HAS_PATH: {
+                            cls = clipboardCallbackRegistryManager.getNames();
+                            break;
+                        }
+                        default: {
+                            cls = clipboardCallbackRegistryManager.getNames();
+                        }
+                    }
+                    // 更新剪切板
+                    clipboard.getItems().clear();
+                    clipboard.getItems().addAll(cls);
+                    // 校验之前选中的是否还可用，不可用使用第一个
+                    if (cls.contains(globalConfigPersistence.getClipboardCallback())) {
+                        clipboard.getSelectionModel().select(globalConfigPersistence.getClipboardCallback());
+                    } else {
+                        clipboard.getSelectionModel().select(0);
+                    }
                 }
             }
         });
+
+        // 初始化存储方式列表
+        imageSave.getItems().addAll(imageStoreRegisterManager.getNames());
+        imageSave.getSelectionModel().select(globalConfigPersistence.getImageStore());
+        // 判断是否有对应的配置界面，决定是否展示配置按钮
+        edit.visibleProperty().setValue(imageStoreRegisterManager.getConfig(globalConfigPersistence.getImageStore()) != null);
+
     }
 
     @SuppressWarnings("unchecked")
     private void loadClipboard() {
-        // 初始化保存到剪切板的内容
-        ClipboardCallbackRegistryManager clipboardCallbackRegistryManager = configuration.getClipboardCallbackRegistryManager();
-        clipboard.getItems().addAll(clipboardCallbackRegistryManager.getNames());
-        clipboard.getSelectionModel().select(configuration.getClipboardCallback());
         clipboard.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue instanceof String) {
-                if (!configuration.getClipboardCallback().equalsIgnoreCase((String) newValue)) {
-                    configuration.setClipboardCallback((String) newValue);
+                if (!globalConfigPersistence.getClipboardCallback().equalsIgnoreCase((String) newValue)) {
+                    globalConfigPersistence.setClipboardCallback((String) newValue);
                     // 刷新配置
+                    // 联动
+                    ClipboardType clipboardType = clipboardCallbackRegistryManager.getType((String) newValue);
+                    List<String> is;
+                    switch (clipboardType) {
+                        case NOT_NEED: {
+                            is = imageStoreRegisterManager.getNames();
+                            break;
+                        }
+                        case NEED_PATH: {
+                            is = imageStoreRegisterManager.getNamesByType(ImageType.HAS_PATH);
+                            break;
+                        }
+                        default: {
+                            is = imageStoreRegisterManager.getNamesByType(ImageType.HAS_PATH);
+                            break;
+                        }
+                    }
+                    imageSave.getItems().clear();
+                    imageSave.getItems().addAll(is);
+                    // 校验之前选中的是否还可用，不可用使用第一个
+                    if (is.contains(globalConfigPersistence.getImageStore())) {
+                        imageSave.getSelectionModel().select(globalConfigPersistence.getImageStore());
+                    } else {
+                        imageSave.getSelectionModel().select(0);
+                    }
                 }
             }
         });
+        // 初始化保存到剪切板的内容
+        clipboard.getItems().addAll(clipboardCallbackRegistryManager.getNames());
+        clipboard.getSelectionModel().select(globalConfigPersistence.getClipboardCallback());
+
     }
 
     private void loadPreView() {
@@ -93,7 +153,6 @@ public class MainView implements Initializable {
     public void editImageStore() {
         // 获取当前选择的图片存储方式
         String name = (String) imageSave.getValue();
-        ImageStoreRegisterManager imageStoreRegisterManager = configuration.getImageStoreRegisterManager();
         Class<? extends Initializable> config = imageStoreRegisterManager.getConfig(name);
         if (config == null) {
             return;

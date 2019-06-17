@@ -1,6 +1,6 @@
 package cn.jpanda.screenshot.oss.view.tray.subs;
 
-import cn.jpanda.screenshot.oss.core.annotations.View;
+import cn.jpanda.screenshot.oss.newcore.annotations.Controller;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -9,7 +9,7 @@ import javafx.scene.paint.Color;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-@View
+@Controller
 public class TrayColorView implements Initializable {
     public Button red;
     public Button yellow;
@@ -23,22 +23,27 @@ public class TrayColorView implements Initializable {
 
     }
 
-    public void red(){
+    public void red() {
         changeColor(Color.RED);
     }
-    public void yellow(){
+
+    public void yellow() {
         changeColor(Color.YELLOW);
     }
-    public void blue(){
+
+    public void blue() {
         changeColor(Color.BLUE);
     }
-    public void green(){
+
+    public void green() {
         changeColor(Color.GREEN);
     }
-    public void black(){
+
+    public void black() {
         changeColor(Color.BLACK);
     }
-    public void white(){
+
+    public void white() {
         changeColor(Color.WHITE);
     }
 

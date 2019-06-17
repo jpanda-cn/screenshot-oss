@@ -1,4 +1,4 @@
-package cn.jpanda.screenshot.oss.store.save;
+package cn.jpanda.screenshot.oss.store.img;
 
 import javafx.fxml.Initializable;
 import lombok.AllArgsConstructor;

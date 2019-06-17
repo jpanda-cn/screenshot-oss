@@ -1,7 +1,6 @@
 package cn.jpanda.screenshot.oss.view.image;
 
 import cn.jpanda.screenshot.oss.common.utils.StringUtils;
-import cn.jpanda.screenshot.oss.core.BootStrap;
 import cn.jpanda.screenshot.oss.newcore.Configuration;
 import cn.jpanda.screenshot.oss.newcore.annotations.Controller;
 import cn.jpanda.screenshot.oss.persistences.LocalImageStorePersistence;
@@ -66,12 +65,12 @@ public class LocalFileImageStoreConfig implements Initializable {
         show.textProperty().setValue(newPath);
     }
 
-    public void cancel(MouseEvent event) {
+    public void cancel() {
         // 取消
         ((Stage) show.getScene().getWindow()).close();
     }
 
-    public void save(MouseEvent event) {
+    public void save() {
         String path = config.getPath();
         String newPath = show.textProperty().get();
         if (StringUtils.isEmpty(newPath)) {

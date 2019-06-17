@@ -19,7 +19,7 @@ public class JPandaScreenshotStarter extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        viewContext = new JPandaApplicationRunner().run(primaryStage, JpandaBootstrap.class);
+        viewContext = new JPandaApplicationRunner().run(primaryStage, getClass());
         // 执行业务逻辑
         // 加载配置全局配置文件
         load();

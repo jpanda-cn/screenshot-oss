@@ -1,9 +1,9 @@
 package cn.jpanda.screenshot.oss.service.handlers.snapshot;
 
 import cn.jpanda.screenshot.oss.common.toolkit.Bounds;
-import cn.jpanda.screenshot.oss.service.handlers.snapshot.RoutingSnapshotCanvasEventHandler;
-import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import cn.jpanda.screenshot.oss.common.toolkit.ExternalComponentBinders;
+import cn.jpanda.screenshot.oss.newcore.Configuration;
+import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import cn.jpanda.screenshot.oss.view.tray.CanvasCutTrayView;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
@@ -19,10 +19,9 @@ import javafx.scene.shape.Rectangle;
 
 import static cn.jpanda.screenshot.oss.common.utils.MathUtils.min;
 import static cn.jpanda.screenshot.oss.common.utils.MathUtils.subAbs;
-import static cn.jpanda.screenshot.oss.core.BootStrap.configuration;
-
 
 public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
+    private Configuration configuration;
     private Paint masking;
     private double startX;
     private double startY;
@@ -35,13 +34,14 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
 
     private boolean start = true;
 
-    public CanvasDrawEventHandler(Paint masking, GraphicsContext graphicsContext) {
+    public CanvasDrawEventHandler(Paint masking, GraphicsContext graphicsContext, Configuration configuration) {
         // 蒙版清晰度
         this.masking = masking;
         // Canvas绘图
         this.graphicsContext = graphicsContext;
         // Canvas所属容器
         pane = ((Pane) (graphicsContext.getCanvas().getParent()));
+        this.configuration = configuration;
         // 加载工具托盘
         Scene scene = configuration.getViewContext().getScene(CanvasCutTrayView.class, true, false);
         toolbar = scene.getRoot();

@@ -1,6 +1,6 @@
 package cn.jpanda.screenshot.oss.view.tray.subs;
 
-import cn.jpanda.screenshot.oss.core.annotations.View;
+import cn.jpanda.screenshot.oss.newcore.annotations.Controller;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -8,7 +8,7 @@ import javafx.scene.control.Button;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-@View
+@Controller
 public class TrayPointView implements Initializable {
     /**
      * 小点点

@@ -2,11 +2,11 @@ package cn.jpanda.screenshot.oss.newcore.persistence.strategy;
 
 import cn.jpanda.screenshot.oss.common.utils.ReflectionUtils;
 import cn.jpanda.screenshot.oss.common.utils.StringUtils;
-import cn.jpanda.screenshot.oss.newcore.persistence.Persistence;
-import cn.jpanda.screenshot.oss.newcore.persistence.visitor.PropertiesVisitor;
 import cn.jpanda.screenshot.oss.newcore.Configuration;
 import cn.jpanda.screenshot.oss.newcore.annotations.Profile;
 import cn.jpanda.screenshot.oss.newcore.interceptor.ValueInterceptor;
+import cn.jpanda.screenshot.oss.newcore.persistence.Persistence;
+import cn.jpanda.screenshot.oss.newcore.persistence.visitor.PropertiesVisitor;
 
 import java.lang.reflect.Field;
 import java.util.Properties;
@@ -81,6 +81,9 @@ public class StandardPropertiesDataPersistenceStrategy implements DataPersistenc
 
     protected String getProfileName(Class type) {
         Profile profile = (Profile) type.getDeclaredAnnotation(Profile.class);
+        if (profile == null) {
+            return Configuration.DEFAULT_COMMON_CONFIG_FILE;
+        }
         if (profile.bootstrap()) {
             return Configuration.DEFAULT_BOOTSTRAP_LOAD_CONFIG_FILE;
         }

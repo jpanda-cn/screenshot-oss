@@ -14,6 +14,8 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -75,6 +77,35 @@ public class Configuration {
     @Getter
     @Setter
     private ViewContext viewContext;
+
+    /**
+     * 特殊且唯一的实体Bean注册表
+     */
+    private Map<Class, Object> specialAndUniqueBeanRegistryTable = new ConcurrentHashMap<>();
+
+
+    /**
+     * 获取一个特殊且唯一的实体类
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T getUniqueBean(Class<T> tClass) {
+        T result = (T) specialAndUniqueBeanRegistryTable.get(tClass);
+        if (result == null) {
+            Class cls = specialAndUniqueBeanRegistryTable.keySet().stream().filter(tClass::isAssignableFrom).findFirst().orElse(null);
+            if (cls == null) {
+                return result;
+            }
+            result = (T) specialAndUniqueBeanRegistryTable.get(cls);
+        }
+        return result;
+    }
+
+    /**
+     * 注册一个特殊且唯一的实体类
+     */
+    public <T> void registryUniqueBean(Class<? extends T> tClass, T obj) {
+        specialAndUniqueBeanRegistryTable.put(tClass, obj);
+    }
 
     /**
      * 获取实体对象

@@ -30,7 +30,7 @@ public class GlobalConfigPersistence implements Persistence {
     /**
      * 图片存储方式
      */
-    private String imageStore = "本地存储";
+    private String imageStore = "本地保存";
     /**
      * 剪切板存储内容
      */

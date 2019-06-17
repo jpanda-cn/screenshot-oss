@@ -1,6 +1,6 @@
 package cn.jpanda.screenshot.oss.view.tray.subs;
 
-import cn.jpanda.screenshot.oss.core.annotations.View;
+import cn.jpanda.screenshot.oss.newcore.annotations.Controller;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import cn.jpanda.screenshot.oss.view.tray.toolkits.TrayConfig;
 import javafx.fxml.FXML;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.IntStream;
 
-@View
+@Controller
 public class TrayFontView implements Initializable {
     @FXML
     private ChoiceBox<String> fontFamily;
