@@ -2,7 +2,7 @@ package cn.jpanda.screenshot.oss.service.handlers.snapshot;
 
 import cn.jpanda.screenshot.oss.common.toolkit.Bounds;
 import cn.jpanda.screenshot.oss.common.toolkit.ExternalComponentBinders;
-import cn.jpanda.screenshot.oss.newcore.Configuration;
+import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import cn.jpanda.screenshot.oss.view.tray.CanvasCutTrayView;
 import javafx.event.EventHandler;

@@ -1,8 +1,10 @@
 package cn.jpanda.screenshot.oss;
 
-import cn.jpanda.screenshot.oss.newcore.JPandaApplicationRunner;
-import cn.jpanda.screenshot.oss.newcore.controller.ViewContext;
-import cn.jpanda.screenshot.oss.newcore.persistence.BootstrapPersistence;
+import cn.jpanda.screenshot.oss.core.JPandaApplicationRunner;
+import cn.jpanda.screenshot.oss.core.controller.ViewContext;
+import cn.jpanda.screenshot.oss.core.i18n.I18nConstants;
+import cn.jpanda.screenshot.oss.core.i18n.I18nResource;
+import cn.jpanda.screenshot.oss.core.persistence.BootstrapPersistence;
 import cn.jpanda.screenshot.oss.view.main.CutView;
 import cn.jpanda.screenshot.oss.view.password.enter.EnterPassword;
 import cn.jpanda.screenshot.oss.view.password.init.ConfigPassword;
@@ -26,13 +28,14 @@ public class JPandaScreenshotStarter extends Application {
     }
 
     private void load() {
-        BootstrapPersistence bootstrapPersistence = new BootstrapPersistence();
+        BootstrapPersistence bootstrapPersistence = viewContext.getConfiguration().getPersistence(BootstrapPersistence.class);
         bootstrapPersistence.updateUseCount();
+        viewContext.getConfiguration().storePersistence(bootstrapPersistence);
         // 校验是否为第一次使用该系统
         if (bootstrapPersistence.getUseCount() == 1) {
             //  展示初始化密码页面
             showInitPassword();
-        } else {
+        } else if (bootstrapPersistence.isUsePassword()) {
             // 校验是否需要展示密码
             showEnterPassword();
         }
@@ -41,7 +44,7 @@ public class JPandaScreenshotStarter extends Application {
 
     protected void doStart() {
         Stage stage = viewContext.getStage();
-        stage.setTitle("一个专属于程序员的截图工具");
+        stage.setTitle(viewContext.getConfiguration().getUniqueBean(I18nResource.class).get(I18nConstants.titleIndex));
         stage.setResizable(false);
         viewContext.getStage().getIcons().add(new Image(this.getClass().getClassLoader().getResourceAsStream("logo.png")));
         viewContext.showScene(CutView.class);

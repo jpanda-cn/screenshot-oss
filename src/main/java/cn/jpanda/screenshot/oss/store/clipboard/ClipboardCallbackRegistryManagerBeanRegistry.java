@@ -1,11 +1,10 @@
 package cn.jpanda.screenshot.oss.store.clipboard;
 
-import cn.jpanda.screenshot.oss.newcore.BeanRegistry;
-import cn.jpanda.screenshot.oss.newcore.Configuration;
-import cn.jpanda.screenshot.oss.newcore.annotations.ClipType;
-import cn.jpanda.screenshot.oss.newcore.annotations.Component;
-import cn.jpanda.screenshot.oss.newcore.toolkit.BeanInstance;
-import cn.jpanda.screenshot.oss.store.img.ImageStore;
+import cn.jpanda.screenshot.oss.core.BeanRegistry;
+import cn.jpanda.screenshot.oss.core.Configuration;
+import cn.jpanda.screenshot.oss.core.annotations.ClipType;
+import cn.jpanda.screenshot.oss.core.annotations.Component;
+import cn.jpanda.screenshot.oss.core.toolkit.BeanInstance;
 
 /**
  * 剪切板回调类注册器

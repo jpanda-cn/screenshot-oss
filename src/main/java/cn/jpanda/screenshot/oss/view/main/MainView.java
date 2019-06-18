@@ -2,8 +2,8 @@ package cn.jpanda.screenshot.oss.view.main;
 
 import cn.jpanda.screenshot.oss.common.enums.ClipboardType;
 import cn.jpanda.screenshot.oss.common.enums.ImageType;
-import cn.jpanda.screenshot.oss.newcore.Configuration;
-import cn.jpanda.screenshot.oss.newcore.annotations.Controller;
+import cn.jpanda.screenshot.oss.core.Configuration;
+import cn.jpanda.screenshot.oss.core.annotations.Controller;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
 import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallbackRegistryManager;
 import cn.jpanda.screenshot.oss.store.img.ImageStoreRegisterManager;
@@ -92,7 +92,9 @@ public class MainView implements Initializable {
                         clipboard.getSelectionModel().select(globalConfigPersistence.getClipboardCallback());
                     } else {
                         clipboard.getSelectionModel().select(0);
+                        globalConfigPersistence.setClipboardCallback((String) clipboard.getItems().get(0));
                     }
+                    configuration.storePersistence(globalConfigPersistence);
                 }
             }
         });
@@ -136,7 +138,9 @@ public class MainView implements Initializable {
                         imageSave.getSelectionModel().select(globalConfigPersistence.getImageStore());
                     } else {
                         imageSave.getSelectionModel().select(0);
+                        globalConfigPersistence.setImageStore((String) imageSave.getItems().get(0));
                     }
+                    configuration.storePersistence(globalConfigPersistence);
                 }
             }
         });

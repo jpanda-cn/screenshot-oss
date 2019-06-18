@@ -1,8 +1,9 @@
 package cn.jpanda.screenshot.oss.view.snapshot;
 
-import cn.jpanda.screenshot.oss.newcore.Configuration;
-import cn.jpanda.screenshot.oss.newcore.annotations.Controller;
-import cn.jpanda.screenshot.oss.newcore.capture.ScreenCapture;
+import cn.jpanda.screenshot.oss.core.Configuration;
+import cn.jpanda.screenshot.oss.core.ScreenshotsProcess;
+import cn.jpanda.screenshot.oss.core.annotations.Controller;
+import cn.jpanda.screenshot.oss.core.capture.ScreenCapture;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import javafx.embed.swing.SwingFXUtils;
@@ -17,7 +18,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import java.awt.*;
@@ -50,7 +50,7 @@ public class SnapshotView implements Initializable {
         SwingFXUtils.toFXImage(image, writableImage);
         imageView.setImage(writableImage);
         Dimension dimension = screenCapture.getTargetGraphicsDevice(0).getDefaultConfiguration().getBounds().getSize();
-        javafx.scene.canvas.Canvas canvas = new Canvas(dimension.getWidth(), dimension.getHeight());
+        Canvas canvas = new Canvas(dimension.getWidth(), dimension.getHeight());
         GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
         graphicsContext.setStroke(Color.rgb(50, 161, 255));
         ((AnchorPane) imageView.getParent()).getChildren().add(canvas);
@@ -77,24 +77,24 @@ public class SnapshotView implements Initializable {
     }
 
     private BufferedImage getDesktopSnapshot() {
+        // 校验一下显示器的数量问题
+        if (globalConfigPersistence.getScreenIndex() >= screenCapture.GraphicsDeviceCount()) {
+            globalConfigPersistence.setScreenIndex(0);
+            configuration.storePersistence(globalConfigPersistence);
+        }
         GraphicsDevice graphicsDevice = screenCapture.getTargetGraphicsDevice(globalConfigPersistence.getScreenIndex());
         Dimension dimension = graphicsDevice.getDefaultConfiguration().getBounds().getSize();
         return screenCapture.screenshotImage(globalConfigPersistence.getScreenIndex(), (int) dimension.getWidth(), (int) dimension.getHeight());
     }
 
     protected void saveAndClose(Canvas canvas) {
+        ScreenshotsProcess screenshotsProcess = configuration.getUniqueBean(ScreenshotsProcess.class);
         // 获取截图区域的图片交由图片处理器来完成保存图片的操作
         CanvasProperties canvasProperties = (CanvasProperties) canvas.getScene().getWindow().getProperties().get(CanvasProperties.class);
         if (canvasProperties == null) {
             return;
         }
-        Rectangle rectangle = canvasProperties.getCutRectangle();
-        WritableImage wImage = canvas.getScene().snapshot(null);
-        // 将图片转为BufferedImage
-        BufferedImage bufferedImage = SwingFXUtils.fromFXImage(wImage, null);
-        bufferedImage = bufferedImage.getSubimage(rectangle.xProperty().intValue() + 1, rectangle.yProperty().intValue() + 1, rectangle.widthProperty().intValue() - 2, rectangle.heightProperty().intValue() - 2);
-        // 将获取到的图片交给图片处理器完成。
-//        configuration.store(bufferedImage);
+        screenshotsProcess.done(screenshotsProcess.snapshot(canvas.getScene(), canvasProperties.getCutRectangle()));
         // 关闭
         ((Stage) canvas.getScene().getWindow()).close();
     }

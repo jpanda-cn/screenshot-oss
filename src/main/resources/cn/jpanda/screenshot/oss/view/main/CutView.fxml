@@ -19,5 +19,5 @@
     <Button fx:id="toSettings" layoutX="275.0" layoutY="4.0" mnemonicParsing="false" onKeyPressed="#toKeySettings" onMouseClicked="#toSettings" text="设置" />
    <Button layoutX="4.0" layoutY="4.0" mnemonicParsing="false" text="切换屏幕" onMouseClicked="#toChoseScreen"/>
    <Label layoutX="76.0" layoutY="8.0" text=":" />
-   <Label layoutX="86.0" layoutY="8.0" text="1" />
+   <Label fx:id="screenIndex" layoutX="86.0" layoutY="8.0" text="1" />
 </AnchorPane>

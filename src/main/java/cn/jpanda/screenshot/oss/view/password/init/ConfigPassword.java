@@ -2,9 +2,9 @@ package cn.jpanda.screenshot.oss.view.password.init;
 
 import cn.jpanda.screenshot.oss.common.utils.AlertUtils;
 import cn.jpanda.screenshot.oss.common.utils.StringUtils;
-import cn.jpanda.screenshot.oss.newcore.Configuration;
-import cn.jpanda.screenshot.oss.newcore.annotations.Controller;
-import cn.jpanda.screenshot.oss.newcore.persistence.BootstrapPersistence;
+import cn.jpanda.screenshot.oss.core.Configuration;
+import cn.jpanda.screenshot.oss.core.annotations.Controller;
+import cn.jpanda.screenshot.oss.core.persistence.BootstrapPersistence;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -82,7 +82,7 @@ public class ConfigPassword implements Initializable {
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent()) {
             if (result.get().getButtonData() == ButtonBar.ButtonData.OK_DONE) {
-                bootstrapPersistence.setUsePassword(true);
+                bootstrapPersistence.setUsePassword(false);
                 configuration.storePersistence(bootstrapPersistence);
                 closeConfigPasswordAndReturnMainView();
             }

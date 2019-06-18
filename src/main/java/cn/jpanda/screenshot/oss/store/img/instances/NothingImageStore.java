@@ -1,7 +1,7 @@
 package cn.jpanda.screenshot.oss.store.img.instances;
 
 import cn.jpanda.screenshot.oss.common.enums.ImageType;
-import cn.jpanda.screenshot.oss.newcore.annotations.ImgStore;
+import cn.jpanda.screenshot.oss.core.annotations.ImgStore;
 import cn.jpanda.screenshot.oss.store.img.ImageStore;
 
 import java.awt.image.BufferedImage;

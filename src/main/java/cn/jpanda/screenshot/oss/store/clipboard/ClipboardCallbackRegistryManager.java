@@ -1,10 +1,9 @@
 package cn.jpanda.screenshot.oss.store.clipboard;
 
 import cn.jpanda.screenshot.oss.common.enums.ClipboardType;
-import cn.jpanda.screenshot.oss.common.enums.ImageType;
 import cn.jpanda.screenshot.oss.core.log.Log;
-import cn.jpanda.screenshot.oss.newcore.Configuration;
-import cn.jpanda.screenshot.oss.newcore.annotations.ClipType;
+import cn.jpanda.screenshot.oss.core.Configuration;
+import cn.jpanda.screenshot.oss.core.annotations.ClipType;
 
 import java.util.ArrayList;
 import java.util.HashMap;

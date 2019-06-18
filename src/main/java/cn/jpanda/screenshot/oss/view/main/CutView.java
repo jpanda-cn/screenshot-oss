@@ -1,13 +1,14 @@
 package cn.jpanda.screenshot.oss.view.main;
 
-import cn.jpanda.screenshot.oss.newcore.Configuration;
-import cn.jpanda.screenshot.oss.newcore.annotations.Controller;
+import cn.jpanda.screenshot.oss.core.Configuration;
+import cn.jpanda.screenshot.oss.core.annotations.Controller;
+import cn.jpanda.screenshot.oss.core.capture.ScreenCapture;
+import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
 import cn.jpanda.screenshot.oss.service.handlers.KeyExitStageEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.SnapshotView;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Modality;
@@ -20,6 +21,7 @@ import java.util.ResourceBundle;
 
 @Controller
 public class CutView implements Initializable {
+    public Label screenIndex;
     private Configuration configuration;
 
     public CutView(Configuration configuration) {
@@ -28,7 +30,13 @@ public class CutView implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        GlobalConfigPersistence globalConfigPersistence = configuration.getPersistence(GlobalConfigPersistence.class);
+        int index = globalConfigPersistence.getScreenIndex();
+        if (index >= configuration.getUniqueBean(ScreenCapture.class).GraphicsDeviceCount()) {
+            globalConfigPersistence.setScreenIndex(0);
+            configuration.storePersistence(globalConfigPersistence);
+        }
+        screenIndex.textProperty().setValue(String.valueOf(globalConfigPersistence.getScreenIndex()));
     }
 
     public void doCut() {
@@ -70,21 +78,18 @@ public class CutView implements Initializable {
     }
 
     public void toChoseScreen() {
+        ScreenCapture screenCapture = configuration.getUniqueBean(ScreenCapture.class);
+        // 获取当前窗口所属的显示器
         Stage defaultStage = configuration.getViewContext().getStage();
         Stage stage = new Stage();
         stage.initOwner(defaultStage);
-        stage.setY(Math.max(stage.getOwner().yProperty().getValue(), 0));
         stage.initModality(Modality.APPLICATION_MODAL);
         Scene scene = configuration.getViewContext().getScene(ChoseScreenView.class, true, false);
-        scene.widthProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                stage.setX(defaultStage.xProperty().subtract(scene.widthProperty().subtract(stage.widthProperty()).divide(2)).get());
-            }
-        });
-        stage.setX(defaultStage.xProperty().subtract(scene.widthProperty().divide(2)).get());
+        stage.resizableProperty().setValue(false);
         stage.setScene(scene);
         stage.showAndWait();
+        GlobalConfigPersistence globalConfigPersistence = configuration.getPersistence(GlobalConfigPersistence.class);
+        screenIndex.textProperty().setValue(String.valueOf(globalConfigPersistence.getScreenIndex()));
     }
 
     public void toKeySettings(KeyEvent event) {

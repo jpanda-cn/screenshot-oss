@@ -2,8 +2,8 @@ package cn.jpanda.screenshot.oss.store.img;
 
 import cn.jpanda.screenshot.oss.common.enums.ImageType;
 import cn.jpanda.screenshot.oss.core.log.Log;
-import cn.jpanda.screenshot.oss.newcore.Configuration;
-import cn.jpanda.screenshot.oss.newcore.annotations.ImgStore;
+import cn.jpanda.screenshot.oss.core.Configuration;
+import cn.jpanda.screenshot.oss.core.annotations.ImgStore;
 import javafx.fxml.Initializable;
 
 import java.util.ArrayList;

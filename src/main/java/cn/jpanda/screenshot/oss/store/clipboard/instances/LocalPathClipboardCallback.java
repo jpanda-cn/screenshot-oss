@@ -1,6 +1,6 @@
 package cn.jpanda.screenshot.oss.store.clipboard.instances;
 
-import cn.jpanda.screenshot.oss.newcore.annotations.ClipType;
+import cn.jpanda.screenshot.oss.core.annotations.ClipType;
 import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallback;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;

@@ -1,6 +1,6 @@
 package cn.jpanda.screenshot.oss.common.utils;
 
-import cn.jpanda.screenshot.oss.newcore.annotations.Order;
+import cn.jpanda.screenshot.oss.core.annotations.Order;
 
 import java.util.Comparator;
 

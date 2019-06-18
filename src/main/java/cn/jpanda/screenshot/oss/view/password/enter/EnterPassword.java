@@ -2,8 +2,8 @@ package cn.jpanda.screenshot.oss.view.password.enter;
 
 import cn.jpanda.screenshot.oss.common.utils.AlertUtils;
 import cn.jpanda.screenshot.oss.common.utils.StringUtils;
-import cn.jpanda.screenshot.oss.newcore.Configuration;
-import cn.jpanda.screenshot.oss.newcore.annotations.Controller;
+import cn.jpanda.screenshot.oss.core.Configuration;
+import cn.jpanda.screenshot.oss.core.annotations.Controller;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;

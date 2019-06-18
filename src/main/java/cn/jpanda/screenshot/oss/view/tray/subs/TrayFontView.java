@@ -1,6 +1,6 @@
 package cn.jpanda.screenshot.oss.view.tray.subs;
 
-import cn.jpanda.screenshot.oss.newcore.annotations.Controller;
+import cn.jpanda.screenshot.oss.core.annotations.Controller;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import cn.jpanda.screenshot.oss.view.tray.toolkits.TrayConfig;
 import javafx.fxml.FXML;

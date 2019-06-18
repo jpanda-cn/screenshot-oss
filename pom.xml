@@ -18,6 +18,11 @@
         <com.aliyun.oss.aliyun-sdk-oss.version>2.8.2</com.aliyun.oss.aliyun-sdk-oss.version>
         <!-- lombok版本 -->
         <org.projectlombok.lombok.version>1.16.20</org.projectlombok.lombok.version>
+        <!-- mockito-core -->
+        <org.mockito.mockito-core.version>2.27.0</org.mockito.mockito-core.version>
+        <org.eclipse.jgit.version>5.4.0.201906121030-r</org.eclipse.jgit.version>
+        <org.apache.maven.plugins.maven-surefire-plugin.version>2.5
+        </org.apache.maven.plugins.maven-surefire-plugin.version>
     </properties>
 
     <!-- 依赖管理-->
@@ -38,6 +43,17 @@
                 <artifactId>lombok</artifactId>
                 <version>${org.projectlombok.lombok.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>${org.mockito.mockito-core.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jgit</groupId>
+                <artifactId>org.eclipse.jgit</artifactId>
+                <version>${org.eclipse.jgit.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -51,7 +67,6 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>2.27.0</version>
             <scope>test</scope>
         </dependency>
 
@@ -62,6 +77,10 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jgit</groupId>
+            <artifactId>org.eclipse.jgit</artifactId>
         </dependency>
     </dependencies>
 
@@ -128,7 +147,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.5</version>
+                <version>${org.apache.maven.plugins.maven-surefire-plugin.version}</version>
                 <configuration>
                     <skip>true</skip>
                 </configuration>

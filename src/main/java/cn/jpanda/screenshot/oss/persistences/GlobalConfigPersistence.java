@@ -1,6 +1,7 @@
 package cn.jpanda.screenshot.oss.persistences;
 
-import cn.jpanda.screenshot.oss.newcore.persistence.Persistence;
+import cn.jpanda.screenshot.oss.core.i18n.I18nEnums;
+import cn.jpanda.screenshot.oss.core.persistence.Persistence;
 import lombok.Data;
 
 /**
@@ -39,4 +40,9 @@ public class GlobalConfigPersistence implements Persistence {
      * 保存的图片格式
      */
     private String imageSuffix = "png";
+
+    /**
+     * 当前语言环境
+     */
+    private String locale = I18nEnums.CHINESE.toString();
 }

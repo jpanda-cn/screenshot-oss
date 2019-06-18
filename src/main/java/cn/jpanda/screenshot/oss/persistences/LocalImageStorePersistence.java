@@ -1,7 +1,7 @@
 package cn.jpanda.screenshot.oss.persistences;
 
-import cn.jpanda.screenshot.oss.newcore.persistence.Persistence;
-import cn.jpanda.screenshot.oss.newcore.annotations.Encrypt;
+import cn.jpanda.screenshot.oss.core.persistence.Persistence;
+import cn.jpanda.screenshot.oss.core.annotations.Encrypt;
 import lombok.Data;
 
 @Data
