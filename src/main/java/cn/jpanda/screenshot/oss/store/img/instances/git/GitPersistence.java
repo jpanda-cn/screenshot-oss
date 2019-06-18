@@ -13,7 +13,7 @@ public class GitPersistence implements Persistence {
     /**
      * 子目录名称
      */
-    private String subDir;
+    private String subDir="";
     /**
      * 远程仓库地址
      */

@@ -1,9 +1,13 @@
 package cn.jpanda.screenshot.oss.store.img.instances.git;
 
+import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.ImgStore;
-import cn.jpanda.screenshot.oss.store.img.ImageStore;
+import cn.jpanda.screenshot.oss.store.img.AbstractConfigImageStore;
 import cn.jpanda.screenshot.oss.view.image.GitFileImageStoreConfig;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import lombok.SneakyThrows;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
@@ -15,17 +19,58 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
  * 将图片存放到git中
  */
-@ImgStore(name = "GIT", config = GitFileImageStoreConfig.class)
-public class GitImageStore implements ImageStore {
-    private Configuration configuration;
+@ImgStore(name = GitImageStore.NAME, config = GitFileImageStoreConfig.class)
+public class GitImageStore extends AbstractConfigImageStore {
+    static final String NAME = "GIT";
 
     public GitImageStore(Configuration configuration) {
-        this.configuration = configuration;
+        super(configuration);
+    }
+
+    public boolean canUse() {
+        GitPersistence gitPersistence = configuration.getPersistence(GitPersistence.class);
+        return StringUtils.isNotEmpty(gitPersistence.getLocalRepositoryDir())
+                && StringUtils.isNotEmpty(gitPersistence.getRemoteRepositoryUrl())
+                && StringUtils.isNotEmpty(gitPersistence.getUsername())
+                && StringUtils.isNotEmpty(gitPersistence.getPassword());
+    }
+
+    public boolean pre() {
+        // 展示一条提示
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("警告");
+        alert.setHeaderText(String.format("【%s】存储方式需要配置GIT相关参数才可使用", "GIT"));
+        alert.getButtonTypes().clear();
+        alert.getButtonTypes().addAll(new ButtonType("取消", ButtonBar.ButtonData.BACK_PREVIOUS), new ButtonType("配置", ButtonBar.ButtonData.OK_DONE));
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent()) {
+            if (result.get().getButtonData() == ButtonBar.ButtonData.OK_DONE) {
+                config();
+                return canUse();
+            } else {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean check() {
+        if (!canUse()) {
+            return pre();
+        }
+        return true;
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
     }
 
     @Override

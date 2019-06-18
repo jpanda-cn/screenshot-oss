@@ -6,18 +6,17 @@ import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
 import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallbackRegistryManager;
+import cn.jpanda.screenshot.oss.store.img.ImageStore;
 import cn.jpanda.screenshot.oss.store.img.ImageStoreRegisterManager;
 import cn.jpanda.screenshot.oss.store.img.NoImageStoreConfig;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -69,6 +68,15 @@ public class MainView implements Initializable {
                     Class<? extends Initializable> conf = imageStoreRegisterManager.getConfig((String) newValue);
                     edit.disableProperty().setValue((conf == null || conf.equals(NoImageStoreConfig.class)));
                     // 联动，剪切板的内容同步发生变化
+                    ImageStore imageStore = imageStoreRegisterManager.getImageStore((String) newValue);
+                    if (!imageStore.check()) {
+                        // 有可能出现死循环，选不回去，所以默认选择[不保存]比较好
+                        ImageStore oldImageStore = imageStoreRegisterManager.getImageStore((String) oldValue);
+                        if (oldImageStore.check()) {
+                            imageSave.getSelectionModel().select(oldValue);
+                        }
+                        return;
+                    }
                     ImageType type = imageStoreRegisterManager.getType((String) newValue);
                     List<String> cls;
                     switch (type) {
@@ -157,17 +165,8 @@ public class MainView implements Initializable {
     public void editImageStore() {
         // 获取当前选择的图片存储方式
         String name = (String) imageSave.getValue();
-        Class<? extends Initializable> config = imageStoreRegisterManager.getConfig(name);
-        if (config == null) {
-            return;
-        }
-        Scene scene = configuration.getViewContext().getScene(config);
-        Stage stage = new Stage();
-        stage.getIcons().addAll(configuration.getViewContext().getStage().getIcons());
-        stage.setTitle(name);
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setScene(scene);
-        stage.showAndWait();
+        ImageStore imageStore = imageStoreRegisterManager.getImageStore(name);
+        imageStore.config();
     }
 
     public void editPreView() {

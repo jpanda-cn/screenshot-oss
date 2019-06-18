@@ -9,6 +9,21 @@ import java.awt.image.BufferedImage;
  * 图片存储实现类
  */
 public interface ImageStore {
+
+    /**
+     * 前置处理
+     */
+    default boolean check() {
+        return true;
+    }
+
+    /**
+     * 展示对应的配置页面
+     */
+    default void config() {
+
+    }
+
     /**
      * 执行存储图片的操作
      *

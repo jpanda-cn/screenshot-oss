@@ -11,6 +11,7 @@ import java.awt.image.BufferedImage;
  */
 @ImgStore(name = "不保存", type = ImageType.NO_PATH)
 public class NothingImageStore implements ImageStore {
+
     @Override
     public String store(BufferedImage image) {
         // !! 鉴于该模式的特殊性质，选择该模式进行存储的时候,不会产生地址供使用
