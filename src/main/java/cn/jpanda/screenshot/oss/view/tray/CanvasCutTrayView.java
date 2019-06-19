@@ -2,6 +2,7 @@ package cn.jpanda.screenshot.oss.view.tray;
 
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.ScreenshotsProcess;
+import cn.jpanda.screenshot.oss.core.Snapshot;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
 import cn.jpanda.screenshot.oss.core.controller.ViewContext;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
@@ -10,7 +11,6 @@ import cn.jpanda.screenshot.oss.view.tray.subs.TrayColorView;
 import cn.jpanda.screenshot.oss.view.tray.subs.TrayFontView;
 import cn.jpanda.screenshot.oss.view.tray.subs.TrayPointView;
 import cn.jpanda.screenshot.oss.view.tray.toolkits.CutInnerType;
-import com.sun.istack.internal.Nullable;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -155,10 +155,11 @@ public class CanvasCutTrayView implements Initializable {
         Rectangle rectangle = canvasProperties.getCutRectangle();
         screenshotsProcess.done(screenshotsProcess.snapshot(scene, rectangle));
         Stage stage = ((Stage) scene.getWindow());
+        configuration.setCutting(false);
         stage.close();
     }
 
-    public void add2Bar(@Nullable Node... nodes) {
+    public void add2Bar(Node... nodes) {
         ObservableList<Node> child = bar.getChildren();
         if (child != null && child.size() > 0) {
             child.forEach((n) -> {

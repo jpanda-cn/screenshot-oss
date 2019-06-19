@@ -54,7 +54,7 @@ public class ClassicScreenshot implements Snapshot {
             stage.setFullScreen(true);
             stage.setAlwaysOnTop(true);
             stage.showAndWait();
-
         });
     }
+
 }

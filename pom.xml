@@ -101,23 +101,6 @@
             </testResource>
         </testResources>
         <plugins>
-            <!-- 打包可执行jar配置 -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <!-- 再生成的jar文件内，不包含 pom.xml和pom.properties 文件 -->
-                        <addMavenDescriptor>false</addMavenDescriptor>
-                        <manifest>
-                            <mainClass>cn.jpanda.screenshot.oss.JpandaBootstrap</mainClass>
-                            <!--  处理第三方依赖jar -->
-                            <addClasspath>true</addClasspath>
-                            <classpathPrefix>lib/</classpathPrefix>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
@@ -156,6 +139,16 @@
                 <version>${org.apache.maven.plugins.maven-surefire-plugin.version}</version>
                 <configuration>
                     <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.zenjava</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>8.8.3</version>
+                <configuration>
+                    <mainClass>cn.jpanda.screenshot.oss.JPandaScreenshotStarter</mainClass>
+                    <vendor>jpanda</vendor>
+                    <appName>screenshot-oss</appName>
                 </configuration>
             </plugin>
         </plugins>
