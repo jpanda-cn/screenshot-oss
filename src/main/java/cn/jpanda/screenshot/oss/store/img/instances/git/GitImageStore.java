@@ -124,7 +124,7 @@ public class GitImageStore extends AbstractConfigImageStore {
         // 更新仓库
         git.pull().setCredentialsProvider(usernamePasswordCredentialsProvider).call();
         // 现将图片存放到本地仓库中
-        git.add().addFilepattern(gitPersistence.getSubDir()).call();
+        git.add().addFilepattern(StringUtils.isEmpty(gitPersistence.getSubDir())?".":gitPersistence.getSubDir()).call();
         // 提交代码
         git.commit()
                 .setMessage(String.format("add new image named:%s", name + "." + suffix))

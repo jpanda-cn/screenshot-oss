@@ -39,7 +39,9 @@ public class JPandaScreenshotStarter extends Application {
             // 校验是否需要展示密码
             showEnterPassword();
         }
+        viewContext.getConfiguration().setStarted(true);
         doStart();
+
     }
 
     protected void doStart() {

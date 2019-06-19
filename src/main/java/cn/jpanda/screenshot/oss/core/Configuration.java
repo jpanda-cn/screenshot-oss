@@ -1,9 +1,9 @@
 package cn.jpanda.screenshot.oss.core;
 
 import cn.jpanda.screenshot.oss.common.utils.OrderComparator;
-import cn.jpanda.screenshot.oss.core.log.LogFactory;
 import cn.jpanda.screenshot.oss.core.controller.ViewContext;
 import cn.jpanda.screenshot.oss.core.interceptor.value.ValueInterceptor;
+import cn.jpanda.screenshot.oss.core.log.LogFactory;
 import cn.jpanda.screenshot.oss.core.persistence.Persistence;
 import cn.jpanda.screenshot.oss.core.persistence.strategy.DataPersistenceStrategy;
 import cn.jpanda.screenshot.oss.core.scan.AfterBootstrapLoaderProcess;
@@ -38,6 +38,18 @@ public class Configuration {
     @Setter
     private String password;
 
+    /**
+     * 是否已经启动完成
+     */
+    @Getter
+    @Setter
+    private boolean started;
+    /**
+     * 正在截图中
+     */
+    @Getter
+    @Setter
+    private volatile boolean cutting;
     /**
      * 程序执行器所处的工作目录
      */

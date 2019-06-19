@@ -6,26 +6,23 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.ToggleButton?>
-<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="372.0" prefWidth="377.0" stylesheets="@MainView.css" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.jpanda.screenshot.oss.view.main.MainView">
+<?import javafx.scene.image.Image?>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="372.0" prefWidth="377.0" stylesheets="@MainView.css" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.jpanda.screenshot.oss.view.main.MainView">
     <ImageView fitHeight="87.0" fitWidth="308.0" layoutX="32.0" layoutY="28.0" pickOnBounds="true" preserveRatio="true">
         <Image url="@logo.png" />
     </ImageView>
     <Separator layoutY="115.0" prefHeight="21.0" prefWidth="377.0" />
     <Button fx:id="edit" layoutX="290.0" layoutY="154.0" mnemonicParsing="false" onMouseClicked="#editImageStore" text="编辑" />
-    <Button layoutX="252.0" layoutY="321.0" mnemonicParsing="false" text="使用" />
     <Label layoutX="38.0" layoutY="157.0" prefHeight="18.0" prefWidth="67.0" text="存储方式" />
     <ChoiceBox fx:id="imageSave" layoutX="113.0" layoutY="154.0" prefWidth="150.0" />
     <Label layoutX="38.0" layoutY="197.0" text="剪切板内容" />
     <ChoiceBox fx:id="clipboard" layoutX="113.0" layoutY="193.0" prefWidth="150.0" />
-    <Button layoutX="85.0" layoutY="321.0" mnemonicParsing="false" onKeyPressed="#keyBack" onMouseClicked="#back" text="返回" />
-    <ToggleButton layoutX="292.0" layoutY="228.0" mnemonicParsing="false" text="启用" />
+    <Button layoutX="38.0" layoutY="308.0" mnemonicParsing="false" onKeyPressed="#keyBack" onMouseClicked="#back" text="返回" />
     <Label fx:id="shotKey" layoutX="40.0" layoutY="232.0" text="系统快捷键" />
-    <TextField layoutX="113.0" layoutY="228.0" />
+    <TextField fx:id="hotKey" layoutX="113.0" layoutY="228.0" onKeyPressed="#changeHotKey" />
     <Label layoutX="40.0" layoutY="267.0" text="截图预览" />
     <CheckBox fx:id="preview" layoutX="113.0" layoutY="266.0" onMouseClicked="#editPreView" />
 </AnchorPane>
