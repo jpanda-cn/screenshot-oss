@@ -141,16 +141,30 @@
                     <skip>true</skip>
                 </configuration>
             </plugin>
+            <!--javafx application package-->
             <plugin>
                 <groupId>com.zenjava</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>8.8.3</version>
                 <configuration>
                     <mainClass>cn.jpanda.screenshot.oss.JPandaScreenshotStarter</mainClass>
-                    <vendor>jpanda</vendor>
                     <appName>screenshot-oss</appName>
+                    <verbose>true</verbose>
+                    <needMenu>true</needMenu>
+                    <needShortcut>true</needShortcut>
+                    <bundleArguments>
+                        <installdirChooser>true</installdirChooser>
+                    </bundleArguments>
+                    <vendor>jpanda</vendor>
+                    <allPermissions>true</allPermissions>
+                    <nativeReleaseVersion>v0.1</nativeReleaseVersion>
+                    <description>
+                        Screenshot oss  是一款面向云的截图工具
+                    </description>
                 </configuration>
             </plugin>
+
+
         </plugins>
     </build>
 
