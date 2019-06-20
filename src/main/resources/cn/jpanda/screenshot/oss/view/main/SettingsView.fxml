@@ -27,5 +27,4 @@
     <CheckBox fx:id="preview" layoutX="113.0" layoutY="266.0" onMouseClicked="#editPreView" />
     <Label fx:id="screenshotMouseFollowLabel" layoutX="165.0" layoutY="268.0" text="截图鼠标跟随" />
     <CheckBox fx:id="screenshotMouseFollow" layoutX="247.0" layoutY="267.0" mnemonicParsing="false" />
-   <Button layoutX="290.0" layoutY="261.0" mnemonicParsing="false" text="密码管理" />
 </AnchorPane>

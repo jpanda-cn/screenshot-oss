@@ -48,7 +48,6 @@ public class GlobalKeyListenerAfterBootstrapLoaderProcess implements AfterBootst
                 if (code.equals(KeyCode.ALT) || code.equals(KeyCode.SHIFT) || code.equals(KeyCode.CONTROL)) {
                     // 移除
                     Set<KeyCode> codess = codes.stream().filter((c) -> (c.equals(KeyCode.ALT) || c.equals(KeyCode.SHIFT) || c.equals(KeyCode.CONTROL))).collect(Collectors.toSet());
-                    System.out.println(codess);
                     codes.clear();
                     codes.addAll(codess);
                 }
