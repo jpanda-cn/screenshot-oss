@@ -10,6 +10,7 @@ import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ResourceBundle;
@@ -106,7 +107,11 @@ public class GitFileImageStoreConfig implements Initializable {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setInitialDirectory(Paths.get(oldPath).toFile());
         directoryChooser.setTitle(title);
-        String newPath = directoryChooser.showDialog(new Stage()).getAbsolutePath();
+        File newDir = directoryChooser.showDialog(new Stage());
+        if (newDir == null) {
+            return oldPath;
+        }
+        String newPath = newDir.getAbsolutePath();
         if (StringUtils.isEmpty(newPath)) {
             return oldPath;
         }
