@@ -1,8 +1,10 @@
 package cn.jpanda.screenshot.oss.core;
 
+import cn.jpanda.screenshot.oss.core.capture.ScreenCapture;
 import cn.jpanda.screenshot.oss.core.log.Log;
+import cn.jpanda.screenshot.oss.core.mouse.GlobalMousePoint;
 import cn.jpanda.screenshot.oss.service.handlers.KeyExitStageEventHandler;
-import cn.jpanda.screenshot.oss.view.main.CutView;
+import cn.jpanda.screenshot.oss.view.main.IndexCutView;
 import cn.jpanda.screenshot.oss.view.snapshot.SnapshotView;
 import javafx.application.Platform;
 import javafx.scene.input.KeyCode;
@@ -24,6 +26,9 @@ public class ClassicScreenshot implements Snapshot {
     @Override
     public synchronized void cut() {
         if (configuration.isCutting()) {
+            Platform.runLater(() -> {
+                stage.toFront();
+            });
             log.debug("is cutting ...");
             return;
         }
@@ -42,13 +47,18 @@ public class ClassicScreenshot implements Snapshot {
             stage.initStyle(StageStyle.UNDECORATED);
             stage.setScene(configuration.getViewContext().getScene(SnapshotView.class, true, false));
 
+            // 添加屏幕跟随，截哪个屏幕就在哪个屏幕上展示
+            ScreenCapture screenCapture = configuration.getUniqueBean(ScreenCapture.class);
+            int index = screenCapture.getGraphicsDeviceIndex(configuration.getUniqueBean(GlobalMousePoint.class).pointSimpleObjectProperty.get().getX());
+            stage.setX(screenCapture.getTargetGraphicsDeviceX(index));
+
             // 输入ESC退出截屏
             stage.setFullScreenExitHint("输入ESC退出截屏");
             stage.addEventHandler(KeyEvent.KEY_RELEASED, new KeyExitStageEventHandler(KeyCode.ESCAPE, stage, configuration));
             stage.setOnCloseRequest(event -> {
                 if (event.getEventType().equals(WindowEvent.WINDOW_CLOSE_REQUEST)) {
                     configuration.setCutting(false);
-                    configuration.getViewContext().showScene(CutView.class);
+                    configuration.getViewContext().showScene(IndexCutView.class);
                 }
             });
             stage.setFullScreen(true);

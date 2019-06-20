@@ -4,6 +4,7 @@ import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.ScreenshotsProcess;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
 import cn.jpanda.screenshot.oss.core.capture.ScreenCapture;
+import cn.jpanda.screenshot.oss.core.mouse.GlobalMousePoint;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import javafx.embed.swing.SwingFXUtils;
@@ -77,14 +78,22 @@ public class SnapshotView implements Initializable {
     }
 
     private BufferedImage getDesktopSnapshot() {
-        // 校验一下显示器的数量问题
-        if (globalConfigPersistence.getScreenIndex() >= screenCapture.GraphicsDeviceCount()) {
-            globalConfigPersistence.setScreenIndex(0);
-            configuration.storePersistence(globalConfigPersistence);
+        int screenIndex = 0;
+        if (globalConfigPersistence.isScreenshotMouseFollow()) {
+            // 启用了鼠标跟随功能
+            screenIndex = screenCapture.getGraphicsDeviceIndex(configuration.getUniqueBean(GlobalMousePoint.class).pointSimpleObjectProperty.get().getX());
+        } else {
+            if (globalConfigPersistence.getScreenIndex() >= screenCapture.GraphicsDeviceCount()) {
+                // 校验一下显示器的数量问题
+                globalConfigPersistence.setScreenIndex(0);
+                configuration.storePersistence(globalConfigPersistence);
+            }
+            screenIndex = globalConfigPersistence.getScreenIndex();
         }
-        GraphicsDevice graphicsDevice = screenCapture.getTargetGraphicsDevice(globalConfigPersistence.getScreenIndex());
+
+        GraphicsDevice graphicsDevice = screenCapture.getTargetGraphicsDevice(screenIndex);
         Dimension dimension = graphicsDevice.getDefaultConfiguration().getBounds().getSize();
-        return screenCapture.screenshotImage(globalConfigPersistence.getScreenIndex(), (int) dimension.getWidth(), (int) dimension.getHeight());
+        return screenCapture.screenshotImage(screenIndex, (int) dimension.getWidth(), (int) dimension.getHeight());
     }
 
     protected void saveAndClose(Canvas canvas) {

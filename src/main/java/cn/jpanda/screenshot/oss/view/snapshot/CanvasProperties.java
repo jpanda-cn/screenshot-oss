@@ -1,5 +1,6 @@
 package cn.jpanda.screenshot.oss.view.snapshot;
 
+import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.view.tray.toolkits.CutInnerType;
 import cn.jpanda.screenshot.oss.view.tray.toolkits.TrayConfig;
 import javafx.scene.Group;
@@ -7,10 +8,14 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.shape.Rectangle;
 import lombok.Data;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Data
 public class CanvasProperties {
+    private Configuration configuration;
     /**
      * 全局的画布对象
      */
@@ -51,8 +56,9 @@ public class CanvasProperties {
 
     private Map<CutInnerType, TrayConfig> trayConfigs = new HashMap<>();
 
-    public CanvasProperties(GraphicsContext globalGraphicsContext, Rectangle cutRectangle) {
+    public CanvasProperties(GraphicsContext globalGraphicsContext, Rectangle cutRectangle, Configuration configuration) {
         this.globalGraphicsContext = globalGraphicsContext;
+        this.configuration = configuration;
         this.cutRectangle = cutRectangle;
         cutPane = ((Group) (cutRectangle.getParent()));
     }

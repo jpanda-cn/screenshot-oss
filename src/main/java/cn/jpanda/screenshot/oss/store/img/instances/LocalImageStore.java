@@ -29,7 +29,6 @@ public class LocalImageStore extends AbstractConfigImageStore {
     @Override
     public String store(BufferedImage image) {
         LocalImageStorePersistence localImageStorePersistence = configuration.getPersistence(LocalImageStorePersistence.class);
-
         // 获取保存图片类型
         String path = localImageStorePersistence.getPath();
         String name = fileNameGenerator();

@@ -17,8 +17,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 
-import static cn.jpanda.screenshot.oss.common.utils.MathUtils.min;
-import static cn.jpanda.screenshot.oss.common.utils.MathUtils.subAbs;
+import static cn.jpanda.screenshot.oss.common.utils.MathUtils.*;
 
 public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
     private Configuration configuration;
@@ -90,8 +89,8 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
 
         //  在这里，截图区域单属一个容器，工具托盘和截图容器共同存放在一个容器内。
         // 获取鼠标点击位置，该位置用于初始化截图区域的坐标
-        startX = event.getScreenX();
-        startY = event.getScreenY();
+        startX = event.getSceneX();
+        startY = event.getSceneY();
         // 更新上一个截图位置的区域
         last = new Bounds(startX, startY, 0, 0);
     }
@@ -100,8 +99,10 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
     protected void draw(MouseEvent event) {
         // 判断需要新增和移除的矩形区域
         // 获取鼠标当前位置
-        double x = event.getScreenX();
-        double y = event.getScreenY();
+        // 获取所属坐标
+        // 处理鼠标的坐标，不能超出所截图区域
+        double x = max(event.getSceneX(), 0);
+        double y = event.getSceneY();
         double currentX = min(startX, x);
         double currentY = min(startY, y);
         double width = subAbs(x, startX);
@@ -153,7 +154,7 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
             cutRec.setCursor(Cursor.CROSSHAIR);
             cutRec.setFill(Color.TRANSPARENT);
 
-            CanvasProperties canvasProperties = new CanvasProperties(graphicsContext, cutRec);
+            CanvasProperties canvasProperties = new CanvasProperties(graphicsContext, cutRec,configuration);
             // 为截图区域注册事件
             cutRec.addEventHandler(MouseEvent.ANY, new RoutingSnapshotCanvasEventHandler(canvasProperties, this));
             // 存放截图相关数据

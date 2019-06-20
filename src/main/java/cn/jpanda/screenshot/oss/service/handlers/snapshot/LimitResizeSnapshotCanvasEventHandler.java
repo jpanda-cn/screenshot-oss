@@ -47,8 +47,8 @@ public class LimitResizeSnapshotCanvasEventHandler extends AbstractSnapshotCanva
         // 获取当前所有子节点
         if (event.getEventType().equals(MouseEvent.MOUSE_MOVED)) {
             // 判断如何展示
-            double mouseX = event.getScreenX();
-            double mouseY = event.getScreenY();
+            double mouseX = event.getSceneX();
+            double mouseY = event.getSceneY();
             Cursor cursor = null;
             ox = rectangle.xProperty().get();
             oy = rectangle.yProperty().get();
@@ -95,9 +95,9 @@ public class LimitResizeSnapshotCanvasEventHandler extends AbstractSnapshotCanva
         } else if (event.getEventType().equals(MouseEvent.MOUSE_PRESSED)) {
             subs = ShapeCovertHelper.toRectanglesUseGroup(canvasProperties.listGroups());
             // 鼠标开始节点
-            x = event.getScreenX();
+            x = event.getSceneX();
             // 鼠标结束节点
-            y = event.getScreenY();
+            y = event.getSceneY();
             ox = rectangle.xProperty().get();
             oy = rectangle.yProperty().get();
             ow = rectangle.widthProperty().get();
@@ -105,8 +105,8 @@ public class LimitResizeSnapshotCanvasEventHandler extends AbstractSnapshotCanva
         } else if (event.getEventType().equals(MouseEvent.MOUSE_DRAGGED)) {
             // 拖动
             // 获取需要移动的元素变更其展示位置
-            double offsetX = event.getScreenX() - x;
-            double offsetY = event.getScreenY() - y;
+            double offsetX = event.getSceneX() - x;
+            double offsetY = event.getSceneY() - y;
             // 判断是否修改宽度和x坐标
 
             if (resizeType.isAcross()) {
@@ -117,20 +117,20 @@ public class LimitResizeSnapshotCanvasEventHandler extends AbstractSnapshotCanva
                     // 右侧不变，变更x
                     // 判断使用鼠标坐标为x还是使用边界为x
                     double endx = ox + ow;
-                    if (event.getScreenX() > endx) {
+                    if (event.getSceneX() > endx) {
                         // 以endx作为x，同时宽度为鼠标-endx
                         if (setRectangleX(endx)) {
-                            setRectangleW(event.getScreenX() - endx);
+                            setRectangleW(event.getSceneX() - endx);
                         }
                     } else {
-                        if (setRectangleX(event.getScreenX())) {
-                            setRectangleW(endx - event.getScreenX());
+                        if (setRectangleX(event.getSceneX())) {
+                            setRectangleW(endx - event.getSceneX());
                         }
                     }
                 } else {
                     // 移动右侧
                     if (setRectangleW(Math.abs(ow + offsetX))) {
-                        setRectangleX(MathUtils.min(event.getScreenX(), ox));
+                        setRectangleX(MathUtils.min(event.getSceneX(), ox));
                     }
                 }
 
@@ -142,18 +142,18 @@ public class LimitResizeSnapshotCanvasEventHandler extends AbstractSnapshotCanva
             if (resizeType.isVertical()) {
                 if (resizeType.isTop()) {
                     double endy = oy + oh;
-                    if (event.getScreenY() < endy) {
-                        if (setRectangleY(event.getScreenY())) {
-                            setRectangleH(endy - event.getScreenY());
+                    if (event.getSceneY() < endy) {
+                        if (setRectangleY(event.getSceneY())) {
+                            setRectangleH(endy - event.getSceneY());
                         }
                     } else {
                         if (setRectangleY(endy)) {
-                            setRectangleH(event.getScreenY() - endy);
+                            setRectangleH(event.getSceneY() - endy);
                         }
                     }
                 } else {
                     if (setRectangleH(Math.abs(oh + offsetY))) {
-                        setRectangleY(MathUtils.min(event.getScreenY(), oy));
+                        setRectangleY(MathUtils.min(event.getSceneY(), oy));
                     }
                 }
 

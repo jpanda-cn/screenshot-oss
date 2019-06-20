@@ -1,9 +1,10 @@
 package cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.drag;
 
-import cn.jpanda.screenshot.oss.common.toolkit.ShapeCovertHelper;
-import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.InnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.common.toolkit.Bounds;
+import cn.jpanda.screenshot.oss.common.toolkit.ShapeCovertHelper;
+import cn.jpanda.screenshot.oss.core.destroy.DestroyBeanHolder;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
+import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.InnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import javafx.scene.Cursor;
 import javafx.scene.input.MouseEvent;
@@ -39,20 +40,22 @@ public class LimitDragInnerSnapshotCanvasEventHandler extends InnerSnapshotCanva
         if (event.getEventType().equals(MouseEvent.MOUSE_MOVED)) {
             rectangle.setCursor(Cursor.MOVE);
         } else if (event.getEventType().equals(MouseEvent.MOUSE_PRESSED)) {
+            DestroyBeanHolder destroyBeanHolder = canvasProperties.getConfiguration().getUniqueBean(DestroyBeanHolder.class);
+            destroyBeanHolder.destroy();
             subs = ShapeCovertHelper.toRectanglesUseGroup(canvasProperties.listGroups());
             parent = ShapeCovertHelper.toRectangle(rectangle.getScene().getWindow());
             // 记录当前位置
             // 鼠标开始节点
-            x = event.getScreenX();
+            x = event.getSceneX();
             // 鼠标结束节点
-            y = event.getScreenY();
+            y = event.getSceneY();
             ox = rectangle.xProperty().get();
             oy = rectangle.yProperty().get();
             ow = rectangle.widthProperty().get();
             oh = rectangle.heightProperty().get();
         } else if (event.getEventType().equals(MouseEvent.MOUSE_DRAGGED)) {
-            double offsetX = event.getScreenX() - x;
-            double offsetY = event.getScreenY() - y;
+            double offsetX = event.getSceneX() - x;
+            double offsetY = event.getSceneY() - y;
             setRectangleX(ox + offsetX);
             setRectangleY(oy + offsetY);
             canvasDrawEventHandler.draw(new Bounds(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight()));
@@ -81,7 +84,8 @@ public class LimitDragInnerSnapshotCanvasEventHandler extends InnerSnapshotCanva
         if (parent == null) {
             return true;
         }
-        return x >= parent.xProperty().get() && x <= parent.xProperty().add(parent.widthProperty()).subtract(rectangle.widthProperty()).get();
+        double px = parent.xProperty().get() - rectangle.getScene().getWindow().getX();
+        return x >= px && x <= px + (parent.widthProperty()).subtract(rectangle.widthProperty()).get();
     }
 
     protected boolean checkOutSubsX(double x) {

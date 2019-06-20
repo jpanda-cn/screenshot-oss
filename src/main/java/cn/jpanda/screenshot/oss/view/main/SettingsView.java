@@ -22,11 +22,14 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 @Controller
-public class MainView implements Initializable {
+public class SettingsView implements Initializable {
     public TextField hotKey;
+    public CheckBox screenshotMouseFollow;
+    public Label screenshotMouseFollowLabel;
+    public Button backBtn;
     private Configuration configuration;
 
-    public MainView(Configuration configuration) {
+    public SettingsView(Configuration configuration) {
         this.configuration = configuration;
     }
 
@@ -54,7 +57,9 @@ public class MainView implements Initializable {
         loadImageSave();
         loadClipboard();
         loadPreView();
+        loadScreenshotMouseFollow();
         loadHotKey();
+
     }
 
     private void loadHotKey() {
@@ -177,6 +182,18 @@ public class MainView implements Initializable {
 
     private void loadPreView() {
         preview.selectedProperty().setValue(globalConfigPersistence.isPreview());
+    }
+
+    private void loadScreenshotMouseFollow() {
+        screenshotMouseFollow.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            globalConfigPersistence.setScreenshotMouseFollow(newValue);
+            configuration.getUniqueBean(ChoseScreenShowValue.class).show.set(newValue);
+            configuration.storePersistence(globalConfigPersistence);
+        });
+        Tooltip tooltip = new Tooltip("开启该功能，使用截图功能时,将会获取鼠标所在屏幕的图像.");
+        Tooltip.install(screenshotMouseFollowLabel, tooltip);
+        Tooltip.install(screenshotMouseFollow, tooltip);
+        screenshotMouseFollow.setSelected(globalConfigPersistence.isScreenshotMouseFollow());
     }
 
     public void editImageStore() {

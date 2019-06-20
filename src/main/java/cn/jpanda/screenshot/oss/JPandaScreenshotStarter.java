@@ -5,7 +5,7 @@ import cn.jpanda.screenshot.oss.core.controller.ViewContext;
 import cn.jpanda.screenshot.oss.core.i18n.I18nConstants;
 import cn.jpanda.screenshot.oss.core.i18n.I18nResource;
 import cn.jpanda.screenshot.oss.core.persistence.BootstrapPersistence;
-import cn.jpanda.screenshot.oss.view.main.CutView;
+import cn.jpanda.screenshot.oss.view.main.IndexCutView;
 import cn.jpanda.screenshot.oss.view.password.enter.EnterPassword;
 import cn.jpanda.screenshot.oss.view.password.init.ConfigPassword;
 import javafx.application.Application;
@@ -20,7 +20,7 @@ public class JPandaScreenshotStarter extends Application {
     private ViewContext viewContext;
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         viewContext = new JPandaApplicationRunner().run(primaryStage, getClass());
         // 执行业务逻辑
         // 加载配置全局配置文件
@@ -49,12 +49,13 @@ public class JPandaScreenshotStarter extends Application {
         stage.setTitle(viewContext.getConfiguration().getUniqueBean(I18nResource.class).get(I18nConstants.titleIndex));
         stage.setResizable(false);
         viewContext.getStage().getIcons().add(new Image(this.getClass().getClassLoader().getResourceAsStream("logo.png")));
-        viewContext.showScene(CutView.class);
+        viewContext.showScene(IndexCutView.class);
     }
 
     protected void showInitPassword() {
         // 将密码页面放置到舞台中央
         Stage stage = new Stage(StageStyle.UNDECORATED);
+        stage.getIcons().add(new Image(this.getClass().getClassLoader().getResourceAsStream("logo.png")));
         stage.initModality(Modality.APPLICATION_MODAL);
         Scene scene = viewContext.getScene(ConfigPassword.class);
         AnchorPane password = (AnchorPane) scene.getRoot();
@@ -62,12 +63,14 @@ public class JPandaScreenshotStarter extends Application {
         stage.toFront();
         stage.setTitle("配置主控密码");
         password.toFront();
+        stage.toFront();
         stage.showAndWait();
     }
 
     protected void showEnterPassword() {
         // 将密码页面放置到舞台中央
         Stage stage = new Stage(StageStyle.UNDECORATED);
+        stage.getIcons().add(new Image(this.getClass().getClassLoader().getResourceAsStream("logo.png")));
         stage.initModality(Modality.APPLICATION_MODAL);
         Scene scene = viewContext.getScene(EnterPassword.class);
         AnchorPane password = (AnchorPane) scene.getRoot();
@@ -75,6 +78,7 @@ public class JPandaScreenshotStarter extends Application {
         stage.toFront();
         stage.setTitle("输入密码");
         password.toFront();
+        stage.toFront();
         stage.showAndWait();
     }
 }

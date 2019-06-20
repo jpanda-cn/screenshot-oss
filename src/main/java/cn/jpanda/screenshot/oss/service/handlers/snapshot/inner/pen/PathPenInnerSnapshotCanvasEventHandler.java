@@ -1,7 +1,8 @@
 package cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.pen;
 
-import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.InnerSnapshotCanvasEventHandler;
+import cn.jpanda.screenshot.oss.core.destroy.DestroyBeanHolder;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
+import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.InnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import cn.jpanda.screenshot.oss.view.tray.toolkits.CutInnerType;
 import cn.jpanda.screenshot.oss.view.tray.toolkits.TrayConfig;
@@ -34,8 +35,8 @@ public class PathPenInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasE
     @Override
     protected void press(MouseEvent event) {
 
-        x = event.getScreenX();
-        y = event.getScreenY();
+        x = event.getSceneX();
+        y = event.getSceneY();
         if (group != null) {
             group.setMouseTransparent(true);
         }
@@ -53,8 +54,8 @@ public class PathPenInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasE
     @Override
     protected void drag(MouseEvent event) {
 
-        double cx = event.getScreenX();
-        double cy = event.getScreenY();
+        double cx = event.getSceneX();
+        double cy = event.getSceneY();
         if (rectangle.contains(cx, cy)) {
             path.getElements().add(new LineTo(cx, cy));
         }
@@ -67,13 +68,15 @@ public class PathPenInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasE
     }
 
     protected void clear() {
-        if (group != null) {
-            group.setMouseTransparent(true);
-            canvasProperties.putGroup(group);
-        }
-        if (path != null) {
-            path.strokeProperty().unbind();
-            path.strokeWidthProperty().unbind();
-        }
+        canvasProperties.getConfiguration().getUniqueBean(DestroyBeanHolder.class).set(() -> {
+            if (group != null) {
+                group.setMouseTransparent(true);
+                canvasProperties.putGroup(group);
+            }
+            if (path != null) {
+                path.strokeProperty().unbind();
+                path.strokeWidthProperty().unbind();
+            }
+        });
     }
 }

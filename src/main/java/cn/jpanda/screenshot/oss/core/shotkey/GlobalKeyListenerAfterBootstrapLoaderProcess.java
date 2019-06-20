@@ -10,11 +10,12 @@ import org.jnativehook.GlobalScreen;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
-import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * 全局快捷键监听
@@ -33,8 +34,8 @@ public class GlobalKeyListenerAfterBootstrapLoaderProcess implements AfterBootst
         LogManager.getLogManager().reset();
         Logger.getGlobal().setLevel(Level.OFF);
         GlobalScreen.registerNativeHook();
+        Set<KeyCode> codes = new ConcurrentSkipListSet<>();
         GlobalScreen.addNativeKeyListener(new NativeKeyListener() {
-            private Set<KeyCode> codes = new HashSet<>();
 
             @Override
             public void nativeKeyTyped(NativeKeyEvent nativeKeyEvent) {
@@ -44,6 +45,14 @@ public class GlobalKeyListenerAfterBootstrapLoaderProcess implements AfterBootst
             @Override
             public void nativeKeyPressed(NativeKeyEvent nativeKeyEvent) {
                 KeyCode code = NativeCodeKeyCodeConvert.getKeyCode(nativeKeyEvent.getKeyCode());
+                if (code.equals(KeyCode.ALT) || code.equals(KeyCode.SHIFT) || code.equals(KeyCode.CONTROL)) {
+                    // 移除
+                    Set<KeyCode> codess = codes.stream().filter((c) -> (c.equals(KeyCode.ALT) || c.equals(KeyCode.SHIFT) || c.equals(KeyCode.CONTROL))).collect(Collectors.toSet());
+                    System.out.println(codess);
+                    codes.clear();
+                    codes.addAll(codess);
+                }
+
                 codes.add(code);
                 // 校验是否满足了全局按键
                 if (isHotKey()) {
@@ -81,7 +90,12 @@ public class GlobalKeyListenerAfterBootstrapLoaderProcess implements AfterBootst
                 if (codes.size() > ++count) {
                     return false;
                 }
-                return codes.contains(KeyCode.valueOf(hotKey2CutPersistence.getCode()));
+                try {
+                    return codes.contains(KeyCode.valueOf(hotKey2CutPersistence.getCode()));
+                } catch (IllegalArgumentException e) {
+
+                }
+                return false;
             }
         });
     }

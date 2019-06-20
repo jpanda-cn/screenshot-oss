@@ -1,6 +1,5 @@
 package cn.jpanda.screenshot.oss.common.toolkit;
 
-import cn.jpanda.screenshot.oss.common.toolkit.LimitRectangleEventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
@@ -30,9 +29,9 @@ public class DragRectangleEventHandler extends LimitRectangleEventHandler {
     protected void drag(MouseEvent event) {
         // 拖动
         // 获取鼠标偏移位置
-        double offsetX = event.getScreenX() - x;
-        double offsetY = event.getScreenY() - y;
-        setRectangleX(ox+offsetX);
-        setRectangleY(oy+offsetY);
+        double offsetX = event.getSceneX() - x;
+        double offsetY = event.getSceneY()- y;
+        setRectangleX(ox + offsetX);
+        setRectangleY(oy + offsetY);
     }
 }

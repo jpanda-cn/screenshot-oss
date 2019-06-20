@@ -1,15 +1,17 @@
 package cn.jpanda.screenshot.oss.common.toolkit;
 
-import cn.jpanda.screenshot.oss.service.handlers.ResizeTagRectangleEventHandler;
 import cn.jpanda.screenshot.oss.common.enums.ResizeType;
+import cn.jpanda.screenshot.oss.service.handlers.ResizeTagRectangleEventHandler;
 import javafx.beans.binding.Bindings;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Rectangle;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class RectangleAddTag2ResizeBinding {
@@ -117,7 +119,7 @@ public class RectangleAddTag2ResizeBinding {
 
         // 统一添加到容器内
         ((Group) rectangle.getParent()).getChildren().addAll(leftTop, top, rightTop, right, rightCenter, below, leftBelow, left);
-
+        Arrays.asList(leftTop, top, rightTop, right, rightCenter, below, leftBelow, left).forEach(Node::toFront);
     }
 
     private Ellipse newEllipse(Cursor cursor) {

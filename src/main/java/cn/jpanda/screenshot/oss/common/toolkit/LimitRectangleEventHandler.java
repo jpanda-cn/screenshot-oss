@@ -50,9 +50,9 @@ public class LimitRectangleEventHandler extends GeneralSplitMouseEventHandler {
 
     protected void press(MouseEvent event) {
         // 鼠标开始节点
-        x = event.getScreenX();
+        x = event.getSceneX();
         // 鼠标结束节点
-        y = event.getScreenY();
+        y = event.getSceneY();
         ox = rectangle.xProperty().get();
         oy = rectangle.yProperty().get();
         ow = rectangle.widthProperty().get();

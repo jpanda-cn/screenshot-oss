@@ -39,8 +39,8 @@ public class ResizeTagRectangleEventHandler extends LimitRectangleEventHandler {
     protected void drag(MouseEvent event) {
         // 拖动
         // 获取鼠标偏移位置
-        double offsetX = event.getScreenX() - x;
-        double offsetY = event.getScreenY() - y;
+        double offsetX = event.getSceneX() - x;
+        double offsetY = event.getSceneY() - y;
         // 判断是否修改宽度和x坐标
 
         // 横向移动
@@ -52,17 +52,17 @@ public class ResizeTagRectangleEventHandler extends LimitRectangleEventHandler {
                 // 右侧不变，变更x
                 // 判断使用鼠标坐标为x还是使用边界为x
                 double endx = ox + ow;
-                if (event.getScreenX() > endx) {
+                if (event.getSceneX() > endx) {
                     // 以endx作为x，同时宽度为鼠标-endx
                     setRectangleX(endx);
-                    setRectangleW(event.getScreenX() - endx);
+                    setRectangleW(event.getSceneX() - endx);
                 } else {
-                    setRectangleX(event.getScreenX());
+                    setRectangleX(event.getSceneX());
                     setRectangleW(endx - rectangle.xProperty().get());
                 }
             } else {
                 // 右侧
-                double targetX = MathUtils.min(event.getScreenX(), ox);
+                double targetX = MathUtils.min(event.getSceneX(), ox);
                 setRectangleX(targetX);
                 // 如果此时x坐标不发生变更，表示碰到了边界
                 if (targetX == rectangle.xProperty().get()) {
@@ -79,15 +79,15 @@ public class ResizeTagRectangleEventHandler extends LimitRectangleEventHandler {
         if (resizeType.isVertical()) {
             if (resizeType.isTop()) {
                 double endy = oy + oh;
-                if (event.getScreenY() < endy) {
-                    setRectangleY(event.getScreenY());
+                if (event.getSceneY() < endy) {
+                    setRectangleY(event.getSceneY());
                     setRectangleH(endy - rectangle.yProperty().get());
                 } else {
                     setRectangleY(endy);
-                    setRectangleH(event.getScreenY() - endy);
+                    setRectangleH(event.getSceneY() - endy);
                 }
             } else {
-                double targetY = MathUtils.min(event.getScreenY(), oy);
+                double targetY = MathUtils.min(event.getSceneY(), oy);
                 setRectangleY(targetY);
                 if (targetY == rectangle.yProperty().get()) {
                     setRectangleH(Math.abs(oh + offsetY));

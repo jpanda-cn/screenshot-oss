@@ -1,8 +1,9 @@
 package cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.text;
 
+import cn.jpanda.screenshot.oss.core.destroy.DestroyBeanHolder;
+import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.InnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.shape.TextRectangle;
-import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import cn.jpanda.screenshot.oss.view.tray.toolkits.CutInnerType;
 import cn.jpanda.screenshot.oss.view.tray.toolkits.TrayConfig;
@@ -61,8 +62,8 @@ public class TextInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEven
 
 
         // 放置文本框
-        text.getExtBorder().xProperty().set(event.getScreenX());
-        text.getExtBorder().yProperty().set(event.getScreenY());
+        text.getExtBorder().xProperty().set(event.getSceneX());
+        text.getExtBorder().yProperty().set(event.getSceneY());
         // 调整高度
         group = new Group(text);
         canvasProperties.getCutPane().getChildren().addAll(group);
@@ -75,18 +76,21 @@ public class TextInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEven
     }
 
     private void clear() {
-        if (group != null) {
-            group.setMouseTransparent(true);
-            canvasProperties.putGroup(group);
-        }
-        // 移除绑定关系
-        if (text != null) {
-            text.getTextArea().editableProperty().setValue(false);
-            text.getTextArea().fontProperty().unbind();
-            text.getExtBorder().fillProperty().set(Color.TRANSPARENT);
-            text.getExtBorder().visibleProperty().setValue(false);
-        }
-        onShowing = false;
+        canvasProperties.getConfiguration().getUniqueBean(DestroyBeanHolder.class).set(() -> {
+            // 鼠标按下时，清理之前生成的矩形组的事件
+            if (group != null) {
+                group.setMouseTransparent(true);
+                canvasProperties.putGroup(group);
+            }
+            // 移除绑定关系
+            if (text != null) {
+                text.getTextArea().editableProperty().setValue(false);
+                text.getTextArea().fontProperty().unbind();
+                text.getExtBorder().fillProperty().set(Color.TRANSPARENT);
+                text.getExtBorder().visibleProperty().setValue(false);
+            }
+            onShowing = false;
+        });
     }
 
     private String color2RGBA(Color color) {

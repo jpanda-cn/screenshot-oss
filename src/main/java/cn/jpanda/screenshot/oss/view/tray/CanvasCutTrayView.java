@@ -2,9 +2,10 @@ package cn.jpanda.screenshot.oss.view.tray;
 
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.ScreenshotsProcess;
-import cn.jpanda.screenshot.oss.core.Snapshot;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
 import cn.jpanda.screenshot.oss.core.controller.ViewContext;
+import cn.jpanda.screenshot.oss.core.destroy.DestroyBean;
+import cn.jpanda.screenshot.oss.core.destroy.DestroyBeanHolder;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import cn.jpanda.screenshot.oss.view.tray.subs.TrayColorView;
@@ -138,11 +139,15 @@ public class CanvasCutTrayView implements Initializable {
             return;
         }
         Scene scene = canvasProperties.getCutPane().getScene();
+        configuration.setCutting(false);
         // 关闭
         ((Stage) scene.getWindow()).close();
     }
 
     public void doDone() {
+        // 执行销毁操作
+        DestroyBeanHolder destroyBeanHolder = configuration.getUniqueBean(DestroyBeanHolder.class);
+        destroyBeanHolder.destroy();
 
         ScreenshotsProcess screenshotsProcess = configuration.getUniqueBean(ScreenshotsProcess.class);
 

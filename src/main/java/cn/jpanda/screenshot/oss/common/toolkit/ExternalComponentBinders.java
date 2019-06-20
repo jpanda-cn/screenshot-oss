@@ -45,15 +45,23 @@ public class ExternalComponentBinders {
         double h = cutRec.heightProperty().get();
         double x = cutRec.xProperty().get();
         double w = cutRec.widthProperty().get();
+        // 截图区域的左下角 x
         double endX = x + w;
+        // 截图区域的左下角 y
         double endY = y + h;
+        // 屏幕的高度
         double windowEndY = window.getY() + window.getHeight();
+        // 屏幕的宽度
         double windowEndX = window.getX() + window.getWidth();
+
         Bounds toolBarBounds = toolbar.layoutBoundsProperty().get();
         double toolW = toolBarBounds.getWidth();
         double toolH = toolBarBounds.getHeight();
+        // 工具无法放置在截图区域下方，同时无法放在截图区域上方
         boolean unableVertical = toolH + endY > windowEndY && toolH > y;
+        // 工具无法放置在截图区域左侧，同时无法放在截图区域右侧
         boolean unableAcross = toolW > x && toolW + endX > windowEndX;
+        // 工具无法放在截图区域外
         boolean isInner = unableVertical && unableAcross;
         if (isInner) {
             // 内部展示 内部下右,不考虑高度不够
@@ -61,11 +69,22 @@ public class ExternalComponentBinders {
             toolbar.layoutXProperty().set(endX - toolW);
         } else {
             if (!unableVertical) {
+                // 垂直可以放
                 if (toolW < w) {
-                    // 截图区域大于工具宽度
+                    // 工具宽度小于截图区域
                     toolbar.layoutXProperty().set(endX - toolW);
-                } else {
+                } else if (toolW == w) {
+                    // 工具的宽度等于截图区域的宽度
                     toolbar.layoutXProperty().set(x);
+                } else {
+                    // 工具的宽度大于截图区域的宽度
+                    // 这里有两种场景,一种是在右侧，一种是在左侧
+                    if (endX - toolW < 0) {
+                        // 在左侧长度不够
+                        toolbar.layoutXProperty().set(window.xProperty().getValue());
+                    } else {
+                        toolbar.layoutXProperty().set(endX - toolW);
+                    }
                 }
 
                 if (toolH + endY <= windowEndY) {

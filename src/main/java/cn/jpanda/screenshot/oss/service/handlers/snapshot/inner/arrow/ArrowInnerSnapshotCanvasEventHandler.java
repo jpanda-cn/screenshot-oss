@@ -1,8 +1,9 @@
 package cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.arrow;
 
+import cn.jpanda.screenshot.oss.core.destroy.DestroyBeanHolder;
+import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.InnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.shape.Arrow;
-import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import cn.jpanda.screenshot.oss.view.tray.toolkits.CutInnerType;
 import cn.jpanda.screenshot.oss.view.tray.toolkits.TrayConfig;
@@ -32,11 +33,13 @@ public class ArrowInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEve
 
     @Override
     protected void press(MouseEvent event) {
+        DestroyBeanHolder destroyBeanHolder = canvasProperties.getConfiguration().getUniqueBean(DestroyBeanHolder.class);
+        destroyBeanHolder.destroy();
         if (group != null) {
             group.setMouseTransparent(true);
         }
-        x = event.getScreenX();
-        y = event.getScreenY();
+        x = event.getSceneX();
+        y = event.getSceneY();
         arrow = new Arrow();
         group = arrow.getGroup();
         TrayConfig config = canvasProperties.getTrayConfig(CutInnerType.ARROW);
@@ -56,8 +59,8 @@ public class ArrowInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEve
     @Override
     protected void drag(MouseEvent event) {
         // 获取需要移动的元素变更其展示位置
-        arrow.endXProperty().set(event.getScreenX());
-        arrow.endYProperty().set(event.getScreenY());
+        arrow.endXProperty().set(event.getSceneX());
+        arrow.endYProperty().set(event.getSceneY());
     }
 
     @Override

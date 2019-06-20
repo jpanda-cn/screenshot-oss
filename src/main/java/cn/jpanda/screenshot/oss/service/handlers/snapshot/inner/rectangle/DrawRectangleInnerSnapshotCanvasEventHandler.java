@@ -1,12 +1,13 @@
 package cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.rectangle;
 
 import cn.jpanda.screenshot.oss.common.toolkit.DragRectangleEventHandler;
-import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.InnerSnapshotCanvasEventHandler;
-import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
-import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
-import cn.jpanda.screenshot.oss.view.tray.toolkits.CutInnerType;
 import cn.jpanda.screenshot.oss.common.toolkit.RectangleAddTag2ResizeBinding;
 import cn.jpanda.screenshot.oss.common.toolkit.RectangleBinding;
+import cn.jpanda.screenshot.oss.core.destroy.DestroyBeanHolder;
+import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
+import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.InnerSnapshotCanvasEventHandler;
+import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
+import cn.jpanda.screenshot.oss.view.tray.toolkits.CutInnerType;
 import cn.jpanda.screenshot.oss.view.tray.toolkits.TrayConfig;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
@@ -42,8 +43,8 @@ public class DrawRectangleInnerSnapshotCanvasEventHandler extends InnerSnapshotC
         currentRectangle.strokeProperty().bind(config.getStrokeColor());
         currentRectangle.setFill(Color.TRANSPARENT);
         // 记录鼠标开始节点
-        x = event.getScreenX();
-        y = event.getScreenY();
+        x = event.getSceneX();
+        y = event.getSceneY();
         currentRectangle.xProperty().set(x);
         currentRectangle.yProperty().set(y);
         rectangleGroup = new Group(currentRectangle);
@@ -52,10 +53,33 @@ public class DrawRectangleInnerSnapshotCanvasEventHandler extends InnerSnapshotC
 
     @Override
     protected void drag(MouseEvent event) {
+        double cx = event.getSceneX();
+        double cy = event.getSceneY();
+        // 限制鼠标位置
+        if (cx > rectangle.xProperty().add(rectangle.widthProperty()).get()) {
+            cx = rectangle.xProperty().add(rectangle.widthProperty()).get();
+        } else if (cx < rectangle.xProperty().get()) {
+            cx = rectangle.xProperty().get();
+        }
+        if (cy > rectangle.yProperty().add(rectangle.heightProperty()).get()) {
+            cy = rectangle.yProperty().add(rectangle.heightProperty()).get();
+        } else if (cy < rectangle.yProperty().get()) {
+            cy = rectangle.yProperty().get();
+        }
+
         // 获取鼠标偏移量
-        double width = event.getScreenX() - x;
-        double height = event.getScreenY() - y;
-        // 限制矩形的大小不能超过截图区域
+        double width = cx - x;
+        double height = cy - y;
+        if (cx < x) {
+            width = x - cx;
+            currentRectangle.xProperty().set(cx);
+
+        }
+        if (cy < y) {
+            height = y - cy;
+            currentRectangle.yProperty().set(cy);
+
+        }
         currentRectangle.widthProperty().set(width);
         currentRectangle.heightProperty().set(height);
 
@@ -74,7 +98,6 @@ public class DrawRectangleInnerSnapshotCanvasEventHandler extends InnerSnapshotC
         dragRectangle.addEventFilter(MouseEvent.ANY, new DragRectangleEventHandler(dragRectangle, rectangle, null));
         // 添加变更大小事件
         new RectangleAddTag2ResizeBinding(dragRectangle, rectangle).bind();
-        dragRectangle.requestFocus();
         dragRectangle.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue) {
                 clear();
@@ -84,14 +107,16 @@ public class DrawRectangleInnerSnapshotCanvasEventHandler extends InnerSnapshotC
     }
 
     private void clear() {
-        // 鼠标按下时，清理之前生成的矩形组的事件
-        if (rectangleGroup != null) {
-            rectangleGroup.setMouseTransparent(true);
-            if (dragRectangle != null) {
-                dragRectangle.visibleProperty().setValue(false);
-                currentRectangle.strokeProperty().unbind();
-                currentRectangle.strokeWidthProperty().unbind();
+        canvasProperties.getConfiguration().getUniqueBean(DestroyBeanHolder.class).set(() -> {
+            // 鼠标按下时，清理之前生成的矩形组的事件
+            if (rectangleGroup != null) {
+                rectangleGroup.setMouseTransparent(true);
+                if (dragRectangle != null) {
+                    dragRectangle.visibleProperty().setValue(false);
+                    currentRectangle.strokeProperty().unbind();
+                    currentRectangle.strokeWidthProperty().unbind();
+                }
             }
-        }
+        });
     }
 }

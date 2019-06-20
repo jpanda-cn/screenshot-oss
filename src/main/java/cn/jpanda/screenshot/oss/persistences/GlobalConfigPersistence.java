@@ -29,6 +29,11 @@ public class GlobalConfigPersistence implements Persistence {
      */
     private int screenIndex = 0;
     /**
+     * 是否启用鼠标跟随功能
+     * 截图时，将会获取鼠标所在屏幕的图像
+     */
+    private boolean screenshotMouseFollow = false;
+    /**
      * 图片存储方式
      */
     private String imageStore = "本地保存";
