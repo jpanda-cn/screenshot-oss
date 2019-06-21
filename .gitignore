@@ -104,4 +104,7 @@ admin-storage/admin-storage-common/*
 # jreble
 rebel.xml
 
+# self
 out/*
+bootstrap.properties
+screenshot4oss.properties

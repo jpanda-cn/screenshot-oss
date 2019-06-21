@@ -8,7 +8,7 @@ import cn.jpanda.screenshot.oss.core.persistence.BootstrapPersistence;
 import cn.jpanda.screenshot.oss.core.persistence.Persistence;
 import cn.jpanda.screenshot.oss.core.persistence.PersistenceBeanCatalogManagement;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
-import cn.jpanda.screenshot.oss.view.password.init.ConfigPassword;
+import cn.jpanda.screenshot.oss.view.password.modify.ModifyPassword;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -20,7 +20,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -61,6 +60,8 @@ public class IndexCutView implements Initializable {
         Menu pwd = new Menu("密码管理");
         MenuItem stopUsePwd = new MenuItem("停用密码");
         MenuItem usePwd = new MenuItem("启用密码");
+        MenuItem cpwd = new MenuItem("修改密码");
+
         stopUsePwd.setOnAction(event -> {
             BootstrapPersistence bootstrapPersistence = configuration.getPersistence(BootstrapPersistence.class);
             // 取消密码，重新存储一下数据
@@ -78,8 +79,10 @@ public class IndexCutView implements Initializable {
             });
             // 完成
             pwd.getItems().remove(stopUsePwd);
+            pwd.getItems().remove(cpwd);
             pwd.getItems().add(0, usePwd);
         });
+
         EventHandler<ActionEvent> usePwdAction = (event) -> {
             PersistenceBeanCatalogManagement persistenceBeanCatalogManagement = configuration.getUniqueBean(PersistenceBeanCatalogManagement.class);
             // 将所有数据重新加载
@@ -90,12 +93,9 @@ public class IndexCutView implements Initializable {
             Stage stage = new Stage(StageStyle.UNDECORATED);
             stage.getIcons().add(new Image(this.getClass().getClassLoader().getResourceAsStream("logo.png")));
             stage.initModality(Modality.APPLICATION_MODAL);
-            Scene scene = configuration.getViewContext().getScene(ConfigPassword.class);
-            AnchorPane password = (AnchorPane) scene.getRoot();
+            Scene scene = configuration.getViewContext().getScene(ModifyPassword.class);
             stage.setScene(scene);
-            stage.toFront();
             stage.setTitle("配置主控密码");
-            password.toFront();
             stage.toFront();
             stage.showAndWait();
             if (configuration.getPersistence(BootstrapPersistence.class).isUsePassword()) {
@@ -106,15 +106,16 @@ public class IndexCutView implements Initializable {
                 // 完成
                 pwd.getItems().remove(usePwd);
                 pwd.getItems().add(0, stopUsePwd);
+                pwd.getItems().add(1, cpwd);
             }
         };
-        MenuItem cpwd = new MenuItem("修改密码");
 
         usePwd.setOnAction(usePwdAction);
         cpwd.setOnAction(usePwdAction);
         BootstrapPersistence bootstrapPersistence = configuration.getPersistence(BootstrapPersistence.class);
-        pwd.getItems().add(bootstrapPersistence.isUsePassword() ? stopUsePwd : usePwd);
-        pwd.getItems().addAll(cpwd);
+        pwd.getItems().addAll(bootstrapPersistence.isUsePassword() ? new MenuItem[]{stopUsePwd, cpwd} : new MenuItem[]{usePwd});
+
+
         MenuItem choseScreen = new MenuItem("切换屏幕");
         choseScreen.setOnAction(event -> {
             // 展示屏幕切换页面
@@ -150,7 +151,6 @@ public class IndexCutView implements Initializable {
     public void toSettings() {
         Stage stage = new Stage();
         stage.initOwner(configuration.getViewContext().getStage());
-//        stage.initStyle(StageStyle.UNDECORATED);
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setScene(configuration.getViewContext().getScene(SettingsView.class, true, false));
         stage.showAndWait();
@@ -167,11 +167,5 @@ public class IndexCutView implements Initializable {
         stage.resizableProperty().setValue(false);
         stage.setScene(scene);
         stage.showAndWait();
-    }
-
-    public void toKeySettings(KeyEvent event) {
-        if (event.getCode().equals(KeyCode.SPACE) || event.getCode().equals(KeyCode.ENTER)) {
-            toSettings();
-        }
     }
 }
