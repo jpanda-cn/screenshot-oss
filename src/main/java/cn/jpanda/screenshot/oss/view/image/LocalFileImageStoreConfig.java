@@ -54,7 +54,11 @@ public class LocalFileImageStoreConfig implements Initializable {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setInitialDirectory(Paths.get(path).toFile());
         directoryChooser.setTitle("请选择本地图片保存地址");
-        String newPath = directoryChooser.showDialog(new Stage()).getAbsolutePath();
+        File file = directoryChooser.showDialog(new Stage());
+        if (file == null) {
+            return;
+        }
+        String newPath = file.getAbsolutePath();
         if (StringUtils.isEmpty(newPath)) {
             return;
         }

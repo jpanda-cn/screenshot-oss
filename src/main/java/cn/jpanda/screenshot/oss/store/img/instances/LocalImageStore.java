@@ -11,6 +11,7 @@ import lombok.SneakyThrows;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.nio.file.Paths;
 import java.util.UUID;
 
@@ -38,7 +39,7 @@ public class LocalImageStore extends AbstractConfigImageStore {
         String path = localImageStorePersistence.getPath();
         String name = fileNameGenerator();
         String suffix = "png";
-        path = path + name + "." + suffix;
+        path = path + File.separator + name + "." + suffix;
         // 本地图片存储
         save(image, suffix, path);
         return path;
