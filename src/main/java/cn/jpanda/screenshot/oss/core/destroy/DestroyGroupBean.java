@@ -1,5 +1,5 @@
 package cn.jpanda.screenshot.oss.core.destroy;
 
-public interface DestroyBean {
+public interface DestroyGroupBean {
     void destroy();
 }

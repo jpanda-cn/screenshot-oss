@@ -1,6 +1,6 @@
 package cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.arrow;
 
-import cn.jpanda.screenshot.oss.core.destroy.DestroyBeanHolder;
+import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.InnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.shape.Arrow;
@@ -33,8 +33,8 @@ public class ArrowInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEve
 
     @Override
     protected void press(MouseEvent event) {
-        DestroyBeanHolder destroyBeanHolder = canvasProperties.getConfiguration().getUniqueBean(DestroyBeanHolder.class);
-        destroyBeanHolder.destroy();
+        DestroyGroupBeanHolder destroyGroupBeanHolder = canvasProperties.getConfiguration().getUniqueBean(DestroyGroupBeanHolder.class);
+        destroyGroupBeanHolder.destroy();
         if (group != null) {
             group.setMouseTransparent(true);
         }

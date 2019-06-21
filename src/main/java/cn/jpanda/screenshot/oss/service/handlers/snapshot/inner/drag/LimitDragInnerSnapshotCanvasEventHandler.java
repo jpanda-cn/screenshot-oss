@@ -2,7 +2,7 @@ package cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.drag;
 
 import cn.jpanda.screenshot.oss.common.toolkit.Bounds;
 import cn.jpanda.screenshot.oss.common.toolkit.ShapeCovertHelper;
-import cn.jpanda.screenshot.oss.core.destroy.DestroyBeanHolder;
+import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.InnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
@@ -40,8 +40,8 @@ public class LimitDragInnerSnapshotCanvasEventHandler extends InnerSnapshotCanva
         if (event.getEventType().equals(MouseEvent.MOUSE_MOVED)) {
             rectangle.setCursor(Cursor.MOVE);
         } else if (event.getEventType().equals(MouseEvent.MOUSE_PRESSED)) {
-            DestroyBeanHolder destroyBeanHolder = canvasProperties.getConfiguration().getUniqueBean(DestroyBeanHolder.class);
-            destroyBeanHolder.destroy();
+            DestroyGroupBeanHolder destroyGroupBeanHolder = canvasProperties.getConfiguration().getUniqueBean(DestroyGroupBeanHolder.class);
+            destroyGroupBeanHolder.destroy();
             subs = ShapeCovertHelper.toRectanglesUseGroup(canvasProperties.listGroups());
             parent = ShapeCovertHelper.toRectangle(rectangle.getScene().getWindow());
             // 记录当前位置

@@ -1,6 +1,6 @@
 package cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.text;
 
-import cn.jpanda.screenshot.oss.core.destroy.DestroyBeanHolder;
+import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.InnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.shape.TextRectangle;
@@ -76,7 +76,7 @@ public class TextInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEven
     }
 
     private void clear() {
-        canvasProperties.getConfiguration().getUniqueBean(DestroyBeanHolder.class).set(() -> {
+        canvasProperties.getConfiguration().getUniqueBean(DestroyGroupBeanHolder.class).set(() -> {
             // 鼠标按下时，清理之前生成的矩形组的事件
             if (group != null) {
                 group.setMouseTransparent(true);

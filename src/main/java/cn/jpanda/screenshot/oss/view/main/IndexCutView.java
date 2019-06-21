@@ -4,22 +4,31 @@ import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.Snapshot;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
 import cn.jpanda.screenshot.oss.core.capture.ScreenCapture;
+import cn.jpanda.screenshot.oss.core.persistence.BootstrapPersistence;
+import cn.jpanda.screenshot.oss.core.persistence.Persistence;
+import cn.jpanda.screenshot.oss.core.persistence.PersistenceBeanCatalogManagement;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
+import cn.jpanda.screenshot.oss.view.password.init.ConfigPassword;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
-import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 @Controller
 public class IndexCutView implements Initializable {
@@ -48,7 +57,64 @@ public class IndexCutView implements Initializable {
             toSettings();
         });
 
-        MenuItem pwd = new MenuItem("密码管理");
+
+        Menu pwd = new Menu("密码管理");
+        MenuItem stopUsePwd = new MenuItem("停用密码");
+        MenuItem usePwd = new MenuItem("启用密码");
+        stopUsePwd.setOnAction(event -> {
+            BootstrapPersistence bootstrapPersistence = configuration.getPersistence(BootstrapPersistence.class);
+            // 取消密码，重新存储一下数据
+            PersistenceBeanCatalogManagement persistenceBeanCatalogManagement = configuration.getUniqueBean(PersistenceBeanCatalogManagement.class);
+            // 将所有数据重新加载
+            List<Persistence> list =
+                    persistenceBeanCatalogManagement.list().stream().filter((p) -> !BootstrapPersistence.class.isAssignableFrom(p)).map((p) -> configuration.getPersistence(p)).collect(Collectors.toList());
+            // 重置使用密码标记
+            bootstrapPersistence.setUsePassword(false);
+            configuration.storePersistence(bootstrapPersistence);
+            configuration.setPassword(null);
+            // 重新存储
+            list.forEach((p) -> {
+                configuration.storePersistence(p);
+            });
+            // 完成
+            pwd.getItems().remove(stopUsePwd);
+            pwd.getItems().add(0, usePwd);
+        });
+        EventHandler<ActionEvent> usePwdAction = (event) -> {
+            PersistenceBeanCatalogManagement persistenceBeanCatalogManagement = configuration.getUniqueBean(PersistenceBeanCatalogManagement.class);
+            // 将所有数据重新加载
+            List<Persistence> list =
+                    persistenceBeanCatalogManagement.list().stream().filter((p) -> !BootstrapPersistence.class.isAssignableFrom(p)).map((p) -> configuration.getPersistence(p)).collect(Collectors.toList());
+            // 跳转到初始化密码页面
+            // 将密码页面放置到舞台中央
+            Stage stage = new Stage(StageStyle.UNDECORATED);
+            stage.getIcons().add(new Image(this.getClass().getClassLoader().getResourceAsStream("logo.png")));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            Scene scene = configuration.getViewContext().getScene(ConfigPassword.class);
+            AnchorPane password = (AnchorPane) scene.getRoot();
+            stage.setScene(scene);
+            stage.toFront();
+            stage.setTitle("配置主控密码");
+            password.toFront();
+            stage.toFront();
+            stage.showAndWait();
+            if (configuration.getPersistence(BootstrapPersistence.class).isUsePassword()) {
+                // 将所有配置重新保存一下
+                list.forEach((p) -> {
+                    configuration.storePersistence(p);
+                });
+                // 完成
+                pwd.getItems().remove(usePwd);
+                pwd.getItems().add(0, stopUsePwd);
+            }
+        };
+        MenuItem cpwd = new MenuItem("修改密码");
+
+        usePwd.setOnAction(usePwdAction);
+        cpwd.setOnAction(usePwdAction);
+        BootstrapPersistence bootstrapPersistence = configuration.getPersistence(BootstrapPersistence.class);
+        pwd.getItems().add(bootstrapPersistence.isUsePassword() ? stopUsePwd : usePwd);
+        pwd.getItems().addAll(cpwd);
         MenuItem choseScreen = new MenuItem("切换屏幕");
         choseScreen.setOnAction(event -> {
             // 展示屏幕切换页面
@@ -84,13 +150,12 @@ public class IndexCutView implements Initializable {
     public void toSettings() {
         Stage stage = new Stage();
         stage.initOwner(configuration.getViewContext().getStage());
-        stage.setX(Math.max(stage.getOwner().xProperty().getValue(), 0));
-        stage.setY(Math.max(stage.getOwner().yProperty().getValue(), 0));
-        stage.initStyle(StageStyle.UNDECORATED);
+//        stage.initStyle(StageStyle.UNDECORATED);
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setScene(configuration.getViewContext().getScene(SettingsView.class, true, false));
         stage.showAndWait();
     }
+
 
     public void toChoseScreen() {
         // 获取当前窗口所属的显示器

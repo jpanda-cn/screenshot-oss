@@ -1,6 +1,7 @@
 package cn.jpanda.screenshot.oss.store.img.instances;
 
 import cn.jpanda.screenshot.oss.common.enums.ImageType;
+import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.ImgStore;
 import cn.jpanda.screenshot.oss.persistences.LocalImageStorePersistence;
@@ -29,6 +30,10 @@ public class LocalImageStore extends AbstractConfigImageStore {
     @Override
     public String store(BufferedImage image) {
         LocalImageStorePersistence localImageStorePersistence = configuration.getPersistence(LocalImageStorePersistence.class);
+        if (StringUtils.isEmpty(localImageStorePersistence.getPath())) {
+            localImageStorePersistence.setPath(configuration.getWorkPath());
+            configuration.storePersistence(localImageStorePersistence);
+        }
         // 获取保存图片类型
         String path = localImageStorePersistence.getPath();
         String name = fileNameGenerator();

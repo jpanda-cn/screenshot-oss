@@ -4,7 +4,7 @@ import cn.jpanda.screenshot.oss.common.toolkit.DragRectangleEventHandler;
 import cn.jpanda.screenshot.oss.common.toolkit.EllipseRectangleBinding;
 import cn.jpanda.screenshot.oss.common.toolkit.RectangleAddTag2ResizeBinding;
 import cn.jpanda.screenshot.oss.common.utils.MathUtils;
-import cn.jpanda.screenshot.oss.core.destroy.DestroyBeanHolder;
+import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.InnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
@@ -102,7 +102,7 @@ public class RoundnessInnerSnapshotCanvasEventHandler extends InnerSnapshotCanva
     }
 
     private void clear() {
-        canvasProperties.getConfiguration().getUniqueBean(DestroyBeanHolder.class).set(() -> {
+        canvasProperties.getConfiguration().getUniqueBean(DestroyGroupBeanHolder.class).set(() -> {
             // 鼠标按下时，清理之前生成的矩形组的事件
             if (ellipseGroup != null) {
                 ellipseGroup.setMouseTransparent(true);

@@ -5,15 +5,15 @@ import cn.jpanda.screenshot.oss.core.annotations.Component;
 import cn.jpanda.screenshot.oss.core.scan.AfterBootstrapLoaderProcess;
 
 @Component
-public class DestroyBeanManagementAfterBootstrapLoaderProcess implements AfterBootstrapLoaderProcess {
+public class DestroyGroupBeanManagementAfterBootstrapLoaderProcess implements AfterBootstrapLoaderProcess {
     private Configuration configuration;
 
-    public DestroyBeanManagementAfterBootstrapLoaderProcess(Configuration configuration) {
+    public DestroyGroupBeanManagementAfterBootstrapLoaderProcess(Configuration configuration) {
         this.configuration = configuration;
     }
 
     @Override
     public void after() {
-        configuration.registryUniqueBean(DestroyBeanHolder.class, new DestroyBeanHolder());
+        configuration.registryUniqueBean(DestroyGroupBeanHolder.class, new DestroyGroupBeanHolder());
     }
 }

@@ -1,6 +1,6 @@
 package cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.pen;
 
-import cn.jpanda.screenshot.oss.core.destroy.DestroyBeanHolder;
+import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.InnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
@@ -68,7 +68,7 @@ public class PathPenInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasE
     }
 
     protected void clear() {
-        canvasProperties.getConfiguration().getUniqueBean(DestroyBeanHolder.class).set(() -> {
+        canvasProperties.getConfiguration().getUniqueBean(DestroyGroupBeanHolder.class).set(() -> {
             if (group != null) {
                 group.setMouseTransparent(true);
                 canvasProperties.putGroup(group);

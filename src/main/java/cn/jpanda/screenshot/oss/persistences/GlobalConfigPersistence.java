@@ -1,5 +1,6 @@
 package cn.jpanda.screenshot.oss.persistences;
 
+import cn.jpanda.screenshot.oss.core.annotations.Profile;
 import cn.jpanda.screenshot.oss.core.i18n.I18nEnums;
 import cn.jpanda.screenshot.oss.core.persistence.Persistence;
 import lombok.Data;
@@ -11,6 +12,7 @@ import lombok.Data;
  * @since 2019/6/13 13:47
  */
 @Data
+@Profile
 public class GlobalConfigPersistence implements Persistence {
 
     private Long useCount = 0L;

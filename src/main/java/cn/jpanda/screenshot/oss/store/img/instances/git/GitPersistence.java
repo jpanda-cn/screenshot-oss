@@ -1,10 +1,12 @@
 package cn.jpanda.screenshot.oss.store.img.instances.git;
 
 import cn.jpanda.screenshot.oss.core.annotations.Encrypt;
+import cn.jpanda.screenshot.oss.core.annotations.Profile;
 import cn.jpanda.screenshot.oss.core.persistence.Persistence;
 import lombok.Data;
 
 @Data
+@Profile
 public class GitPersistence implements Persistence {
     /**
      * 本地仓库地址
