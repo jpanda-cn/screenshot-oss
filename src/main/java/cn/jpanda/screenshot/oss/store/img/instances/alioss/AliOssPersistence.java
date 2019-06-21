@@ -8,11 +8,14 @@ import lombok.Data;
 @Data
 @Profile
 public class AliOssPersistence implements Persistence {
+    /**
+     * 地域域名
+     */
     private String endpoint;
     private String bucket;
     private String accessKeyId;
     @Encrypt
     private String accessKeySecret;
-    private String schema = "HTTP";
+    private String accessUrl;
     private boolean async = false;
 }

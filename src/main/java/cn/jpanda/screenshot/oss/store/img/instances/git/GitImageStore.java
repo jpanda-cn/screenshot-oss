@@ -5,9 +5,6 @@ import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.ImgStore;
 import cn.jpanda.screenshot.oss.store.img.AbstractConfigImageStore;
 import cn.jpanda.screenshot.oss.view.image.GitFileImageStoreConfig;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
 import lombok.SneakyThrows;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
@@ -19,7 +16,6 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -33,6 +29,7 @@ public class GitImageStore extends AbstractConfigImageStore {
         super(configuration);
     }
 
+    @Override
     public boolean canUse() {
         GitPersistence gitPersistence = configuration.getPersistence(GitPersistence.class);
         return StringUtils.isNotEmpty(gitPersistence.getLocalRepositoryDir())
@@ -41,32 +38,6 @@ public class GitImageStore extends AbstractConfigImageStore {
                 && StringUtils.isNotEmpty(gitPersistence.getPassword());
     }
 
-    public boolean pre() {
-        // 展示一条提示
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle("警告");
-        alert.setHeaderText(String.format("【%s】存储方式需要配置GIT相关参数才可使用", "GIT"));
-        alert.getButtonTypes().clear();
-        alert.getButtonTypes().addAll(new ButtonType("取消", ButtonBar.ButtonData.BACK_PREVIOUS), new ButtonType("配置", ButtonBar.ButtonData.OK_DONE));
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent()) {
-            if (result.get().getButtonData() == ButtonBar.ButtonData.OK_DONE) {
-                config();
-                return canUse();
-            } else {
-                return false;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean check() {
-        if (!canUse()) {
-            return pre();
-        }
-        return true;
-    }
 
     @Override
     public String getName() {
@@ -124,7 +95,7 @@ public class GitImageStore extends AbstractConfigImageStore {
         // 更新仓库
         git.pull().setCredentialsProvider(usernamePasswordCredentialsProvider).call();
         // 现将图片存放到本地仓库中
-        git.add().addFilepattern(StringUtils.isEmpty(gitPersistence.getSubDir())?".":gitPersistence.getSubDir()).call();
+        git.add().addFilepattern(StringUtils.isEmpty(gitPersistence.getSubDir()) ? "." : gitPersistence.getSubDir()).call();
         // 提交代码
         git.commit()
                 .setMessage(String.format("add new image named:%s", name + "." + suffix))

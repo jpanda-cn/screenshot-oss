@@ -1,5 +1,6 @@
 package cn.jpanda.screenshot.oss.store.img.instances.alioss;
 
+import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.ImgStore;
 import cn.jpanda.screenshot.oss.store.img.AbstractConfigImageStore;
@@ -39,10 +40,8 @@ public class AliOssImageStore extends AbstractConfigImageStore {
             upload(image, aliOssPersistence, name);
         }
 
-        return String.format("%s://%s.%s/%s"
-                , aliOssPersistence.getSchema()
-                , aliOssPersistence.getBucket()
-                , aliOssPersistence.getEndpoint()
+        return String.format("%s/%s"
+                , aliOssPersistence.getAccessUrl()
                 , name
         );
     }
@@ -55,6 +54,7 @@ public class AliOssImageStore extends AbstractConfigImageStore {
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             ImageIO.write(image, "png", os);
             PutObjectResult result = ossClient.putObject(aliOssPersistence.getBucket(), name, new ByteArrayInputStream(os.toByteArray()));
+
         } finally {
             ossClient.shutdown();
         }
@@ -63,4 +63,17 @@ public class AliOssImageStore extends AbstractConfigImageStore {
     protected String fileNameGenerator() {
         return UUID.randomUUID().toString() + ".png";
     }
+
+    @Override
+    public boolean canUse() {
+        AliOssPersistence aliOssPersistence = configuration.getPersistence(AliOssPersistence.class);
+        return StringUtils.isNotEmpty(aliOssPersistence.getEndpoint())
+                && StringUtils.isNotEmpty(aliOssPersistence.getBucket())
+                && StringUtils.isNotEmpty(aliOssPersistence.getAccessKeyId())
+                && StringUtils.isNotEmpty(aliOssPersistence.getAccessKeySecret())
+                && StringUtils.isNotEmpty(aliOssPersistence.getAccessUrl());
+    }
+
+
+
 }

@@ -135,7 +135,7 @@ public class GitFileImageStoreConfig implements Initializable {
             AlertUtils.alert(Alert.AlertType.ERROR, "本地仓库目录不存在");
             return;
         }
-        if (!Pattern.matches("^(https?)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]", remote)) {
+        if (StringUtils.isEmpty(remote)||!Pattern.matches("^(https?)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]", remote)) {
             AlertUtils.alert(Alert.AlertType.ERROR, "远程仓库地址格式错误");
             return;
         }

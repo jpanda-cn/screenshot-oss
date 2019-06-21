@@ -26,7 +26,6 @@ public class SettingsView implements Initializable {
     public TextField hotKey;
     public CheckBox screenshotMouseFollow;
     public Label screenshotMouseFollowLabel;
-    public Button backBtn;
     private Configuration configuration;
 
     public SettingsView(Configuration configuration) {
@@ -90,11 +89,8 @@ public class SettingsView implements Initializable {
                 // 联动，剪切板的内容同步发生变化
                 ImageStore imageStore = imageStoreRegisterManager.getImageStore((String) newValue);
                 if (!imageStore.check()) {
-                    // 有可能出现死循环，选不回去，所以默认选择[不保存]比较好
-                    ImageStore oldImageStore = imageStoreRegisterManager.getImageStore((String) oldValue);
-                    if (oldImageStore.check()) {
-                        imageSave.getSelectionModel().select(oldValue);
-                    }
+                    // 会出现异常，但是不影响正常业务
+                    imageSave.getSelectionModel().selectNext();
                     return;
                 }
                 // 判断是否有对应的配置界面，决定是否展示配置按钮

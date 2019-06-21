@@ -5,9 +5,11 @@ import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
 import cn.jpanda.screenshot.oss.store.img.instances.alioss.AliOssPersistence;
-import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -15,13 +17,12 @@ import java.util.ResourceBundle;
 
 @Controller
 public class AliOssFileImageStoreConfig implements Initializable {
-    @FXML
-    public ComboBox schema;
     public TextField endpoint;
     public TextField bucket;
     public TextField accessKeyId;
     public PasswordField accessKeySecret;
     public CheckBox async;
+    public TextField accessUrl;
     private Configuration configuration;
 
     public AliOssFileImageStoreConfig(Configuration configuration) {
@@ -36,9 +37,6 @@ public class AliOssFileImageStoreConfig implements Initializable {
     private void init() {
         AliOssPersistence aliOssPersistence = configuration.getPersistence(AliOssPersistence.class);
 
-        schema.getItems().addAll("HTTP", "HTTPS");
-        schema.getSelectionModel().select(aliOssPersistence.getSchema());
-
         if (StringUtils.isNotEmpty(aliOssPersistence.getEndpoint())) {
             endpoint.textProperty().setValue(aliOssPersistence.getEndpoint());
         }
@@ -51,6 +49,10 @@ public class AliOssFileImageStoreConfig implements Initializable {
         if (StringUtils.isNotEmpty(aliOssPersistence.getAccessKeySecret())) {
             accessKeySecret.textProperty().setValue(aliOssPersistence.getAccessKeySecret());
         }
+        if (StringUtils.isNotEmpty(aliOssPersistence.getAccessUrl())) {
+            accessKeySecret.textProperty().setValue(aliOssPersistence.getAccessUrl());
+        }
+
         async.selectedProperty().set(aliOssPersistence.isAsync());
     }
 
@@ -59,13 +61,15 @@ public class AliOssFileImageStoreConfig implements Initializable {
     }
 
     public void save() {
-        check();
+        if (!check()) {
+            return;
+        }
         AliOssPersistence aliOssPersistence = configuration.getPersistence(AliOssPersistence.class);
         aliOssPersistence.setEndpoint(endpoint.textProperty().get());
         aliOssPersistence.setBucket(bucket.textProperty().get());
         aliOssPersistence.setAccessKeyId(accessKeyId.textProperty().get());
         aliOssPersistence.setAccessKeySecret(accessKeySecret.textProperty().get());
-        aliOssPersistence.setSchema((String) schema.getSelectionModel().getSelectedItem());
+        aliOssPersistence.setAccessUrl(accessUrl.textProperty().get());
         aliOssPersistence.setAsync(async.isSelected());
         configuration.storePersistence(aliOssPersistence);
         close();
