@@ -103,3 +103,5 @@ admin-storage/admin-storage-common/*
 
 # jreble
 rebel.xml
+
+out/*

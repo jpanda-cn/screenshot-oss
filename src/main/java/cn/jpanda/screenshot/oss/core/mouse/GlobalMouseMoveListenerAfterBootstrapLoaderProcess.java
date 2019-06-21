@@ -3,6 +3,7 @@ package cn.jpanda.screenshot.oss.core.mouse;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.Component;
 import cn.jpanda.screenshot.oss.core.scan.AfterBootstrapLoaderProcess;
+import cn.jpanda.screenshot.oss.core.shotkey.DaemonGlobalScreen;
 import lombok.SneakyThrows;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.mouse.NativeMouseEvent;
@@ -28,8 +29,8 @@ public class GlobalMouseMoveListenerAfterBootstrapLoaderProcess implements After
         // 监听鼠标位置
         LogManager.getLogManager().reset();
         Logger.getGlobal().setLevel(Level.OFF);
-        GlobalScreen.registerNativeHook();
-        GlobalScreen.addNativeMouseMotionListener(new GlobalMousePointNativeMouseMotionListener(configuration));
+        DaemonGlobalScreen.registerNativeHook();
+        DaemonGlobalScreen.addNativeMouseMotionListener(new GlobalMousePointNativeMouseMotionListener(configuration));
     }
 
     private static class GlobalMousePointNativeMouseMotionListener implements NativeMouseMotionListener {

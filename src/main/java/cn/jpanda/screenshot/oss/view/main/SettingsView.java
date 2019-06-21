@@ -34,9 +34,9 @@ public class SettingsView implements Initializable {
     }
 
     public Button edit;
-    public ChoiceBox imageSave;
+    public ComboBox imageSave;
     @FXML
-    public ChoiceBox clipboard;
+    public ComboBox clipboard;
     public Label shotKey;
     /**
      * 截图预览
@@ -130,6 +130,7 @@ public class SettingsView implements Initializable {
         });
 
         // 初始化存储方式列表
+        imageSave.getItems().clear();
         imageSave.getItems().addAll(imageStoreRegisterManager.getNames());
         imageSave.getSelectionModel().select(globalConfigPersistence.getImageStore());
         // 判断是否有对应的配置界面，决定是否展示配置按钮
@@ -174,6 +175,7 @@ public class SettingsView implements Initializable {
                 }
             }
         });
+        clipboard.getItems().clear();
         // 初始化保存到剪切板的内容
         clipboard.getItems().addAll(clipboardCallbackRegistryManager.getNames());
         clipboard.getSelectionModel().select(globalConfigPersistence.getClipboardCallback());
