@@ -10,6 +10,7 @@ import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallbackRegistryManager
 import cn.jpanda.screenshot.oss.store.img.ImageStore;
 import cn.jpanda.screenshot.oss.store.img.ImageStoreRegisterManager;
 import cn.jpanda.screenshot.oss.store.img.NoImageStoreConfig;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -90,7 +91,8 @@ public class SettingsView implements Initializable {
                 ImageStore imageStore = imageStoreRegisterManager.getImageStore((String) newValue);
                 if (!imageStore.check()) {
                     // 会出现异常，但是不影响正常业务
-                    imageSave.getSelectionModel().selectNext();
+                    // 2019年6月22日21:48:55 修复角标越界异常
+                    Platform.runLater(new Thread(() -> imageSave.getSelectionModel().selectNext()));
                     return;
                 }
                 // 判断是否有对应的配置界面，决定是否展示配置按钮
