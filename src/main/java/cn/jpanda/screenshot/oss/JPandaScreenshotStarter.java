@@ -48,7 +48,7 @@ public class JPandaScreenshotStarter extends Application {
         Stage stage = viewContext.getStage();
         stage.setTitle(viewContext.getConfiguration().getUniqueBean(I18nResource.class).get(I18nConstants.titleIndex));
         stage.setResizable(false);
-        viewContext.getStage().getIcons().add(new Image(this.getClass().getClassLoader().getResourceAsStream("/logo.png")));
+        viewContext.getStage().getIcons().add(new Image("/logo.png"));
         viewContext.showScene(IndexCutView.class);
     }
 
