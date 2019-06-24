@@ -8,7 +8,7 @@
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="cn.jpanda.screenshot.oss.view.image.GitFileImageStoreConfig">
     <ImageView fitHeight="87.0" fitWidth="308.0" layoutX="14.0" layoutY="23.0" pickOnBounds="true" preserveRatio="true">
-        <Image url="/logo.png"/>
+        <Image url="/images/logo.png"/>
     </ImageView>
     <Label layoutX="27.0" layoutY="130.0" text="本地仓库地址"/>
     <Label layoutX="27.0" layoutY="160.0" text="图片子目录地址"/>

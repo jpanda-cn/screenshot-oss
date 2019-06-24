@@ -1,6 +1,4 @@
 .button {
-    -fx-background-color: #32a1ff;
-}
-#backBtn {
-    -fx-background-color: gray;
+    -fx-background-color: #050402;
+    -fx-text-fill: white;
 }

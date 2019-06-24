@@ -11,7 +11,7 @@
 <?import javafx.scene.image.Image?>
 <AnchorPane prefHeight="400.0" prefWidth="357.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.jpanda.screenshot.oss.view.image.AliOssFileImageStoreConfig">
     <ImageView fitHeight="87.0" fitWidth="308.0" layoutX="26.0" layoutY="23.0" pickOnBounds="true" preserveRatio="true">
-        <Image url="/logo.png"/>
+        <Image url="/images/logo.png"/>
     </ImageView>
     <Label layoutX="42.0" layoutY="125.0" text="endpoint" />
     <Label layoutX="42.0" layoutY="152.0" text="bucket" />
