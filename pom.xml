@@ -23,6 +23,7 @@
         <org.eclipse.jgit.version>5.4.0.201906121030-r</org.eclipse.jgit.version>
         <org.apache.maven.plugins.maven-surefire-plugin.version>2.5
         </org.apache.maven.plugins.maven-surefire-plugin.version>
+        <com.zenjava.javafx-maven-plugin.version>8.8.3</com.zenjava.javafx-maven-plugin.version>
     </properties>
 
     <!-- 依赖管理-->
@@ -145,26 +146,30 @@
             <plugin>
                 <groupId>com.zenjava</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
-                <version>8.8.3</version>
+                <version>${com.zenjava.javafx-maven-plugin.version}</version>
                 <configuration>
+                    <!-- 启动类 -->
                     <mainClass>cn.jpanda.screenshot.oss.JPandaScreenshotStarter</mainClass>
+                    <!-- 运行文件名称-->
                     <appName>screenshot-oss</appName>
-                    <verbose>true</verbose>
-                    <needMenu>true</needMenu>
+                    <!-- 生成桌面图标 -->
                     <needShortcut>true</needShortcut>
                     <bundleArguments>
                         <installdirChooser>true</installdirChooser>
                     </bundleArguments>
-                    <vendor>jpanda</vendor>
+                    <vendor>jpanda.cn</vendor>
+                    <!-- 获取所有权限 -->
                     <allPermissions>true</allPermissions>
-                    <nativeReleaseVersion>v0.1</nativeReleaseVersion>
+                    <nativeReleaseVersion>v${version}</nativeReleaseVersion>
+                    <launcherArguments>
+                        <launcherArgument>-Dfile.encoding=UTF-8</launcherArgument>
+                        <launcherArgument>-Dvisualvm.display.name=Screenshot-oss</launcherArgument>
+                    </launcherArguments>
                     <description>
-                        Screenshot oss  是一款面向云的截图工具
+                        Screenshot-oss 是一款自动上传图片到云服务器中的截图工具，主要是方便coder写博客和README使用。
                     </description>
                 </configuration>
             </plugin>
-
-
         </plugins>
     </build>
 

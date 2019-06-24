@@ -15,8 +15,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import org.jnativehook.GlobalScreen;
-import org.jnativehook.NativeHookException;
 
 public class JPandaScreenshotStarter extends Application {
     private ViewContext viewContext;
@@ -50,7 +48,7 @@ public class JPandaScreenshotStarter extends Application {
         Stage stage = viewContext.getStage();
         stage.setTitle(viewContext.getConfiguration().getUniqueBean(I18nResource.class).get(I18nConstants.titleIndex));
         stage.setResizable(false);
-        viewContext.getStage().getIcons().add(new Image(this.getClass().getClassLoader().getResourceAsStream("logo.png")));
+        viewContext.getStage().getIcons().add(new Image(this.getClass().getClassLoader().getResourceAsStream("/logo.png")));
         viewContext.showScene(IndexCutView.class);
     }
 
@@ -82,5 +80,9 @@ public class JPandaScreenshotStarter extends Application {
         password.toFront();
         stage.toFront();
         stage.showAndWait();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
     }
 }
