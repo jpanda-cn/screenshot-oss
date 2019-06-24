@@ -48,8 +48,7 @@ public class DefaultScreenshotsProcess implements ScreenshotsProcess {
         GlobalConfigPersistence globalConfigPersistence = configuration.getPersistence(GlobalConfigPersistence.class);
         if (globalConfigPersistence.isPreview()) {
             // 从剪切板搞定图片
-            Stage stage = new Stage();
-            stage.getIcons().add(new Image("/logo.png"));
+            Stage stage = configuration.getViewContext().newStage();
             stage.setTitle("预览图片,如不需要，请到设置中关闭该功能。");
             stage.setScene(new Scene(new AnchorPane(new ImageView(SwingFXUtils.toFXImage(image, null)))));
             stage.showAndWait();

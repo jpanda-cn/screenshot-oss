@@ -21,7 +21,6 @@ public class KeyExitStageEventHandler implements EventHandler<KeyEvent> {
     @Override
     public void handle(KeyEvent event) {
         if (code.equals(event.getCode())) {
-            configuration.setCutting(false);
             stage.close();
         }
     }

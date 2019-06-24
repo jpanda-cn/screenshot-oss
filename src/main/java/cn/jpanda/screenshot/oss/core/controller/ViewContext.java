@@ -13,6 +13,11 @@ public interface ViewContext {
     Stage getStage();
 
     /**
+     * 创建一个新的舞台，主要作用是统一图标
+     */
+    Stage newStage();
+
+    /**
      * 关闭舞台
      */
     void closeStage();

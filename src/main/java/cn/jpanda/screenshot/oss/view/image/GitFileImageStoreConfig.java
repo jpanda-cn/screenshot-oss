@@ -107,7 +107,7 @@ public class GitFileImageStoreConfig implements Initializable {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setInitialDirectory(Paths.get(oldPath).toFile());
         directoryChooser.setTitle(title);
-        File newDir = directoryChooser.showDialog(new Stage());
+        File newDir = directoryChooser.showDialog(configuration.getViewContext().newStage());
         if (newDir == null) {
             return oldPath;
         }

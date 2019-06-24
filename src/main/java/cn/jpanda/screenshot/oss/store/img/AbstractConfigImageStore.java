@@ -28,7 +28,7 @@ public abstract class AbstractConfigImageStore implements ImageStore {
             return;
         }
         Scene scene = configuration.getViewContext().getScene(config);
-        Stage stage = new Stage();
+        Stage stage = configuration.getViewContext().newStage();
         stage.getIcons().addAll(configuration.getViewContext().getStage().getIcons());
         stage.setTitle(getName());
         stage.initModality(Modality.APPLICATION_MODAL);

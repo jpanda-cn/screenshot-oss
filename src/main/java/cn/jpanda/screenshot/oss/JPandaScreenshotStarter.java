@@ -48,14 +48,6 @@ public class JPandaScreenshotStarter extends Application {
 
     protected void doStart() {
         Stage stage = viewContext.getStage();
-//        stage.setOnCloseRequest(event -> {
-//            // 移除
-//            try {
-//                GlobalScreen.unregisterNativeHook();
-//            } catch (NativeHookException e) {
-//                e.printStackTrace();
-//            }
-//        });
         stage.setTitle(viewContext.getConfiguration().getUniqueBean(I18nResource.class).get(I18nConstants.titleIndex));
         stage.setResizable(false);
         viewContext.getStage().getIcons().add(new Image(this.getClass().getClassLoader().getResourceAsStream("logo.png")));
@@ -64,10 +56,10 @@ public class JPandaScreenshotStarter extends Application {
 
     protected void showInitPassword() {
         // 将密码页面放置到舞台中央
-        Stage stage = new Stage(StageStyle.UNDECORATED);
-        stage.getIcons().add(new Image(this.getClass().getClassLoader().getResourceAsStream("logo.png")));
+        Stage stage = viewContext.newStage();
         stage.initModality(Modality.APPLICATION_MODAL);
         Scene scene = viewContext.getScene(ConfigPassword.class);
+        stage.initStyle(StageStyle.UNDECORATED);
         AnchorPane password = (AnchorPane) scene.getRoot();
         stage.setScene(scene);
         stage.toFront();
@@ -79,8 +71,8 @@ public class JPandaScreenshotStarter extends Application {
 
     protected void showEnterPassword() {
         // 将密码页面放置到舞台中央
-        Stage stage = new Stage(StageStyle.UNDECORATED);
-        stage.getIcons().add(new Image(this.getClass().getClassLoader().getResourceAsStream("logo.png")));
+        Stage stage = viewContext.newStage();
+        stage.initStyle(StageStyle.UNDECORATED);
         stage.initModality(Modality.APPLICATION_MODAL);
         Scene scene = viewContext.getScene(EnterPassword.class);
         AnchorPane password = (AnchorPane) scene.getRoot();

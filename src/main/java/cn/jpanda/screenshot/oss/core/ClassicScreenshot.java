@@ -25,7 +25,7 @@ public class ClassicScreenshot implements Snapshot {
 
     @Override
     public synchronized void cut() {
-        if (configuration.isCutting()) {
+        if (configuration.getCutting().get()) {
             Platform.runLater(() -> {
                 stage.toFront();
             });
@@ -37,27 +37,26 @@ public class ClassicScreenshot implements Snapshot {
             log.debug("The application has not started yet.");
             return;
         }
-        configuration.setCutting(true);
         Platform.runLater(() -> {
             // 调用截图操作
             // 执行截图操作
             // 处理ICON
-            stage = new Stage();
+            stage = configuration.getViewContext().newStage();
+            configuration.getCutting().bind(stage.showingProperty());
             stage.initOwner(configuration.getViewContext().getStage());
             stage.initStyle(StageStyle.UNDECORATED);
             stage.setScene(configuration.getViewContext().getScene(SnapshotView.class, true, false));
 
             // 添加屏幕跟随，截哪个屏幕就在哪个屏幕上展示
             ScreenCapture screenCapture = configuration.getUniqueBean(ScreenCapture.class);
-            int index = screenCapture.getGraphicsDeviceIndex(configuration.getUniqueBean(GlobalMousePoint.class).pointSimpleObjectProperty.get().getX());
-            stage.setX(screenCapture.getTargetGraphicsDeviceX(index));
+            int index = screenCapture.getScreenIndex(configuration.getUniqueBean(GlobalMousePoint.class).pointSimpleObjectProperty.get().getX());
+            stage.setX(screenCapture.getTargetScreenX(index));
 
             // 输入ESC退出截屏
             stage.setFullScreenExitHint("输入ESC退出截屏");
             stage.addEventHandler(KeyEvent.KEY_RELEASED, new KeyExitStageEventHandler(KeyCode.ESCAPE, stage, configuration));
             stage.setOnCloseRequest(event -> {
                 if (event.getEventType().equals(WindowEvent.WINDOW_CLOSE_REQUEST)) {
-                    configuration.setCutting(false);
                     configuration.getViewContext().showScene(IndexCutView.class);
                 }
             });

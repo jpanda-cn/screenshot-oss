@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import lombok.SneakyThrows;
 
@@ -31,6 +32,13 @@ public class DefaultViewContext implements ViewContext {
     @Override
     public Stage getStage() {
         return defaultStage;
+    }
+
+    @Override
+    public Stage newStage() {
+        Stage stage = new Stage();
+        stage.getIcons().add(new Image("/logo.png"));
+        return stage;
     }
 
     @Override

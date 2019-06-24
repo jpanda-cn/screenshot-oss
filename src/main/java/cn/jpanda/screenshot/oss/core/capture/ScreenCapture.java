@@ -1,7 +1,10 @@
 package cn.jpanda.screenshot.oss.core.capture;
 
-import java.awt.*;
+import cn.jpanda.screenshot.oss.common.toolkit.Bounds;
+import javafx.stage.Screen;
+
 import java.awt.image.BufferedImage;
+import java.util.List;
 
 /**
  * 屏幕图片获取接口
@@ -65,17 +68,22 @@ public interface ScreenCapture {
      */
     BufferedImage screenshotImage(int index, int x, int y, double percentWidth, double percentHeight);
 
-    int GraphicsDeviceCount();
+    int screensCount();
 
-    GraphicsDevice getTargetGraphicsDevice(final int index);
+    Bounds getTargetScreen(final int index);
 
-    int getTargetGraphicsDeviceX(final int index);
+    int getTargetScreenX(final int index);
 
     /**
      * 根据x坐标，获取显示器的索引
      *
      * @param x x坐标
-     * @return
      */
-    int getGraphicsDeviceIndex(final double x);
+    int getScreenIndex(final double x);
+
+    /**
+     * 或许所有屏幕
+     */
+    List<Screen> listScreen();
+
 }

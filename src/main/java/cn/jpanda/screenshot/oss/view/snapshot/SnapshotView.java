@@ -1,5 +1,6 @@
 package cn.jpanda.screenshot.oss.view.snapshot;
 
+import cn.jpanda.screenshot.oss.common.toolkit.Bounds;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.ScreenshotsProcess;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
@@ -50,7 +51,7 @@ public class SnapshotView implements Initializable {
         WritableImage writableImage = new WritableImage(image.getWidth(), image.getHeight());
         SwingFXUtils.toFXImage(image, writableImage);
         imageView.setImage(writableImage);
-        Dimension dimension = screenCapture.getTargetGraphicsDevice(0).getDefaultConfiguration().getBounds().getSize();
+        Bounds dimension = screenCapture.getTargetScreen(0);
         Canvas canvas = new Canvas(dimension.getWidth(), dimension.getHeight());
         GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
         graphicsContext.setStroke(Color.rgb(50, 161, 255));
@@ -81,9 +82,9 @@ public class SnapshotView implements Initializable {
         int screenIndex = 0;
         if (globalConfigPersistence.isScreenshotMouseFollow()) {
             // 启用了鼠标跟随功能
-            screenIndex = screenCapture.getGraphicsDeviceIndex(configuration.getUniqueBean(GlobalMousePoint.class).pointSimpleObjectProperty.get().getX());
+            screenIndex = screenCapture.getScreenIndex(configuration.getUniqueBean(GlobalMousePoint.class).pointSimpleObjectProperty.get().getX());
         } else {
-            if (globalConfigPersistence.getScreenIndex() >= screenCapture.GraphicsDeviceCount()) {
+            if (globalConfigPersistence.getScreenIndex() >= screenCapture.screensCount()) {
                 // 校验一下显示器的数量问题
                 globalConfigPersistence.setScreenIndex(0);
                 configuration.storePersistence(globalConfigPersistence);
@@ -91,9 +92,8 @@ public class SnapshotView implements Initializable {
             screenIndex = globalConfigPersistence.getScreenIndex();
         }
 
-        GraphicsDevice graphicsDevice = screenCapture.getTargetGraphicsDevice(screenIndex);
-        Dimension dimension = graphicsDevice.getDefaultConfiguration().getBounds().getSize();
-        return screenCapture.screenshotImage(screenIndex, (int) dimension.getWidth(), (int) dimension.getHeight());
+        Bounds graphicsDevice = screenCapture.getTargetScreen(screenIndex);
+        return screenCapture.screenshotImage(screenIndex, (int) graphicsDevice.getWidth(), (int) graphicsDevice.getHeight());
     }
 
     protected void saveAndClose(Canvas canvas) {

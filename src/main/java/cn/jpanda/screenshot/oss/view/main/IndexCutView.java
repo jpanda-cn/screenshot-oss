@@ -42,7 +42,7 @@ public class IndexCutView implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         GlobalConfigPersistence globalConfigPersistence = configuration.getPersistence(GlobalConfigPersistence.class);
         int index = globalConfigPersistence.getScreenIndex();
-        if (index >= configuration.getUniqueBean(ScreenCapture.class).GraphicsDeviceCount()) {
+        if (index >= configuration.getUniqueBean(ScreenCapture.class).screensCount()) {
             globalConfigPersistence.setScreenIndex(0);
             configuration.storePersistence(globalConfigPersistence);
         }
@@ -90,8 +90,8 @@ public class IndexCutView implements Initializable {
                     persistenceBeanCatalogManagement.list().stream().filter((p) -> !BootstrapPersistence.class.isAssignableFrom(p)).map((p) -> configuration.getPersistence(p)).collect(Collectors.toList());
             // 跳转到初始化密码页面
             // 将密码页面放置到舞台中央
-            Stage stage = new Stage(StageStyle.UNDECORATED);
-            stage.getIcons().add(new Image(this.getClass().getClassLoader().getResourceAsStream("logo.png")));
+            Stage stage =configuration.getViewContext().newStage();
+            stage.initStyle(StageStyle.UNDECORATED);
             stage.initModality(Modality.APPLICATION_MODAL);
             Scene scene = configuration.getViewContext().getScene(ModifyPassword.class);
             stage.setScene(scene);
@@ -149,7 +149,7 @@ public class IndexCutView implements Initializable {
     }
 
     public void toSettings() {
-        Stage stage = new Stage();
+        Stage stage = configuration.getViewContext().newStage();
         stage.initOwner(configuration.getViewContext().getStage());
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setScene(configuration.getViewContext().getScene(SettingsView.class, true, false));
@@ -160,7 +160,7 @@ public class IndexCutView implements Initializable {
     public void toChoseScreen() {
         // 获取当前窗口所属的显示器
         Stage defaultStage = configuration.getViewContext().getStage();
-        Stage stage = new Stage();
+        Stage stage = configuration.getViewContext().newStage();
         stage.initOwner(defaultStage);
         stage.initModality(Modality.APPLICATION_MODAL);
         Scene scene = configuration.getViewContext().getScene(ChoseScreenView.class, true, false);

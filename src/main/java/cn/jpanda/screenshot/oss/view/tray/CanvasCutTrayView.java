@@ -138,7 +138,6 @@ public class CanvasCutTrayView implements Initializable {
             return;
         }
         Scene scene = canvasProperties.getCutPane().getScene();
-        configuration.setCutting(false);
         // 关闭
         ((Stage) scene.getWindow()).close();
     }
@@ -159,7 +158,6 @@ public class CanvasCutTrayView implements Initializable {
         Rectangle rectangle = canvasProperties.getCutRectangle();
         screenshotsProcess.done(screenshotsProcess.snapshot(scene, rectangle));
         Stage stage = ((Stage) scene.getWindow());
-        configuration.setCutting(false);
         stage.close();
     }
 
