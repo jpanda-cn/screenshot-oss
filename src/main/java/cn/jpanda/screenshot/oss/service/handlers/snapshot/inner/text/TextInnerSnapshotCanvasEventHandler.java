@@ -68,11 +68,11 @@ public class TextInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEven
         group = new Group(text);
         canvasProperties.getCutPane().getChildren().addAll(group);
         text.getTextArea().requestFocus();
-        text.getTextArea().focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue) {
-                clear();
-            }
-        });
+//        text.getTextArea().focusedProperty().addListener((observable, oldValue, newValue) -> {
+//            if (!newValue) {
+//                clear();
+//            }
+//        });
     }
 
     private void clear() {

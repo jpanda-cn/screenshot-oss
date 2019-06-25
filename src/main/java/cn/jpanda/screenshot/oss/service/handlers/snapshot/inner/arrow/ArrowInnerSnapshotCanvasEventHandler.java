@@ -33,6 +33,7 @@ public class ArrowInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEve
 
     @Override
     protected void press(MouseEvent event) {
+        clear();
         DestroyGroupBeanHolder destroyGroupBeanHolder = canvasProperties.getConfiguration().getUniqueBean(DestroyGroupBeanHolder.class);
         destroyGroupBeanHolder.destroy();
         if (group != null) {
@@ -65,6 +66,19 @@ public class ArrowInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEve
 
     @Override
     protected void release(MouseEvent event) {
-        canvasProperties.putGroup(group);
+//        clear();
+    }
+
+    private void clear() {
+        canvasProperties.getConfiguration().getUniqueBean(DestroyGroupBeanHolder.class).set(() -> {
+            if (group != null) {
+                group.setMouseTransparent(true);
+                canvasProperties.putGroup(group);
+            }
+            if (arrow != null) {
+                arrow.strokeProperty().unbind();
+                arrow.strokeWidthProperty().unbind();
+            }
+        });
     }
 }

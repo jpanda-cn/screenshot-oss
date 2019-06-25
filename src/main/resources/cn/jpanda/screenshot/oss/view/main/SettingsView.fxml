@@ -11,7 +11,7 @@
 
 <?import javafx.scene.image.Image?>
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="315.0" prefWidth="328.0" stylesheets="@SettingsView.css" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.jpanda.screenshot.oss.view.main.SettingsView">
-    <ImageView fitHeight="87.0" fitWidth="308.0" layoutX="11.0" layoutY="28.0" pickOnBounds="true" preserveRatio="true">
+    <ImageView fitHeight="87.0" fitWidth="308.0" layoutX="10.0" layoutY="28.0" pickOnBounds="true" preserveRatio="true">
         <Image url="/images/logo.png"/>
     </ImageView>
     <Separator layoutY="115.0" prefHeight="21.0" prefWidth="377.0" />

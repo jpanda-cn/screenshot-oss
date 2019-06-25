@@ -69,7 +69,9 @@ public class RoundnessInnerSnapshotCanvasEventHandler extends InnerSnapshotCanva
         double width = MathUtils.subAbs(event.getSceneX(), x);
         double height = MathUtils.subAbs(event.getSceneY(), y);
         // 宽度限制，宽度半径不得大于中心x，宽度半径不得大于宽度-中心x
-
+        if (event.isShiftDown()) {
+            width = height = MathUtils.max(width, height);
+        }
         if (width <= MathUtils.min(x - canvasProperties.getCutRectangle().xProperty().get(), canvasProperties.getCutRectangle().xProperty().get() + canvasProperties.getCutRectangle().widthProperty().get() - x)) {
             ellipse.radiusXProperty().set(width);
         }

@@ -34,7 +34,7 @@ public class PathPenInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasE
 
     @Override
     protected void press(MouseEvent event) {
-
+        clear();
         x = event.getSceneX();
         y = event.getSceneY();
         if (group != null) {
@@ -64,7 +64,7 @@ public class PathPenInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasE
 
     @Override
     protected void release(MouseEvent event) {
-        clear();
+//        clear();
     }
 
     protected void clear() {

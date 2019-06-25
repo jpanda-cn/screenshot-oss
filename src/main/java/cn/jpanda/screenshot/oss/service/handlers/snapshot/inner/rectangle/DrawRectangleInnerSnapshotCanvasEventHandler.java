@@ -70,6 +70,7 @@ public class DrawRectangleInnerSnapshotCanvasEventHandler extends InnerSnapshotC
         // 获取鼠标偏移量
         double width = cx - x;
         double height = cy - y;
+
         if (cx < x) {
             width = x - cx;
             currentRectangle.xProperty().set(cx);
@@ -103,13 +104,13 @@ public class DrawRectangleInnerSnapshotCanvasEventHandler extends InnerSnapshotC
                 clear();
             }
         });
-        canvasProperties.putGroup(rectangleGroup);
     }
 
     private void clear() {
         canvasProperties.getConfiguration().getUniqueBean(DestroyGroupBeanHolder.class).set(() -> {
             // 鼠标按下时，清理之前生成的矩形组的事件
             if (rectangleGroup != null) {
+                canvasProperties.putGroup(rectangleGroup);
                 rectangleGroup.setMouseTransparent(true);
                 if (dragRectangle != null) {
                     dragRectangle.visibleProperty().setValue(false);

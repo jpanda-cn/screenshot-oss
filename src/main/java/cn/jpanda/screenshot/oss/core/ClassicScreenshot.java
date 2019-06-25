@@ -1,8 +1,10 @@
 package cn.jpanda.screenshot.oss.core;
 
+import cn.jpanda.screenshot.oss.common.toolkit.Bounds;
 import cn.jpanda.screenshot.oss.core.capture.ScreenCapture;
 import cn.jpanda.screenshot.oss.core.log.Log;
 import cn.jpanda.screenshot.oss.core.mouse.GlobalMousePoint;
+import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
 import cn.jpanda.screenshot.oss.service.handlers.KeyExitStageEventHandler;
 import cn.jpanda.screenshot.oss.view.main.IndexCutView;
 import cn.jpanda.screenshot.oss.view.snapshot.SnapshotView;
@@ -47,13 +49,29 @@ public class ClassicScreenshot implements Snapshot {
             stage.initStyle(StageStyle.UNDECORATED);
             stage.setScene(configuration.getViewContext().getScene(SnapshotView.class, true, false));
 
+            GlobalConfigPersistence globalConfigPersistence = configuration.getPersistence(GlobalConfigPersistence.class);
             // 添加屏幕跟随，截哪个屏幕就在哪个屏幕上展示
             ScreenCapture screenCapture = configuration.getUniqueBean(ScreenCapture.class);
-            int index = screenCapture.getScreenIndex(configuration.getUniqueBean(GlobalMousePoint.class).pointSimpleObjectProperty.get().getX());
-            stage.setX(screenCapture.getTargetScreenX(index));
+            int index;
+            if (globalConfigPersistence.isScreenshotMouseFollow()) {
+                index = screenCapture.getScreenIndex(configuration.getUniqueBean(GlobalMousePoint.class).pointSimpleObjectProperty.get().getX());
 
+            } else {
+                index = globalConfigPersistence.getScreenIndex();
+                // 校验索引
+                if (index >= screenCapture.screensCount()) {
+                    // 校验一下显示器的数量问题
+                    globalConfigPersistence.setScreenIndex(0);
+                    configuration.storePersistence(globalConfigPersistence);
+                }
+                index = globalConfigPersistence.getScreenIndex();
+            }
+            Bounds bounds = screenCapture.getTargetScreen(index);
+            stage.setX(bounds.getX());
+            stage.setY(bounds.getY());
             // 输入ESC退出截屏
             stage.setFullScreenExitHint("输入ESC退出截屏");
+
             stage.addEventHandler(KeyEvent.KEY_RELEASED, new KeyExitStageEventHandler(KeyCode.ESCAPE, stage, configuration));
             stage.setOnCloseRequest(event -> {
                 if (event.getEventType().equals(WindowEvent.WINDOW_CLOSE_REQUEST)) {
@@ -64,6 +82,7 @@ public class ClassicScreenshot implements Snapshot {
             stage.setAlwaysOnTop(true);
             stage.showAndWait();
         });
+
     }
 
 }
