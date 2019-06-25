@@ -1,6 +1,8 @@
 package cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.arrow;
 
 import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
+import cn.jpanda.screenshot.oss.core.shotkey.ScreenshotsElements;
+import cn.jpanda.screenshot.oss.core.shotkey.ScreenshotsElementsHolder;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.InnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.shape.Arrow;
@@ -70,6 +72,38 @@ public class ArrowInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEve
     }
 
     private void clear() {
+        canvasProperties.getConfiguration().getUniqueBean(ScreenshotsElementsHolder.class).putEffectiveElement(new ScreenshotsElements() {
+            @Override
+            public void active() {
+                if (group != null) {
+                    group.setMouseTransparent(false);
+                    canvasProperties.getCutPane().getChildren().add(group);
+                }
+                if (arrow != null) {
+                    TrayConfig config = canvasProperties.getTrayConfig(CutInnerType.ARROW);
+                    config.getStroke().unbind();
+                    config.getStrokeColor().unbind();
+                    arrow.strokeWidthProperty().bind(config.getStroke());
+                    arrow.strokeProperty().bind(config.getStrokeColor());
+                }
+
+            }
+
+            @Override
+            public void destroy() {
+                if (group != null) {
+                    group.setMouseTransparent(true);
+                    canvasProperties.putGroup(group);
+                    System.out.println(1123);
+                    System.out.println(group);
+                    canvasProperties.getCutPane().getChildren().remove(group);
+                }
+                if (arrow != null) {
+                    arrow.strokeProperty().unbind();
+                    arrow.strokeWidthProperty().unbind();
+                }
+            }
+        });
         canvasProperties.getConfiguration().getUniqueBean(DestroyGroupBeanHolder.class).set(() -> {
             if (group != null) {
                 group.setMouseTransparent(true);

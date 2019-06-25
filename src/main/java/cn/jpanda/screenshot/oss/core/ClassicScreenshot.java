@@ -7,10 +7,8 @@ import cn.jpanda.screenshot.oss.view.main.IndexCutView;
 import cn.jpanda.screenshot.oss.view.snapshot.SnapshotView;
 import javafx.application.Platform;
 import javafx.scene.Scene;
-import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -62,8 +60,10 @@ public class ClassicScreenshot implements Snapshot {
                     configuration.getViewContext().showScene(IndexCutView.class);
                 }
             });
+
+            stage.toFront();
             stage.setResizable(false);
-//            stage.setAlwaysOnTop(true);
+            stage.setAlwaysOnTop(true);
             stage.showAndWait();
         });
 

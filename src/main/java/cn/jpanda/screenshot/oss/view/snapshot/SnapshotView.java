@@ -4,14 +4,12 @@ import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.ScreenshotsProcess;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
 import cn.jpanda.screenshot.oss.core.capture.ScreenCapture;
-import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
@@ -19,7 +17,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.awt.image.BufferedImage;
@@ -32,7 +29,6 @@ import java.util.ResourceBundle;
 @Controller
 public class SnapshotView implements Initializable {
     private Configuration configuration;
-    private GlobalConfigPersistence globalConfigPersistence;
     private ScreenCapture screenCapture;
 
     public SnapshotView(Configuration configuration) {
@@ -45,7 +41,6 @@ public class SnapshotView implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         screenCapture = configuration.getUniqueBean(ScreenCapture.class);
-        globalConfigPersistence = configuration.getPersistence(GlobalConfigPersistence.class);
         BufferedImage image = getDesktopSnapshot();
         WritableImage writableImage = new WritableImage(image.getWidth(), image.getHeight());
         SwingFXUtils.toFXImage(image, writableImage);

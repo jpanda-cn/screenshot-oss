@@ -38,6 +38,10 @@ public class CanvasProperties {
      * 存放所有的子节点
      */
     private List<Group> allGroupNodes = new ArrayList<>();
+    /**
+     * 所有被撤销的子节点
+     */
+    private List<Group> allRepealGroupNodes = new ArrayList<>();
 
     public void putGroup(Group group) {
         allGroupNodes.add(group);
@@ -54,6 +58,20 @@ public class CanvasProperties {
         return allGroupNodes;
     }
 
+    public void putRepealGroup(Group group) {
+        allRepealGroupNodes.add(group);
+    }
+
+    public Group popRepealGroup() {
+        if (allRepealGroupNodes.isEmpty()) {
+            return null;
+        }
+        return allRepealGroupNodes.remove(allRepealGroupNodes.size() - 1);
+    }
+
+    public List<Group> listRepealGroups() {
+        return allRepealGroupNodes;
+    }
     private Map<CutInnerType, TrayConfig> trayConfigs = new HashMap<>();
 
     public CanvasProperties(GraphicsContext globalGraphicsContext, Rectangle cutRectangle, Configuration configuration) {

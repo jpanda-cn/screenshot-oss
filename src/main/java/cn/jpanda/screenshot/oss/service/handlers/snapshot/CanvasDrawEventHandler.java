@@ -3,6 +3,7 @@ package cn.jpanda.screenshot.oss.service.handlers.snapshot;
 import cn.jpanda.screenshot.oss.common.toolkit.Bounds;
 import cn.jpanda.screenshot.oss.common.toolkit.ExternalComponentBinders;
 import cn.jpanda.screenshot.oss.core.Configuration;
+import cn.jpanda.screenshot.oss.core.shotkey.ScreenshotsElementConvertor;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import cn.jpanda.screenshot.oss.view.tray.CanvasCutTrayView;
 import javafx.event.EventHandler;
@@ -11,6 +12,7 @@ import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -153,10 +155,10 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
             cutRec.visibleProperty().setValue(true);
             cutRec.setCursor(Cursor.CROSSHAIR);
             cutRec.setFill(Color.TRANSPARENT);
-
-            CanvasProperties canvasProperties = new CanvasProperties(graphicsContext, cutRec,configuration);
+            CanvasProperties canvasProperties = new CanvasProperties(graphicsContext, cutRec, configuration);
             // 为截图区域注册事件
             cutRec.addEventHandler(MouseEvent.ANY, new RoutingSnapshotCanvasEventHandler(canvasProperties, this));
+            cutRec.getScene().getWindow().addEventHandler(KeyEvent.KEY_PRESSED, new SnapshotRegionKeyEventHandler(configuration.getUniqueBean(ScreenshotsElementConvertor.class)));
             // 存放截图相关数据
             pane.getScene().getWindow().getProperties().put(CanvasProperties.class, canvasProperties);
         }
