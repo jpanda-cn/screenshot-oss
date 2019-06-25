@@ -6,6 +6,7 @@ import cn.jpanda.screenshot.oss.core.annotations.Controller;
 import cn.jpanda.screenshot.oss.core.controller.ViewContext;
 import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
+import cn.jpanda.screenshot.oss.view.main.SettingsView;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import cn.jpanda.screenshot.oss.view.tray.subs.TrayColorView;
 import cn.jpanda.screenshot.oss.view.tray.subs.TrayFontView;
@@ -18,10 +19,12 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -33,6 +36,8 @@ import java.util.ResourceBundle;
 @Controller
 public class CanvasCutTrayView implements Initializable {
 
+    public Button settings;
+    public Button mosaic;
     private Configuration configuration;
 
     public CanvasCutTrayView(Configuration configuration) {
@@ -59,19 +64,28 @@ public class CanvasCutTrayView implements Initializable {
     public AnchorPane bar;
 
     private volatile CanvasProperties canvasProperties;
-    private GlobalConfigPersistence globalConfigPersistence;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         bar.getChildren().addListener((ListChangeListener<Node>) c -> c.getList().forEach((n) -> {
             n.visibleProperty().setValue(true);
         }));
+        drag.tooltipProperty().setValue(new Tooltip("拖动"));
+        roundness.tooltipProperty().setValue(new Tooltip("圆形:<<按住shift键试试>>"));
+        rectangle.tooltipProperty().setValue(new Tooltip("矩形"));
+        arrow.tooltipProperty().setValue(new Tooltip("箭头"));
+        pen.tooltipProperty().setValue(new Tooltip("画笔"));
+        text.tooltipProperty().setValue(new Tooltip("文字"));
+        mosaic.tooltipProperty().setValue(new Tooltip("马赛克"));
+        settings.tooltipProperty().setValue(new Tooltip("设置"));
+        cancel.tooltipProperty().setValue(new Tooltip("取消"));
+        submit.tooltipProperty().setValue(new Tooltip("保存"));
     }
 
     private void initRectangle() {
         canvasProperties = (CanvasProperties) submit.getScene().getWindow().getProperties().get(CanvasProperties.class);
         // 加载配置
-        globalConfigPersistence = configuration.getDataPersistenceStrategy().load(GlobalConfigPersistence.class);
+        GlobalConfigPersistence globalConfigPersistence = configuration.getDataPersistenceStrategy().load(GlobalConfigPersistence.class);
     }
 
     // 画圆
@@ -130,6 +144,26 @@ public class CanvasCutTrayView implements Initializable {
         initRectangle();
         canvasProperties.setCutInnerType(CutInnerType.DRAG);
         add2Bar(new HBox());
+    }
+
+    public void doMosaic() {
+        initRectangle();
+        canvasProperties.setCutInnerType(CutInnerType.MOSAIC);
+        add2Bar(new HBox((Pane) configuration.getViewContext().getScene(TrayPointView.class).getRoot()));
+    }
+
+    // 设置
+    public void doSettings() {
+        add2Bar(new HBox());
+        Stage cutStage = (Stage) settings.getScene().getWindow();
+        cutStage.setAlwaysOnTop(false);
+        Stage stage = configuration.getViewContext().newStage();
+        stage.initOwner(settings.getScene().getWindow());
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setScene(configuration.getViewContext().getScene(SettingsView.class, true, false));
+        stage.toFront();
+        stage.showAndWait();
+        cutStage.setAlwaysOnTop(true);
     }
 
     public void doCancel() {

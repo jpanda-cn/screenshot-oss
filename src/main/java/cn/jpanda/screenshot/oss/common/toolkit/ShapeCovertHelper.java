@@ -48,7 +48,7 @@ public class ShapeCovertHelper {
         return new Rectangle(pane.layoutXProperty().get(), pane.layoutYProperty().get(), pane.widthProperty().get(), pane.heightProperty().get());
     }
 
-    public static Rectangle toRectangle2(Node node) {
+    public static Rectangle toRectangle4Node(Node node) {
         Bounds bounds = node.getLayoutBounds();
         return new Rectangle(bounds.getMinX(), bounds.getMinY(), bounds.getWidth(), bounds.getHeight());
     }
@@ -66,7 +66,7 @@ public class ShapeCovertHelper {
         } else if (node instanceof Group) {
             return toRectangle((Group) node);
         }
-        return null;
+        return toRectangle4Node(node);
     }
 
     public static List<Rectangle> toRectangles(List<Node> nodes) {

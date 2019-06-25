@@ -13,7 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-@Component
+//@Component
 public class GlobalMouseMoveListenerAfterBootstrapLoaderProcess implements AfterBootstrapLoaderProcess {
     private Configuration configuration;
 

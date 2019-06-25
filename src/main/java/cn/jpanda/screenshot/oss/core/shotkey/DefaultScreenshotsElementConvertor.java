@@ -1,20 +1,19 @@
 package cn.jpanda.screenshot.oss.core.shotkey;
 
-import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.Component;
 
 @Component
 public class DefaultScreenshotsElementConvertor implements ScreenshotsElementConvertor {
     private ScreenshotsElementsHolder screenshotsElementsHolder;
 
-    public DefaultScreenshotsElementConvertor(Configuration configuration) {
-        this.screenshotsElementsHolder = configuration.getUniqueBean(ScreenshotsElementsHolder.class);
+    public DefaultScreenshotsElementConvertor(ScreenshotsElementsHolder screenshotsElementsHolder) {
+        this.screenshotsElementsHolder = screenshotsElementsHolder;
     }
 
     @Override
     public void activateOne() {
         // 激活一个
-        ScreenshotsElements elements = screenshotsElementsHolder.popInvalidElement();
+        ScreenshotsElements elements=screenshotsElementsHolder.popInvalidElement();
         if (elements == null) {
             return;
         }
@@ -26,15 +25,10 @@ public class DefaultScreenshotsElementConvertor implements ScreenshotsElementCon
     public void destroyOne() {
         // 销毁一个
         ScreenshotsElements elements = screenshotsElementsHolder.popEffectiveElement();
-        System.out.println("eff");
-        screenshotsElementsHolder.listEffective().forEach(System.out::println);
-        System.out.println(elements);
         if (elements == null) {
             return;
         }
         elements.destroy();
-        System.out.println("invalid");
         screenshotsElementsHolder.putInvalidElement(elements);
-        screenshotsElementsHolder.listInvalid().forEach(System.out::println);
     }
 }

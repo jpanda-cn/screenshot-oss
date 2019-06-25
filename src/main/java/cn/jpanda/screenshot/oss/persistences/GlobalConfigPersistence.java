@@ -21,11 +21,6 @@ public class GlobalConfigPersistence implements Persistence {
     private boolean usePassword;
 
     /**
-     * 是否使用截图预览
-     */
-    private boolean preview = true;
-
-    /**
      * 图片存储方式
      */
     private String imageStore = "本地保存";

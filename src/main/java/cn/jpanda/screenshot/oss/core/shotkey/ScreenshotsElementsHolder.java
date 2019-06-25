@@ -46,6 +46,13 @@ public class ScreenshotsElementsHolder {
         if (invalid.isEmpty()) {
             return null;
         }
-        return invalid.remove(invalid.size() - 1);
+        ScreenshotsElements screenshotsElements;
+        for (int i = 1; i <= invalid.size(); i++) {
+            screenshotsElements = invalid.get(invalid.size() - i);
+            if (screenshotsElements.canActive()) {
+                return invalid.remove(invalid.size() - i);
+            }
+        }
+        return null;
     }
 }

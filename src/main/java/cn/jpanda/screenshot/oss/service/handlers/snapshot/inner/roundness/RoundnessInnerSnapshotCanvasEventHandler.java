@@ -5,6 +5,8 @@ import cn.jpanda.screenshot.oss.common.toolkit.EllipseRectangleBinding;
 import cn.jpanda.screenshot.oss.common.toolkit.RectangleAddTag2ResizeBinding;
 import cn.jpanda.screenshot.oss.common.utils.MathUtils;
 import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
+import cn.jpanda.screenshot.oss.core.shotkey.DefaultGroupScreenshotsElements;
+import cn.jpanda.screenshot.oss.core.shotkey.ScreenshotsElementsHolder;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.InnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
@@ -52,6 +54,7 @@ public class RoundnessInnerSnapshotCanvasEventHandler extends InnerSnapshotCanva
         ellipse.centerXProperty().set(x);
         ellipse.centerYProperty().set(y);
         ellipseGroup = new Group(ellipse);
+        canvasProperties.getScreenshotsElementsHolder().putEffectiveElement(new DefaultGroupScreenshotsElements(ellipseGroup, canvasProperties));
         ellipseGroup.setPickOnBounds(true);
         canvasProperties.getCutPane().getChildren().addAll(ellipseGroup);
 

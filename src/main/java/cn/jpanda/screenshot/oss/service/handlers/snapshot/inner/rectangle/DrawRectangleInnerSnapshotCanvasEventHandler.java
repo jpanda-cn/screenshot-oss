@@ -4,6 +4,8 @@ import cn.jpanda.screenshot.oss.common.toolkit.DragRectangleEventHandler;
 import cn.jpanda.screenshot.oss.common.toolkit.RectangleAddTag2ResizeBinding;
 import cn.jpanda.screenshot.oss.common.toolkit.RectangleBinding;
 import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
+import cn.jpanda.screenshot.oss.core.shotkey.DefaultGroupScreenshotsElements;
+import cn.jpanda.screenshot.oss.core.shotkey.ScreenshotsElementsHolder;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.InnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
@@ -35,6 +37,7 @@ public class DrawRectangleInnerSnapshotCanvasEventHandler extends InnerSnapshotC
     protected void press(MouseEvent event) {
         // 鼠标按下时，清理之前生成的矩形组的事件
         clear();
+
         TrayConfig config = canvasProperties.getTrayConfig(CutInnerType.RECTANGLE);
         // 生成一个新的矩形
         currentRectangle = new Rectangle(0, 0);
@@ -48,6 +51,7 @@ public class DrawRectangleInnerSnapshotCanvasEventHandler extends InnerSnapshotC
         currentRectangle.xProperty().set(x);
         currentRectangle.yProperty().set(y);
         rectangleGroup = new Group(currentRectangle);
+        canvasProperties.getScreenshotsElementsHolder().putEffectiveElement(new DefaultGroupScreenshotsElements(rectangleGroup, canvasProperties));
         canvasProperties.getCutPane().getChildren().addAll(rectangleGroup);
     }
 

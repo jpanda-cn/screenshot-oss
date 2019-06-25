@@ -3,7 +3,6 @@ package cn.jpanda.screenshot.oss.service.handlers.snapshot;
 import cn.jpanda.screenshot.oss.common.toolkit.Bounds;
 import cn.jpanda.screenshot.oss.common.toolkit.ExternalComponentBinders;
 import cn.jpanda.screenshot.oss.core.Configuration;
-import cn.jpanda.screenshot.oss.core.shotkey.ScreenshotsElementConvertor;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import cn.jpanda.screenshot.oss.view.tray.CanvasCutTrayView;
 import javafx.event.EventHandler;
@@ -158,7 +157,10 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
             CanvasProperties canvasProperties = new CanvasProperties(graphicsContext, cutRec, configuration);
             // 为截图区域注册事件
             cutRec.addEventHandler(MouseEvent.ANY, new RoutingSnapshotCanvasEventHandler(canvasProperties, this));
-            cutRec.getScene().getWindow().addEventHandler(KeyEvent.KEY_PRESSED, new SnapshotRegionKeyEventHandler(configuration.getUniqueBean(ScreenshotsElementConvertor.class)));
+            cutRec.getScene().getWindow().addEventHandler(KeyEvent.KEY_PRESSED, new SnapshotRegionKeyEventHandler(
+                    canvasProperties.getScreenshotsElementConvertor()
+                    , configuration
+                    , canvasProperties));
             // 存放截图相关数据
             pane.getScene().getWindow().getProperties().put(CanvasProperties.class, canvasProperties);
         }

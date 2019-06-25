@@ -93,7 +93,7 @@ public class LimitResizeSnapshotCanvasEventHandler extends AbstractSnapshotCanva
                 rectangle.setCursor(cursor);
             }
         } else if (event.getEventType().equals(MouseEvent.MOUSE_PRESSED)) {
-            subs = ShapeCovertHelper.toRectanglesUseGroup(canvasProperties.listGroups());
+            subs = ShapeCovertHelper.toRectangles(canvasProperties.listGroups());
             // 鼠标开始节点
             x = event.getSceneX();
             // 鼠标结束节点

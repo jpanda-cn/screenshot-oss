@@ -8,4 +8,5 @@ public enum CutInnerType {
     TEXT,
     RESIZE,
     DRAG,
+    MOSAIC,
 }

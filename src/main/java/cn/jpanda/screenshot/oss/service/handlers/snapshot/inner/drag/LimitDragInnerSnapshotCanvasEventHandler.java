@@ -42,7 +42,7 @@ public class LimitDragInnerSnapshotCanvasEventHandler extends InnerSnapshotCanva
         } else if (event.getEventType().equals(MouseEvent.MOUSE_PRESSED)) {
             DestroyGroupBeanHolder destroyGroupBeanHolder = canvasProperties.getConfiguration().getUniqueBean(DestroyGroupBeanHolder.class);
             destroyGroupBeanHolder.destroy();
-            subs = ShapeCovertHelper.toRectanglesUseGroup(canvasProperties.listGroups());
+            subs = ShapeCovertHelper.toRectangles(canvasProperties.listGroups());
             parent = ShapeCovertHelper.toRectangle(rectangle.getScene().getWindow());
             // 记录当前位置
             // 鼠标开始节点

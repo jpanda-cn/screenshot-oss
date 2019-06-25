@@ -54,7 +54,6 @@ public class SettingsView implements Initializable {
         globalConfigPersistence = configuration.getPersistence(GlobalConfigPersistence.class);
         loadImageSave();
         loadClipboard();
-        loadPreView();
         loadHotKey();
 
     }
@@ -177,9 +176,6 @@ public class SettingsView implements Initializable {
 
     }
 
-    private void loadPreView() {
-        preview.selectedProperty().setValue(globalConfigPersistence.isPreview());
-    }
 
 
     public void editImageStore() {
@@ -189,13 +185,6 @@ public class SettingsView implements Initializable {
         imageStore.config();
     }
 
-    public void editPreView() {
-        boolean isPreview = preview.selectedProperty().get();
-        if (globalConfigPersistence.isPreview() != isPreview) {
-            globalConfigPersistence.setPreview(isPreview);
-            configuration.storePersistence(globalConfigPersistence);
-        }
-    }
 
     public void back() {
         // 取消

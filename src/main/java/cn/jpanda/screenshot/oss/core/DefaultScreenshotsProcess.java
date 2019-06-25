@@ -39,20 +39,7 @@ public class DefaultScreenshotsProcess implements ScreenshotsProcess {
     @Override
     public void done(BufferedImage image) {
         handlerClipboardContent(image, saveImage(image));
-        // 处理是否配置了截图预览功能
-        preview(image);
 
-    }
-
-    public void preview(BufferedImage image) {
-        GlobalConfigPersistence globalConfigPersistence = configuration.getPersistence(GlobalConfigPersistence.class);
-        if (globalConfigPersistence.isPreview()) {
-            // 从剪切板搞定图片
-            Stage stage = configuration.getViewContext().newStage();
-            stage.setTitle("预览图片,如不需要，请到设置中关闭该功能。");
-            stage.setScene(new Scene(new AnchorPane(new ImageView(SwingFXUtils.toFXImage(image, null)))));
-            stage.showAndWait();
-        }
     }
 
     public String saveImage(BufferedImage image) {

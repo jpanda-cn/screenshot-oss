@@ -1,6 +1,8 @@
 package cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.text;
 
 import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
+import cn.jpanda.screenshot.oss.core.shotkey.DefaultGroupScreenshotsElements;
+import cn.jpanda.screenshot.oss.core.shotkey.ScreenshotsElementsHolder;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.InnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.shape.TextRectangle;
@@ -41,6 +43,7 @@ public class TextInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEven
             clear();
             return;
         }
+
         initText(event);
         onShowing = true;
     }
@@ -66,13 +69,9 @@ public class TextInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEven
         text.getExtBorder().yProperty().set(event.getSceneY());
         // 调整高度
         group = new Group(text);
+        canvasProperties.getScreenshotsElementsHolder().putEffectiveElement(new DefaultGroupScreenshotsElements(group, canvasProperties));
         canvasProperties.getCutPane().getChildren().addAll(group);
         text.getTextArea().requestFocus();
-//        text.getTextArea().focusedProperty().addListener((observable, oldValue, newValue) -> {
-//            if (!newValue) {
-//                clear();
-//            }
-//        });
     }
 
     private void clear() {
