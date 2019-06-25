@@ -1,16 +1,17 @@
 package cn.jpanda.screenshot.oss.core;
 
-import cn.jpanda.screenshot.oss.common.toolkit.Bounds;
 import cn.jpanda.screenshot.oss.core.capture.ScreenCapture;
 import cn.jpanda.screenshot.oss.core.log.Log;
-import cn.jpanda.screenshot.oss.core.mouse.GlobalMousePoint;
-import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
 import cn.jpanda.screenshot.oss.service.handlers.KeyExitStageEventHandler;
 import cn.jpanda.screenshot.oss.view.main.IndexCutView;
 import cn.jpanda.screenshot.oss.view.snapshot.SnapshotView;
 import javafx.application.Platform;
+import javafx.scene.Scene;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.text.Font;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
@@ -47,30 +48,13 @@ public class ClassicScreenshot implements Snapshot {
             configuration.getCutting().bind(stage.showingProperty());
             stage.initOwner(configuration.getViewContext().getStage());
             stage.initStyle(StageStyle.UNDECORATED);
-            stage.setScene(configuration.getViewContext().getScene(SnapshotView.class, true, false));
+            Scene scene = configuration.getViewContext().getScene(SnapshotView.class, true, false);
+            stage.setScene(scene);
 
-            GlobalConfigPersistence globalConfigPersistence = configuration.getPersistence(GlobalConfigPersistence.class);
             // 添加屏幕跟随，截哪个屏幕就在哪个屏幕上展示
-            ScreenCapture screenCapture = configuration.getUniqueBean(ScreenCapture.class);
-            int index;
-            if (globalConfigPersistence.isScreenshotMouseFollow()) {
-                index = screenCapture.getScreenIndex(configuration.getUniqueBean(GlobalMousePoint.class).pointSimpleObjectProperty.get().getX());
-
-            } else {
-                index = globalConfigPersistence.getScreenIndex();
-                // 校验索引
-                if (index >= screenCapture.screensCount()) {
-                    // 校验一下显示器的数量问题
-                    globalConfigPersistence.setScreenIndex(0);
-                    configuration.storePersistence(globalConfigPersistence);
-                }
-                index = globalConfigPersistence.getScreenIndex();
-            }
-            Bounds bounds = screenCapture.getTargetScreen(index);
-            stage.setX(bounds.getX());
-            stage.setY(bounds.getY());
-            // 输入ESC退出截屏
-            stage.setFullScreenExitHint("输入ESC退出截屏");
+            Screen screen = configuration.getUniqueBean(ScreenCapture.class).first();
+            stage.setX(screen.getBounds().getMinX());
+            stage.setY(screen.getBounds().getMinY());
 
             stage.addEventHandler(KeyEvent.KEY_RELEASED, new KeyExitStageEventHandler(KeyCode.ESCAPE, stage, configuration));
             stage.setOnCloseRequest(event -> {
@@ -78,8 +62,8 @@ public class ClassicScreenshot implements Snapshot {
                     configuration.getViewContext().showScene(IndexCutView.class);
                 }
             });
-            stage.setFullScreen(true);
-            stage.setAlwaysOnTop(true);
+            stage.setResizable(false);
+//            stage.setAlwaysOnTop(true);
             stage.showAndWait();
         });
 

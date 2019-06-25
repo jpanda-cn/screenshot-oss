@@ -15,7 +15,6 @@ import lombok.Data;
 @Profile
 public class GlobalConfigPersistence implements Persistence {
 
-    private Long useCount = 0L;
     /**
      * 是否使用主控密码
      */
@@ -26,15 +25,6 @@ public class GlobalConfigPersistence implements Persistence {
      */
     private boolean preview = true;
 
-    /**
-     * 当前使用的截图屏幕的索引
-     */
-    private int screenIndex = 0;
-    /**
-     * 是否启用鼠标跟随功能
-     * 截图时，将会获取鼠标所在屏幕的图像
-     */
-    private boolean screenshotMouseFollow = false;
     /**
      * 图片存储方式
      */

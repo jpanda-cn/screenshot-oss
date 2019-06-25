@@ -1,11 +1,9 @@
 package cn.jpanda.screenshot.oss.view.snapshot;
 
-import cn.jpanda.screenshot.oss.common.toolkit.Bounds;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.ScreenshotsProcess;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
 import cn.jpanda.screenshot.oss.core.capture.ScreenCapture;
-import cn.jpanda.screenshot.oss.core.mouse.GlobalMousePoint;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import javafx.embed.swing.SwingFXUtils;
@@ -13,6 +11,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
@@ -20,9 +19,9 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -51,8 +50,7 @@ public class SnapshotView implements Initializable {
         WritableImage writableImage = new WritableImage(image.getWidth(), image.getHeight());
         SwingFXUtils.toFXImage(image, writableImage);
         imageView.setImage(writableImage);
-        Bounds dimension = screenCapture.getTargetScreen(0);
-        Canvas canvas = new Canvas(dimension.getWidth(), dimension.getHeight());
+        Canvas canvas = new Canvas(image.getWidth(), image.getHeight());
         GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
         graphicsContext.setStroke(Color.rgb(50, 161, 255));
         ((AnchorPane) imageView.getParent()).getChildren().add(canvas);
@@ -79,21 +77,7 @@ public class SnapshotView implements Initializable {
     }
 
     private BufferedImage getDesktopSnapshot() {
-        int screenIndex = 0;
-        if (globalConfigPersistence.isScreenshotMouseFollow()) {
-            // 启用了鼠标跟随功能
-            screenIndex = screenCapture.getScreenIndex(configuration.getUniqueBean(GlobalMousePoint.class).pointSimpleObjectProperty.get().getX());
-        } else {
-            if (globalConfigPersistence.getScreenIndex() >= screenCapture.screensCount()) {
-                // 校验一下显示器的数量问题
-                globalConfigPersistence.setScreenIndex(0);
-                configuration.storePersistence(globalConfigPersistence);
-            }
-            screenIndex = globalConfigPersistence.getScreenIndex();
-        }
-
-        Bounds graphicsDevice = screenCapture.getTargetScreen(screenIndex);
-        return screenCapture.screenshotImage(screenIndex, (int) graphicsDevice.getWidth(), (int) graphicsDevice.getHeight());
+        return screenCapture.screenshotImage();
     }
 
     protected void saveAndClose(Canvas canvas) {

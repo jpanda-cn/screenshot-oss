@@ -24,6 +24,4 @@
     <TextField fx:id="hotKey" layoutX="98.0" layoutY="228.0" onKeyPressed="#changeHotKey" prefHeight="23.0" prefWidth="150.0" />
     <Label layoutX="25.0" layoutY="267.0" text="截图预览" />
     <CheckBox fx:id="preview" layoutX="98.0" layoutY="266.0" onMouseClicked="#editPreView" />
-    <Label fx:id="screenshotMouseFollowLabel" layoutX="150.0" layoutY="268.0" text="截图鼠标跟随" />
-    <CheckBox fx:id="screenshotMouseFollow" layoutX="232.0" layoutY="267.0" mnemonicParsing="false" />
 </AnchorPane>

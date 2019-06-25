@@ -25,8 +25,6 @@ import java.util.ResourceBundle;
 @Controller
 public class SettingsView implements Initializable {
     public TextField hotKey;
-    public CheckBox screenshotMouseFollow;
-    public Label screenshotMouseFollowLabel;
     private Configuration configuration;
 
     public SettingsView(Configuration configuration) {
@@ -57,7 +55,6 @@ public class SettingsView implements Initializable {
         loadImageSave();
         loadClipboard();
         loadPreView();
-        loadScreenshotMouseFollow();
         loadHotKey();
 
     }
@@ -184,17 +181,6 @@ public class SettingsView implements Initializable {
         preview.selectedProperty().setValue(globalConfigPersistence.isPreview());
     }
 
-    private void loadScreenshotMouseFollow() {
-        screenshotMouseFollow.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            globalConfigPersistence.setScreenshotMouseFollow(newValue);
-            configuration.getUniqueBean(ChoseScreenShowValue.class).show.set(newValue);
-            configuration.storePersistence(globalConfigPersistence);
-        });
-        Tooltip tooltip = new Tooltip("开启该功能，使用截图功能时,将会获取鼠标所在屏幕的图像.");
-        Tooltip.install(screenshotMouseFollowLabel, tooltip);
-        Tooltip.install(screenshotMouseFollow, tooltip);
-        screenshotMouseFollow.setSelected(globalConfigPersistence.isScreenshotMouseFollow());
-    }
 
     public void editImageStore() {
         // 获取当前选择的图片存储方式

@@ -1,7 +1,7 @@
 package cn.jpanda.screenshot.oss.core;
 
 import cn.jpanda.screenshot.oss.core.annotations.Component;
-import cn.jpanda.screenshot.oss.core.capture.JavafxScreenCapture;
+import cn.jpanda.screenshot.oss.core.capture.JPandaScreenCapture;
 import cn.jpanda.screenshot.oss.core.capture.ScreenCapture;
 import cn.jpanda.screenshot.oss.core.scan.AfterBootstrapLoaderProcess;
 
@@ -19,7 +19,7 @@ public class ScreenCaptureSpecialUniqueBeanAfterBootstrapLoaderProcess implement
     @Override
     public void after() {
         // 注册一个截图类
-        ScreenCapture screenCapture = new JavafxScreenCapture();
+        ScreenCapture screenCapture = new JPandaScreenCapture();
         configuration.registryUniqueBean(screenCapture.getClass(), screenCapture);
 
     }

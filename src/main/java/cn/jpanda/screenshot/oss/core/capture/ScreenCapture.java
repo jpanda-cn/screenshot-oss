@@ -1,89 +1,30 @@
 package cn.jpanda.screenshot.oss.core.capture;
 
-import cn.jpanda.screenshot.oss.common.toolkit.Bounds;
+import javafx.collections.ObservableList;
 import javafx.stage.Screen;
 
 import java.awt.image.BufferedImage;
-import java.util.List;
 
-/**
- * 屏幕图片获取接口
- */
 public interface ScreenCapture {
     /**
-     * 获取指定屏幕的全屏截图
-     *
-     * @param index 指定位置
-     * @return 截图
+     * 执行截图
      */
-    default BufferedImage screenshotImage(int index) {
-        return screenshotImage(index, 1.0D, 1.0D);
-    }
+    BufferedImage screenshotImage();
+
+    /*
+     * 获取首屏
+     */
+    Screen first();
 
     /**
-     * 获取指定屏幕的全屏截图
-     *
-     * @param index  指定位置
-     * @param width  宽度
-     * @param height 高度
-     * @return 截图
+     * 获取主屏
      */
-    default BufferedImage screenshotImage(int index, int width, int height) {
-        return screenshotImage(index, 0, 0, width, height);
-    }
+    Screen main();
 
     /**
-     * 获取指定屏幕的全屏截图
-     *
-     * @param index  指定位置
-     * @param x      起始X坐标
-     * @param y      起始Y坐标
-     * @param width  宽度
-     * @param height 高度
-     * @return 截图
+     * 获取所有屏幕
      */
-    BufferedImage screenshotImage(int index, int x, int y, int width, int height);
+    ObservableList<Screen> screens();
 
-    /**
-     * 获取指定屏幕的全屏截图
-     *
-     * @param index         指定位置
-     * @param percentWidth  宽度百分比
-     * @param percentHeight 高度百分比
-     * @return 截图
-     */
-    default BufferedImage screenshotImage(int index, double percentWidth, double percentHeight) {
-        return screenshotImage(index, 0, 0, percentWidth, percentHeight);
-    }
-
-    /**
-     * 获取指定屏幕的全屏截图
-     *
-     * @param index         指定位置
-     * @param x             起始X坐标
-     * @param y             起始Y坐标
-     * @param percentWidth  宽度百分比
-     * @param percentHeight 高度百分比
-     * @return 截图
-     */
-    BufferedImage screenshotImage(int index, int x, int y, double percentWidth, double percentHeight);
-
-    int screensCount();
-
-    Bounds getTargetScreen(final int index);
-
-    int getTargetScreenX(final int index);
-
-    /**
-     * 根据x坐标，获取显示器的索引
-     *
-     * @param x x坐标
-     */
-    int getScreenIndex(final double x);
-
-    /**
-     * 或许所有屏幕
-     */
-    List<Screen> listScreen();
 
 }

@@ -3,7 +3,6 @@ package cn.jpanda.screenshot.oss.view.main;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.Snapshot;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
-import cn.jpanda.screenshot.oss.core.capture.ScreenCapture;
 import cn.jpanda.screenshot.oss.core.persistence.BootstrapPersistence;
 import cn.jpanda.screenshot.oss.core.persistence.Persistence;
 import cn.jpanda.screenshot.oss.core.persistence.PersistenceBeanCatalogManagement;
@@ -17,7 +16,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
-import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Modality;
@@ -40,12 +38,6 @@ public class IndexCutView implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        GlobalConfigPersistence globalConfigPersistence = configuration.getPersistence(GlobalConfigPersistence.class);
-        int index = globalConfigPersistence.getScreenIndex();
-        if (index >= configuration.getUniqueBean(ScreenCapture.class).screensCount()) {
-            globalConfigPersistence.setScreenIndex(0);
-            configuration.storePersistence(globalConfigPersistence);
-        }
         initSettings();
     }
 
@@ -114,27 +106,8 @@ public class IndexCutView implements Initializable {
         cpwd.setOnAction(usePwdAction);
         BootstrapPersistence bootstrapPersistence = configuration.getPersistence(BootstrapPersistence.class);
         pwd.getItems().addAll(bootstrapPersistence.isUsePassword() ? new MenuItem[]{stopUsePwd, cpwd} : new MenuItem[]{usePwd});
-
-
-        MenuItem choseScreen = new MenuItem("切换屏幕");
-        choseScreen.setOnAction(event -> {
-            // 展示屏幕切换页面
-            toChoseScreen();
-        });
-        SimpleBooleanProperty show = configuration.getUniqueBean(ChoseScreenShowValue.class).show;
-        show.addListener((observable, oldValue, newValue) -> {
-            if (!newValue) {
-                options.getItems().add(choseScreen);
-            } else {
-                options.getItems().remove(choseScreen);
-            }
-        });
         options.getItems().add(general);
         options.getItems().add(pwd);
-        // 判断是否展示
-        if (show.not().get()) {
-            options.getItems().add(choseScreen);
-        }
     }
 
 
@@ -153,19 +126,6 @@ public class IndexCutView implements Initializable {
         stage.initOwner(configuration.getViewContext().getStage());
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setScene(configuration.getViewContext().getScene(SettingsView.class, true, false));
-        stage.showAndWait();
-    }
-
-
-    public void toChoseScreen() {
-        // 获取当前窗口所属的显示器
-        Stage defaultStage = configuration.getViewContext().getStage();
-        Stage stage = configuration.getViewContext().newStage();
-        stage.initOwner(defaultStage);
-        stage.initModality(Modality.APPLICATION_MODAL);
-        Scene scene = configuration.getViewContext().getScene(ChoseScreenView.class, true, false);
-        stage.resizableProperty().setValue(false);
-        stage.setScene(scene);
         stage.showAndWait();
     }
 }
