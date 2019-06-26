@@ -75,8 +75,11 @@ public class ClassicScreenshot implements Snapshot {
         GlobalConfigPersistence globalConfigPersistence = configuration.getPersistence(GlobalConfigPersistence.class);
         if (globalConfigPersistence.isHideIndexScreen()) {
             Stage stage = configuration.getViewContext().getStage();
-            stage.opacityProperty().set(0);
-            stage.hide();
+
+            Platform.runLater(()->{
+                stage.opacityProperty().set(0);
+                stage.hide();
+            });
         }
     }
 
