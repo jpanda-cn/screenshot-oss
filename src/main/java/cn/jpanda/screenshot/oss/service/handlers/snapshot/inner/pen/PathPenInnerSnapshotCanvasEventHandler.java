@@ -1,5 +1,6 @@
 package cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.pen;
 
+import cn.jpanda.screenshot.oss.common.utils.MathUtils;
 import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
 import cn.jpanda.screenshot.oss.core.shotkey.DefaultGroupScreenshotsElements;
 import cn.jpanda.screenshot.oss.core.shotkey.ScreenshotsElementsHolder;
@@ -11,9 +12,7 @@ import cn.jpanda.screenshot.oss.view.tray.toolkits.TrayConfig;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
+import javafx.scene.shape.*;
 
 /**
  * 通过{@link Path}实现画笔功能
@@ -59,8 +58,18 @@ public class PathPenInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasE
 
         double cx = event.getSceneX();
         double cy = event.getSceneY();
+
+
         if (rectangle.contains(cx, cy)) {
-            path.getElements().add(new LineTo(cx, cy));
+            PathElement line;
+            if (event.isShiftDown()) {
+                boolean iss = MathUtils.subAbs(cx, x) > MathUtils.subAbs(cy, y);
+                line = iss ? new HLineTo(cx) : new VLineTo(cy);
+            } else {
+                line = new LineTo(cx, cy);
+            }
+
+            path.getElements().add(line);
         }
     }
 

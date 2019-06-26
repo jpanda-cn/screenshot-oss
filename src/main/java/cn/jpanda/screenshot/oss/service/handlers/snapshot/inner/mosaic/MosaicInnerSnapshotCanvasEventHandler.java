@@ -1,5 +1,6 @@
 package cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.mosaic;
 
+import cn.jpanda.screenshot.oss.common.utils.MathUtils;
 import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
 import cn.jpanda.screenshot.oss.core.shotkey.DefaultGroupScreenshotsElements;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
@@ -12,9 +13,7 @@ import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.ImagePattern;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
+import javafx.scene.shape.*;
 
 public class MosaicInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEventHandler {
     private Group group;
@@ -60,7 +59,15 @@ public class MosaicInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEv
 
 
         if (rectangle.contains(cx, cy)) {
-            path.getElements().add(new LineTo(cx, cy));
+            PathElement line;
+            if (event.isShiftDown()) {
+                boolean iss = MathUtils.subAbs(cx, x) > MathUtils.subAbs(cy, y);
+                line = iss ? new HLineTo(cx) : new VLineTo(cy);
+            } else {
+                line = new LineTo(cx, cy);
+            }
+
+            path.getElements().add(line);
         }
     }
 
