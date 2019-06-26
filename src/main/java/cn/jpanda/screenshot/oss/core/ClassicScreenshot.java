@@ -2,6 +2,7 @@ package cn.jpanda.screenshot.oss.core;
 
 import cn.jpanda.screenshot.oss.core.capture.ScreenCapture;
 import cn.jpanda.screenshot.oss.core.log.Log;
+import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
 import cn.jpanda.screenshot.oss.service.handlers.KeyExitStageEventHandler;
 import cn.jpanda.screenshot.oss.view.main.IndexCutView;
 import cn.jpanda.screenshot.oss.view.snapshot.SnapshotView;
@@ -37,6 +38,7 @@ public class ClassicScreenshot implements Snapshot {
             log.debug("The application has not started yet.");
             return;
         }
+        beforeCut();
         Platform.runLater(() -> {
             // 调用截图操作
             // 执行截图操作
@@ -64,8 +66,25 @@ public class ClassicScreenshot implements Snapshot {
             stage.setResizable(false);
             stage.setAlwaysOnTop(true);
             stage.showAndWait();
+            afterCut();
         });
 
     }
 
+    protected void beforeCut() {
+        GlobalConfigPersistence globalConfigPersistence = configuration.getPersistence(GlobalConfigPersistence.class);
+        if (globalConfigPersistence.isHideIndexScreen()) {
+            Stage stage = configuration.getViewContext().getStage();
+            stage.opacityProperty().set(0);
+            stage.hide();
+        }
+    }
+
+    protected void afterCut() {
+        Stage stage = configuration.getViewContext().getStage();
+        if (stage.showingProperty().not().get()) {
+            stage.opacityProperty().set(1);
+            stage.show();
+        }
+    }
 }

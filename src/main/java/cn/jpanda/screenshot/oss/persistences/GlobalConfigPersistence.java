@@ -21,6 +21,11 @@ public class GlobalConfigPersistence implements Persistence {
     private boolean usePassword;
 
     /**
+     * 截图时隐藏主窗口
+     */
+    private boolean hideIndexScreen = true;
+
+    /**
      * 图片存储方式
      */
     private String imageStore = "本地保存";

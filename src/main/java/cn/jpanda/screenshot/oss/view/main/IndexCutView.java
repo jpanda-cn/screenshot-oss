@@ -8,7 +8,6 @@ import cn.jpanda.screenshot.oss.core.persistence.Persistence;
 import cn.jpanda.screenshot.oss.core.persistence.PersistenceBeanCatalogManagement;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
 import cn.jpanda.screenshot.oss.view.password.modify.ModifyPassword;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
@@ -16,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.RadioButton;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Modality;
@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 @Controller
 public class IndexCutView implements Initializable {
     public MenuButton options;
+    public RadioButton hidden;
     private Configuration configuration;
 
     public IndexCutView(Configuration configuration) {
@@ -39,6 +40,18 @@ public class IndexCutView implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         initSettings();
+        initHidden();
+    }
+
+    public void initHidden() {
+
+        GlobalConfigPersistence configPersistence = configuration.getPersistence(GlobalConfigPersistence.class);
+        hidden.selectedProperty().set(configPersistence.isHideIndexScreen());
+        hidden.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            GlobalConfigPersistence configPersistence1 = configuration.getPersistence(GlobalConfigPersistence.class);
+            configPersistence1.setHideIndexScreen(newValue);
+            configuration.storePersistence(configPersistence1);
+        });
     }
 
     private void initSettings() {
@@ -82,7 +95,7 @@ public class IndexCutView implements Initializable {
                     persistenceBeanCatalogManagement.list().stream().filter((p) -> !BootstrapPersistence.class.isAssignableFrom(p)).map((p) -> configuration.getPersistence(p)).collect(Collectors.toList());
             // 跳转到初始化密码页面
             // 将密码页面放置到舞台中央
-            Stage stage =configuration.getViewContext().newStage();
+            Stage stage = configuration.getViewContext().newStage();
             stage.initStyle(StageStyle.UNDECORATED);
             stage.initModality(Modality.APPLICATION_MODAL);
             Scene scene = configuration.getViewContext().getScene(ModifyPassword.class);
