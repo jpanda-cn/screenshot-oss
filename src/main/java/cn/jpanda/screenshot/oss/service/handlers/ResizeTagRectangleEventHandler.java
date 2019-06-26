@@ -1,8 +1,8 @@
 package cn.jpanda.screenshot.oss.service.handlers;
 
-import cn.jpanda.screenshot.oss.common.utils.MathUtils;
 import cn.jpanda.screenshot.oss.common.enums.ResizeType;
 import cn.jpanda.screenshot.oss.common.toolkit.LimitRectangleEventHandler;
+import cn.jpanda.screenshot.oss.common.utils.MathUtils;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
 
@@ -97,5 +97,18 @@ public class ResizeTagRectangleEventHandler extends LimitRectangleEventHandler {
         }
     }
 
-
+    @Override
+    protected boolean checkInParentX(double x) {
+        if (parent == null) {
+            return true;
+        }
+        return x >= parent.xProperty().get() && x <= parent.xProperty().add(parent.widthProperty()).get();
+    }
+    @Override
+    protected boolean checkInParentY(double y) {
+        if (parent == null) {
+            return true;
+        }
+        return y >= parent.yProperty().get() && y <= parent.yProperty().add(parent.heightProperty()).get();
+    }
 }

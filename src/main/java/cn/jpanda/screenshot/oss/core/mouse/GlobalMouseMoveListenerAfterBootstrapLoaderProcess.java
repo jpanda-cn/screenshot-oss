@@ -5,7 +5,6 @@ import cn.jpanda.screenshot.oss.core.annotations.Component;
 import cn.jpanda.screenshot.oss.core.scan.AfterBootstrapLoaderProcess;
 import cn.jpanda.screenshot.oss.core.shotkey.DaemonGlobalScreen;
 import lombok.SneakyThrows;
-import org.jnativehook.GlobalScreen;
 import org.jnativehook.mouse.NativeMouseEvent;
 import org.jnativehook.mouse.NativeMouseMotionListener;
 
@@ -13,7 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-//@Component
+@Component
 public class GlobalMouseMoveListenerAfterBootstrapLoaderProcess implements AfterBootstrapLoaderProcess {
     private Configuration configuration;
 

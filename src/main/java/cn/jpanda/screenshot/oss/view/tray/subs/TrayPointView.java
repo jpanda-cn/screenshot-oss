@@ -33,11 +33,11 @@ public class TrayPointView implements Initializable {
     }
 
     public void mid() {
-        changeStokeSize(2);
+        changeStokeSize(5);
     }
 
     public void big() {
-        changeStokeSize(3);
+        changeStokeSize(10);
     }
 
     private void changeStokeSize(double size) {
