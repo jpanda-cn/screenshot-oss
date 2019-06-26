@@ -6,16 +6,16 @@ import cn.jpanda.screenshot.oss.core.annotations.Controller;
 import cn.jpanda.screenshot.oss.core.persistence.BootstrapPersistence;
 import cn.jpanda.screenshot.oss.core.persistence.Persistence;
 import cn.jpanda.screenshot.oss.core.persistence.PersistenceBeanCatalogManagement;
+import cn.jpanda.screenshot.oss.core.shotkey.HotKey2CutPersistence;
+import cn.jpanda.screenshot.oss.core.shotkey.SettingsHotKeyPropertyHolder;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
 import cn.jpanda.screenshot.oss.view.password.modify.ModifyPassword;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.RadioButton;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Modality;
@@ -31,6 +31,8 @@ import java.util.stream.Collectors;
 public class IndexCutView implements Initializable {
     public MenuButton options;
     public RadioButton hidden;
+    public Label shotKey;
+    public Button cutBtn;
     private Configuration configuration;
 
     public IndexCutView(Configuration configuration) {
@@ -41,6 +43,50 @@ public class IndexCutView implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         initSettings();
         initHidden();
+        loadShotKey();
+    }
+
+    private void loadShotKey() {
+        shotKey.setMouseTransparent(true);
+        SettingsHotKeyPropertyHolder settingsHotKeyPropertyHolder = configuration.getUniqueBean(SettingsHotKeyPropertyHolder.class);
+        settingsHotKeyPropertyHolder.isSettings.addListener((observable, oldValue, newValue) -> {
+            if (!newValue) {
+                updateShotKey();
+            }
+        });
+        updateShotKey();
+
+    }
+
+    private void updateShotKey() {
+        String shot = getShotKey();
+        // 计算文字宽度
+        shotKey.widthProperty().addListener((observable, oldValue, newValue) -> {
+            Platform.runLater(() -> {
+                shotKey.setLayoutX(cutBtn.widthProperty().subtract(newValue.doubleValue()).divide(2).add(cutBtn.layoutXProperty()).get());
+            });
+        });
+
+        shotKey.textProperty().setValue(shot);
+    }
+
+    private String getShotKey() {
+        HotKey2CutPersistence hotKey2CutPersistence = configuration.getPersistence(HotKey2CutPersistence.class);
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("( ");
+        if (hotKey2CutPersistence.isCtrl()) {
+            stringBuilder.append(KeyCode.CONTROL.getName()).append(" + ");
+        }
+        if (hotKey2CutPersistence.isShift()) {
+            stringBuilder.append(KeyCode.SHIFT.getName()).append(" + ");
+        }
+        if (hotKey2CutPersistence.isAlt()) {
+            stringBuilder.append(KeyCode.ALT.getName()).append(" + ");
+        }
+        stringBuilder.append(hotKey2CutPersistence.getCode());
+        stringBuilder.append(" )");
+        return stringBuilder.toString();
     }
 
     public void initHidden() {
