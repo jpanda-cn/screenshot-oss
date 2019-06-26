@@ -5,6 +5,7 @@ import cn.jpanda.screenshot.oss.common.enums.ImageType;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
 import cn.jpanda.screenshot.oss.core.shotkey.HotKey2CutPersistence;
+import cn.jpanda.screenshot.oss.core.shotkey.SettingsHotKeyPropertyHolder;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
 import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallbackRegistryManager;
 import cn.jpanda.screenshot.oss.store.img.ImageStore;
@@ -59,6 +60,10 @@ public class SettingsView implements Initializable {
     }
 
     private void loadHotKey() {
+        SettingsHotKeyPropertyHolder settingsHotKeyPropertyHolder = configuration.getUniqueBean(SettingsHotKeyPropertyHolder.class);
+        settingsHotKeyPropertyHolder.isSettings.unbind();
+        settingsHotKeyPropertyHolder.isSettings.bind(hotKey.focusedProperty());
+
         hotKey.editableProperty().setValue(false);
         HotKey2CutPersistence hotKey2CutPersistence = configuration.getPersistence(HotKey2CutPersistence.class);
 
@@ -175,7 +180,6 @@ public class SettingsView implements Initializable {
         clipboard.getSelectionModel().select(globalConfigPersistence.getClipboardCallback());
 
     }
-
 
 
     public void editImageStore() {

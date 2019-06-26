@@ -6,7 +6,6 @@ import cn.jpanda.screenshot.oss.core.annotations.Component;
 import cn.jpanda.screenshot.oss.core.scan.AfterBootstrapLoaderProcess;
 import javafx.scene.input.KeyCode;
 import lombok.SneakyThrows;
-import org.jnativehook.GlobalScreen;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
@@ -65,6 +64,10 @@ public class GlobalKeyListenerAfterBootstrapLoaderProcess implements AfterBootst
             }
 
             private boolean isHotKey() {
+                if (configuration.getUniqueBean(SettingsHotKeyPropertyHolder.class).isSettings.get()) {
+                    // 正在配置快键键的过程中，不会触发快捷键
+                    return false;
+                }
                 HotKey2CutPersistence hotKey2CutPersistence = configuration.getPersistence(HotKey2CutPersistence.class);
                 int count = 0;
                 if (hotKey2CutPersistence.isShift()) {
