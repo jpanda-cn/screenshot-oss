@@ -26,5 +26,8 @@ public interface ScreenCapture {
      */
     ObservableList<Screen> screens();
 
+    int minx();
+
+    int miny();
 
 }

@@ -9,7 +9,6 @@ import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
@@ -50,9 +49,9 @@ public class ClassicScreenshot implements Snapshot {
             stage.setScene(scene);
 
             // 添加屏幕跟随，截哪个屏幕就在哪个屏幕上展示
-            Screen screen = configuration.getUniqueBean(ScreenCapture.class).first();
-            stage.setX(screen.getBounds().getMinX());
-            stage.setY(screen.getBounds().getMinY());
+            ScreenCapture screenCapture = configuration.getUniqueBean(ScreenCapture.class);
+            stage.setX(screenCapture.minx());
+            stage.setY(screenCapture.miny());
 
             stage.addEventHandler(KeyEvent.KEY_RELEASED, new KeyExitStageEventHandler(KeyCode.ESCAPE, stage, configuration));
             stage.setOnCloseRequest(event -> {

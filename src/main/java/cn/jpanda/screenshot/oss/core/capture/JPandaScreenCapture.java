@@ -13,8 +13,8 @@ public class JPandaScreenCapture implements ScreenCapture {
     public BufferedImage screenshotImage() {
         //所有的 显示器
         ObservableList<Screen> screens = Screen.getScreens();
-        int minX = (int) screens.get(0).getBounds().getMinX();
-        int minY = (int) screens.get(0).getBounds().getMinY();
+        int minX = minx();
+        int minY = miny();
         int countWidth = screens.stream().mapToInt((s) -> (int) s.getBounds().getWidth()).sum();
         int maxHeight = screens.stream().mapToInt((s) -> (int) s.getBounds().getHeight()).min().orElse(0);
         return new Robot().createScreenCapture(new Rectangle(minX, minY, countWidth, maxHeight));
@@ -34,4 +34,15 @@ public class JPandaScreenCapture implements ScreenCapture {
     public ObservableList<Screen> screens() {
         return Screen.getScreens();
     }
+
+    @Override
+    public int minx() {
+        return screens().stream().mapToInt((s) -> (int) s.getBounds().getMinX()).min().orElse(0);
+    }
+
+    @Override
+    public int miny() {
+        return screens().stream().mapToInt((s) -> (int) s.getBounds().getMinY()).min().orElse(0);
+    }
+
 }
