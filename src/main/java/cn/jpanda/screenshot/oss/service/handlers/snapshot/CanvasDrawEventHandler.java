@@ -136,6 +136,7 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
         graphicsContext.clearRect(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight());
         graphicsContext.setFill(Color.TRANSPARENT);
         graphicsContext.setStroke(Color.RED);
+        graphicsContext.setLineWidth(1);
         graphicsContext.strokeRect(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight());
         graphicsContext.fillRect(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight());
     }

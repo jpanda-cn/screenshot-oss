@@ -1,27 +1,38 @@
 package cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.mosaic;
 
-import cn.jpanda.screenshot.oss.common.utils.MathUtils;
 import cn.jpanda.screenshot.oss.core.ScreenshotsProcess;
 import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
 import cn.jpanda.screenshot.oss.core.shotkey.DefaultGroupScreenshotsElements;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.InnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
-import cn.jpanda.screenshot.oss.view.tray.toolkits.CutInnerType;
-import cn.jpanda.screenshot.oss.view.tray.toolkits.TrayConfig;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.shape.*;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
 import lombok.SneakyThrows;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 
+/**
+ * 对于马赛克的实现目前有两种思路：
+ * 一种是: 获取固定区域内的平均RGB，或者中心RGB，然后渲染到该固定区域内。
+ * 另一种是:采用图片贴纸的方式来完成
+ */
 public class MosaicInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEventHandler {
-    private Group group;
-    private Path path;
+    /**
+     * 当前操作的马赛克
+     */
+    protected Group group;
+    /**
+     * 当前路径
+     */
+    protected Path path;
+
+    protected BufferedImage bufferedImage;
+
 
     public MosaicInnerSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler) {
         super(canvasProperties, canvasDrawEventHandler);
@@ -47,43 +58,8 @@ public class MosaicInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEv
         canvasProperties.getCutPane().getChildren().add(group);
         canvasProperties.getScreenshotsElementsHolder().putEffectiveElement(new DefaultGroupScreenshotsElements(group, canvasProperties));
 
-    }
-
-    @Override
-    @SneakyThrows
-    protected void drag(MouseEvent event) {
-        double cx = event.getSceneX();
-        double cy = event.getSceneY();
-        TrayConfig config = canvasProperties.getTrayConfig(CutInnerType.MOSAIC);
-        double width = config.getStroke().get() * 2;
-        if (width < 5) {
-            width = 5;
-        }
-        // 获取指定索引范围内的图片
         ScreenshotsProcess screenshotsProcess = canvasProperties.getConfiguration().getUniqueBean(ScreenshotsProcess.class);
-
-        BufferedImage bufferedImage = screenshotsProcess.snapshot(canvasProperties.getCutPane().getScene(), new Rectangle(MathUtils.min(cx, x), MathUtils.min(cy, y), width, width));
-        // 计算平均RGBA
-        Color color = new Color(bufferedImage.getRGB((int) (width/2), (int) (width/2)));
-        path.setStroke(javafx.scene.paint.Color.valueOf(String.format("rgb(%d,%d,%d)", color.getRed(), color.getGreen(), color.getBlue())));
-        path.setStrokeWidth(width);
-        path = new Path();
-        group.getChildren().add(path);
-        path.getElements().add(new MoveTo(cx, cy));
-        x = cx;
-        y = cy;
-        if (rectangle.contains(cx, cy)) {
-            PathElement line;
-            if (event.isShiftDown()) {
-                boolean iss = MathUtils.subAbs(cx, x) > MathUtils.subAbs(cy, y);
-                line = iss ? new HLineTo(cx) : new VLineTo(cy);
-            } else {
-                line = new LineTo(cx, cy);
-            }
-
-            path.getElements().add(line);
-        }
-
+        bufferedImage = screenshotsProcess.snapshot(canvasProperties.getCutPane().getScene(), rectangle);
     }
 
 
@@ -100,5 +76,6 @@ public class MosaicInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEv
             }
         });
     }
+
 
 }
