@@ -60,6 +60,7 @@ public class MosaicInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEv
 
         ScreenshotsProcess screenshotsProcess = canvasProperties.getConfiguration().getUniqueBean(ScreenshotsProcess.class);
         bufferedImage = screenshotsProcess.snapshot(canvasProperties.getCutPane().getScene(), rectangle);
+        canvasProperties.getGlobalGraphicsContext().moveTo(x,y);
     }
 
 
