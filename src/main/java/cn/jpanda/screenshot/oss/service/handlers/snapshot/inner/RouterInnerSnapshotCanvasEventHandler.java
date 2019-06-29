@@ -3,6 +3,7 @@ package cn.jpanda.screenshot.oss.service.handlers.snapshot.inner;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.arrow.ArrowInnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.drag.LimitDragInnerSnapshotCanvasEventHandler;
+import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.mosaic.DotMatrixMosaicInnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.mosaic.MosaicInnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.mosaic.TypicalMosaicInnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.pen.PathPenInnerSnapshotCanvasEventHandler;
@@ -51,7 +52,7 @@ public class RouterInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEv
         arrowInnerSnapshotCanvasEventHandler = new ArrowInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler);
         penInnerSnapshotCanvasEventHandler = new PathPenInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler);
         textInnerSnapshotCanvasEventHandler = new TextInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler);
-        mosaicInnerSnapshotCanvasEventHandler = new TypicalMosaicInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler);
+        mosaicInnerSnapshotCanvasEventHandler = new DotMatrixMosaicInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler);
     }
 
     @Override

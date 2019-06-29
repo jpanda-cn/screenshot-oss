@@ -37,7 +37,7 @@ public class TypicalMosaicInnerSnapshotCanvasEventHandler extends MosaicInnerSna
     /**
      * 马赛克的半径 实际直径为: mosaicRadius*2+1
      */
-    private int mosaicRadius = 20;
+    private int mosaicRadius = 2;
     /**
      * 画笔宽度的一半，实际长度为 widthRadius*2+1
      */
@@ -52,6 +52,8 @@ public class TypicalMosaicInnerSnapshotCanvasEventHandler extends MosaicInnerSna
      * 画笔宽度
      */
     private int width = widthRadius * 2 + mosaicWidth;
+
+    protected BufferedImage bufferedImage;
 
     protected BufferedImage computerBufferedImage;
 

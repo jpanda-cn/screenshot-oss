@@ -31,7 +31,6 @@ public class MosaicInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEv
      */
     protected Path path;
 
-    protected BufferedImage bufferedImage;
 
 
     public MosaicInnerSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler) {
@@ -57,10 +56,6 @@ public class MosaicInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEv
         group = new Group(path);
         canvasProperties.getCutPane().getChildren().add(group);
         canvasProperties.getScreenshotsElementsHolder().putEffectiveElement(new DefaultGroupScreenshotsElements(group, canvasProperties));
-
-        ScreenshotsProcess screenshotsProcess = canvasProperties.getConfiguration().getUniqueBean(ScreenshotsProcess.class);
-        bufferedImage = screenshotsProcess.snapshot(canvasProperties.getCutPane().getScene(), rectangle);
-        canvasProperties.getGlobalGraphicsContext().moveTo(x,y);
     }
 
 
