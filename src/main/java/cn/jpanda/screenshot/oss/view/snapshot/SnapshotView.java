@@ -43,7 +43,9 @@ public class SnapshotView implements Initializable {
         screenCapture = configuration.getUniqueBean(ScreenCapture.class);
         BufferedImage image = getDesktopSnapshot();
         WritableImage writableImage = new WritableImage(image.getWidth(), image.getHeight());
+        WritableImage computerImage = new WritableImage(image.getWidth(), image.getHeight());
         SwingFXUtils.toFXImage(image, writableImage);
+        SwingFXUtils.toFXImage(getDesktopSnapshot(), computerImage);
         imageView.setImage(writableImage);
         Canvas canvas = new Canvas(image.getWidth(), image.getHeight());
         GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
@@ -54,7 +56,7 @@ public class SnapshotView implements Initializable {
         graphicsContext.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
         // 黑化之后，剩余的就交给绘制处理器来完成了
-        canvas.addEventHandler(MouseEvent.ANY, new CanvasDrawEventHandler(Color.rgb(0, 0, 0, 0.3), graphicsContext, configuration));
+        canvas.addEventHandler(MouseEvent.ANY, new CanvasDrawEventHandler(Color.rgb(0, 0, 0, 0.3), graphicsContext, configuration, writableImage, computerImage));
 
         // 双击完成截图
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {

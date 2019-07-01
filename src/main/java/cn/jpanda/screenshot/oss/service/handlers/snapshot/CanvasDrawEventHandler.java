@@ -11,6 +11,7 @@ import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -34,14 +35,20 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
 
     private boolean start = true;
 
-    public CanvasDrawEventHandler(Paint masking, GraphicsContext graphicsContext, Configuration configuration) {
+    private WritableImage backgroundImage;
+    private WritableImage computerImage;
+
+    public CanvasDrawEventHandler(Paint masking, GraphicsContext graphicsContext, Configuration configuration, WritableImage writableImage, WritableImage computerImage) {
         // 蒙版清晰度
         this.masking = masking;
+        this.backgroundImage = writableImage;
+        this.computerImage = computerImage;
         // Canvas绘图
         this.graphicsContext = graphicsContext;
         // Canvas所属容器
         pane = ((Pane) (graphicsContext.getCanvas().getParent()));
         this.configuration = configuration;
+
         // 加载工具托盘
         Scene scene = configuration.getViewContext().getScene(CanvasCutTrayView.class, true, false);
         toolbar = scene.getRoot();
@@ -155,7 +162,7 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
             cutRec.visibleProperty().setValue(true);
             cutRec.setCursor(Cursor.CROSSHAIR);
             cutRec.setFill(Color.TRANSPARENT);
-            CanvasProperties canvasProperties = new CanvasProperties(graphicsContext, cutRec, configuration);
+            CanvasProperties canvasProperties = new CanvasProperties(graphicsContext, cutRec, configuration, backgroundImage,computerImage);
             // 为截图区域注册事件
             cutRec.addEventHandler(MouseEvent.ANY, new RoutingSnapshotCanvasEventHandler(canvasProperties, this));
             cutRec.getScene().getWindow().addEventHandler(KeyEvent.KEY_PRESSED, new SnapshotRegionKeyEventHandler(

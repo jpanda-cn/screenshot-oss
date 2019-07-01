@@ -84,8 +84,6 @@ public class CanvasCutTrayView implements Initializable {
 
     private void initRectangle() {
         canvasProperties = (CanvasProperties) submit.getScene().getWindow().getProperties().get(CanvasProperties.class);
-        // 加载配置
-        GlobalConfigPersistence globalConfigPersistence = configuration.getDataPersistenceStrategy().load(GlobalConfigPersistence.class);
     }
 
     // 画圆

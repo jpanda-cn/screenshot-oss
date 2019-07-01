@@ -10,6 +10,7 @@ import cn.jpanda.screenshot.oss.view.tray.toolkits.TrayConfig;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.WritableImage;
 import javafx.scene.shape.Rectangle;
 import lombok.Data;
 import lombok.SneakyThrows;
@@ -37,6 +38,15 @@ public class CanvasProperties {
     private Rectangle cutRectangle;
 
     /**
+     * 背景图片
+     */
+    private WritableImage backgroundImage;
+    /**
+     * 计算用的背景图
+     */
+    protected WritableImage computerImage;
+
+    /**
      * 托盘选中的按钮类型
      */
     private CutInnerType cutInnerType = CutInnerType.DRAG;
@@ -61,10 +71,12 @@ public class CanvasProperties {
 
     private Map<CutInnerType, TrayConfig> trayConfigs = new HashMap<>();
 
-    public CanvasProperties(GraphicsContext globalGraphicsContext, Rectangle cutRectangle, Configuration configuration) {
+    public CanvasProperties(GraphicsContext globalGraphicsContext, Rectangle cutRectangle, Configuration configuration, WritableImage writableImage, WritableImage computerImage) {
         this.globalGraphicsContext = globalGraphicsContext;
         this.configuration = configuration;
         this.cutRectangle = cutRectangle;
+        this.backgroundImage = writableImage;
+        this.computerImage = computerImage;
         cutPane = ((Group) (cutRectangle.getParent()));
     }
 
