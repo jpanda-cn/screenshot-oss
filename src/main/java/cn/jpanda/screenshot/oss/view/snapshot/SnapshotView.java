@@ -4,6 +4,8 @@ import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.ScreenshotsProcess;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
 import cn.jpanda.screenshot.oss.core.capture.ScreenCapture;
+import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
+import cn.jpanda.screenshot.oss.core.shotkey.ScreenshotsElementsHolder;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
@@ -80,12 +82,17 @@ public class SnapshotView implements Initializable {
     protected void saveAndClose(Canvas canvas) {
         ScreenshotsProcess screenshotsProcess = configuration.getUniqueBean(ScreenshotsProcess.class);
         // 获取截图区域的图片交由图片处理器来完成保存图片的操作
-        CanvasProperties canvasProperties = (CanvasProperties) canvas.getScene().getWindow().getProperties().get(CanvasProperties.class);
+        Stage stage = ((Stage) canvas.getScene().getWindow());
+        CanvasProperties canvasProperties = (CanvasProperties) stage.getProperties().get(CanvasProperties.class);
         if (canvasProperties == null) {
             return;
         }
         screenshotsProcess.done(screenshotsProcess.snapshot(canvas.getScene(), canvasProperties.getCutRectangle()));
         // 关闭
-        ((Stage) canvas.getScene().getWindow()).close();
+        stage.getProperties().clear();
+        canvasProperties.getConfiguration().getUniqueBean(DestroyGroupBeanHolder.class).destroy();
+        canvasProperties.getConfiguration().getUniqueBean(ScreenshotsElementsHolder.class).clear();
+        canvasProperties = null;
+        stage.close();
     }
 }

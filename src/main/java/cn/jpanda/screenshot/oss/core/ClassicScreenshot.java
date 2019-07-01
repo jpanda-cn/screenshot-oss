@@ -44,6 +44,7 @@ public class ClassicScreenshot implements Snapshot {
             // 执行截图操作
             // 处理ICON
             stage = configuration.getViewContext().newStage();
+            configuration.getCutting().unbind();
             configuration.getCutting().bind(stage.showingProperty());
             stage.initOwner(configuration.getViewContext().getStage());
             stage.initStyle(StageStyle.UNDECORATED);

@@ -55,4 +55,9 @@ public class ScreenshotsElementsHolder {
         }
         return null;
     }
+
+    public void  clear(){
+        invalid.clear();
+        effective.clear();
+    }
 }

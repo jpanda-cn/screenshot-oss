@@ -11,6 +11,7 @@ import cn.jpanda.screenshot.oss.core.shotkey.SettingsHotKeyPropertyHolder;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
 import cn.jpanda.screenshot.oss.view.password.modify.ModifyPassword;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
@@ -49,11 +50,13 @@ public class IndexCutView implements Initializable {
     private void loadShotKey() {
         shotKey.setMouseTransparent(true);
         SettingsHotKeyPropertyHolder settingsHotKeyPropertyHolder = configuration.getUniqueBean(SettingsHotKeyPropertyHolder.class);
-        settingsHotKeyPropertyHolder.isSettings.addListener((observable, oldValue, newValue) -> {
+        ChangeListener<Boolean> listener = (observable, oldValue, newValue) -> {
             if (!newValue) {
                 updateShotKey();
             }
-        });
+        };
+        settingsHotKeyPropertyHolder.isSettings.removeListener(listener);
+        settingsHotKeyPropertyHolder.isSettings.addListener(listener);
         updateShotKey();
 
     }
@@ -61,12 +64,13 @@ public class IndexCutView implements Initializable {
     private void updateShotKey() {
         String shot = getShotKey();
         // 计算文字宽度
-        shotKey.widthProperty().addListener((observable, oldValue, newValue) -> {
+        ChangeListener<Number> listener = (observable, oldValue, newValue) -> {
             Platform.runLater(() -> {
                 shotKey.setLayoutX(cutBtn.widthProperty().subtract(newValue.doubleValue()).divide(2).add(cutBtn.layoutXProperty()).get());
             });
-        });
-
+        };
+        shotKey.widthProperty().removeListener(listener);
+        shotKey.widthProperty().addListener(listener);
         shotKey.textProperty().setValue(shot);
     }
 
@@ -93,11 +97,13 @@ public class IndexCutView implements Initializable {
 
         GlobalConfigPersistence configPersistence = configuration.getPersistence(GlobalConfigPersistence.class);
         hidden.selectedProperty().set(configPersistence.isHideIndexScreen());
-        hidden.selectedProperty().addListener((observable, oldValue, newValue) -> {
+        ChangeListener<Boolean> listener = (observable, oldValue, newValue) -> {
             GlobalConfigPersistence configPersistence1 = configuration.getPersistence(GlobalConfigPersistence.class);
             configPersistence1.setHideIndexScreen(newValue);
             configuration.storePersistence(configPersistence1);
-        });
+        };
+        hidden.selectedProperty().removeListener(listener);
+        hidden.selectedProperty().addListener(listener);
     }
 
     private void initSettings() {
@@ -112,7 +118,6 @@ public class IndexCutView implements Initializable {
         MenuItem stopUsePwd = new MenuItem("停用密码");
         MenuItem usePwd = new MenuItem("启用密码");
         MenuItem cpwd = new MenuItem("修改密码");
-
         stopUsePwd.setOnAction(event -> {
             BootstrapPersistence bootstrapPersistence = configuration.getPersistence(BootstrapPersistence.class);
             // 取消密码，重新存储一下数据
