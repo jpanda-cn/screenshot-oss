@@ -90,10 +90,11 @@ public class CanvasCutTrayView implements Initializable {
     public void doRoundness() {
         // 尝试初始化
         initRectangle();
+        configuration.getUniqueBean(DestroyGroupBeanHolder.class).destroy();
         canvasProperties.setCutInnerType(CutInnerType.ROUNDNESS);
         ViewContext v = configuration.getViewContext();
-        Pane points = (Pane) v.getScene(TrayPointView.class).getRoot();
-        Pane colors = (Pane) v.getScene(TrayColorView.class).getRoot();
+        Pane points = (Pane) v.getScene(TrayPointView.class, true, false).getRoot();
+        Pane colors = (Pane) v.getScene(TrayColorView.class, true, false).getRoot();
         add2Bar(new HBox(points, colors));
         // 为圆形框内的每个元素添加事件
     }
@@ -101,57 +102,71 @@ public class CanvasCutTrayView implements Initializable {
     public void doRectangle() {
         // 尝试初始化
         initRectangle();
+        DestroyGroupBeanHolder destroyGroupBeanHolder = configuration.getUniqueBean(DestroyGroupBeanHolder.class);
+        destroyGroupBeanHolder.destroy();
         canvasProperties.setCutInnerType(CutInnerType.RECTANGLE);
         // 生成左侧大小按钮
         ViewContext v = configuration.getViewContext();
-        Pane points = (Pane) v.getScene(TrayPointView.class).getRoot();
-        Pane colors = (Pane) v.getScene(TrayColorView.class).getRoot();
+        Pane points = (Pane) v.getScene(TrayPointView.class, true, false).getRoot();
+        Pane colors = (Pane) v.getScene(TrayColorView.class, true, false).getRoot();
         add2Bar(new HBox(points, colors));
         // 为圆形框内的每个元素添加事件
     }
 
     public void doArrow() {
         initRectangle();
+        DestroyGroupBeanHolder destroyGroupBeanHolder = configuration.getUniqueBean(DestroyGroupBeanHolder.class);
+        destroyGroupBeanHolder.destroy();
         canvasProperties.setCutInnerType(CutInnerType.ARROW);
         ViewContext v = configuration.getViewContext();
-        Pane points = (Pane) v.getScene(TrayPointView.class).getRoot();
-        Pane colors = (Pane) v.getScene(TrayColorView.class).getRoot();
+        Pane points = (Pane) v.getScene(TrayPointView.class, true, false).getRoot();
+        Pane colors = (Pane) v.getScene(TrayColorView.class, true, false).getRoot();
         add2Bar(new HBox(points, colors));
     }
 
     public void doPen() {
         initRectangle();
+        DestroyGroupBeanHolder destroyGroupBeanHolder = configuration.getUniqueBean(DestroyGroupBeanHolder.class);
+        destroyGroupBeanHolder.destroy();
         canvasProperties.setCutInnerType(CutInnerType.PEN);
         ViewContext v = configuration.getViewContext();
-        Pane points = (Pane) v.getScene(TrayPointView.class).getRoot();
-        Pane colors = (Pane) v.getScene(TrayColorView.class).getRoot();
+        Pane points = (Pane) v.getScene(TrayPointView.class, true, false).getRoot();
+        Pane colors = (Pane) v.getScene(TrayColorView.class, true, false).getRoot();
         add2Bar(new HBox(points, colors));
     }
 
     public void doText() {
         initRectangle();
+        DestroyGroupBeanHolder destroyGroupBeanHolder = configuration.getUniqueBean(DestroyGroupBeanHolder.class);
+        destroyGroupBeanHolder.destroy();
         canvasProperties.setCutInnerType(CutInnerType.TEXT);
         ViewContext v = configuration.getViewContext();
-        Pane fonts = (Pane) v.getScene(TrayFontView.class).getRoot();
-        Pane colors = (Pane) v.getScene(TrayColorView.class).getRoot();
+        Pane fonts = (Pane) v.getScene(TrayFontView.class, true, false).getRoot();
+        Pane colors = (Pane) v.getScene(TrayColorView.class, true, false).getRoot();
         add2Bar(new HBox(fonts, colors));
     }
 
     // 拖动
     public void doDrag() {
         initRectangle();
+        DestroyGroupBeanHolder destroyGroupBeanHolder = configuration.getUniqueBean(DestroyGroupBeanHolder.class);
+        destroyGroupBeanHolder.destroy();
         canvasProperties.setCutInnerType(CutInnerType.DRAG);
         add2Bar(new HBox());
     }
 
     public void doMosaic() {
         initRectangle();
+        DestroyGroupBeanHolder destroyGroupBeanHolder = configuration.getUniqueBean(DestroyGroupBeanHolder.class);
+        destroyGroupBeanHolder.destroy();
         canvasProperties.setCutInnerType(CutInnerType.MOSAIC);
-        add2Bar(new HBox((Pane) configuration.getViewContext().getScene(TrayPointView.class).getRoot()));
+        add2Bar(new HBox((Pane) configuration.getViewContext().getScene(TrayPointView.class, true, false).getRoot()));
     }
 
     // 设置
     public void doSettings() {
+        DestroyGroupBeanHolder destroyGroupBeanHolder = configuration.getUniqueBean(DestroyGroupBeanHolder.class);
+        destroyGroupBeanHolder.destroy();
         add2Bar(new HBox());
         Stage cutStage = (Stage) settings.getScene().getWindow();
         cutStage.setAlwaysOnTop(false);
@@ -165,6 +180,8 @@ public class CanvasCutTrayView implements Initializable {
     }
 
     public void doCancel() {
+        DestroyGroupBeanHolder destroyGroupBeanHolder = configuration.getUniqueBean(DestroyGroupBeanHolder.class);
+        destroyGroupBeanHolder.destroy();
         initRectangle();
         if (canvasProperties == null) {
             return;
@@ -175,6 +192,7 @@ public class CanvasCutTrayView implements Initializable {
     }
 
     public void doDone() {
+
         // 执行销毁操作
         DestroyGroupBeanHolder destroyGroupBeanHolder = configuration.getUniqueBean(DestroyGroupBeanHolder.class);
         destroyGroupBeanHolder.destroy();
@@ -188,9 +206,13 @@ public class CanvasCutTrayView implements Initializable {
         }
         Scene scene = canvasProperties.getCutPane().getScene();
         Rectangle rectangle = canvasProperties.getCutRectangle();
-        screenshotsProcess.done(screenshotsProcess.snapshot(scene, rectangle));
-        Stage stage = ((Stage) scene.getWindow());
-        stage.close();
+        try {
+            screenshotsProcess.done(screenshotsProcess.snapshot(scene, rectangle));
+        }finally {
+            Stage stage = ((Stage) scene.getWindow());
+            stage.close();
+        }
+
     }
 
     public void add2Bar(Node... nodes) {

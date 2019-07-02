@@ -6,6 +6,8 @@ import cn.jpanda.screenshot.oss.view.tray.toolkits.CutInnerType;
 import cn.jpanda.screenshot.oss.view.tray.toolkits.TrayConfig;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
+import javafx.scene.ImageCursor;
+import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
@@ -18,7 +20,7 @@ import java.util.Map;
 
 /**
  * 点阵mosaic实现
- * 亟需优化
+ * 亟需优化 clearType模式下的文字处理
  */
 public class DotMatrixMosaicInnerSnapshotCanvasEventHandler extends MosaicInnerSnapshotCanvasEventHandler {
 
@@ -29,13 +31,23 @@ public class DotMatrixMosaicInnerSnapshotCanvasEventHandler extends MosaicInnerS
     /**
      * 马赛克区域的宽度
      */
-    protected Integer mosaicRegionWidth;
+    protected Integer mosaicRegionWidth = mosaicRegionRadius * 2 + 1;
 
     protected WritableImage computerImage;
+
+    Image image = new Image("/images/cursor/mosaic.png", mosaicRegionWidth, mosaicRegionWidth, true, false);
+    private ImageCursor cursor = new ImageCursor(image, image.getWidth() / 2, image.getHeight() / 2);
 
     public DotMatrixMosaicInnerSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler) {
         super(canvasProperties, canvasDrawEventHandler);
         computerImage = canvasProperties.getBackgroundImage();
+
+    }
+
+    @Override
+    protected void move(MouseEvent event) {
+        // 使用自定义鼠标
+        rectangle.setCursor(cursor);
     }
 
     @Override
@@ -44,7 +56,13 @@ public class DotMatrixMosaicInnerSnapshotCanvasEventHandler extends MosaicInnerS
         // 确定马赛克大小
         TrayConfig trayConfig = canvasProperties.getTrayConfig(CutInnerType.MOSAIC);
         int ratio = trayConfig.getStroke().intValue();
-        mosaicRegionWidth = mosaicRegionRadius * ratio + 1;
+        if (ratio == 5) {
+            ratio = 2;
+        }
+        if (ratio == 10) {
+            ratio = 4;
+        }
+        mosaicRegionWidth = mosaicRegionRadius * 2 * ratio + 1;
     }
 
     @Override
@@ -53,7 +71,7 @@ public class DotMatrixMosaicInnerSnapshotCanvasEventHandler extends MosaicInnerS
         if (!rectangle.contains(event.getSceneX(), event.getSceneY())) {
             return;
         }
-        path.strokeWidthProperty().set(mosaicRegionWidth*2);
+        path.strokeWidthProperty().set(mosaicRegionWidth * 2);
         path.opacityProperty().set(0);
         path.getElements().add(new LineTo(event.getSceneX(), event.getSceneY()));
         // 处理

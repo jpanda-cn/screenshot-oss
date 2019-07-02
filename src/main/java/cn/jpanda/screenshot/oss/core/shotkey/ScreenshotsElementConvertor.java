@@ -6,4 +6,6 @@ public interface ScreenshotsElementConvertor {
     void activateOne();
 
     void destroyOne();
+
+    void clear();
 }

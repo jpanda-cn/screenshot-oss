@@ -3,6 +3,7 @@ package cn.jpanda.screenshot.oss.common.toolkit;
 import cn.jpanda.screenshot.oss.common.enums.ResizeType;
 import cn.jpanda.screenshot.oss.service.handlers.ResizeTagRectangleEventHandler;
 import javafx.beans.binding.Bindings;
+import javafx.event.EventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -12,7 +13,9 @@ import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Rectangle;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class RectangleAddTag2ResizeBinding {
 
@@ -28,6 +31,8 @@ public class RectangleAddTag2ResizeBinding {
      * 首先的子节点
      */
     private List<Rectangle> subs;
+
+    private Map<Ellipse, EventHandler<MouseEvent>> binds = new HashMap<>(8);
 
     public RectangleAddTag2ResizeBinding(Rectangle rectangle) {
         this.rectangle = rectangle;
@@ -63,8 +68,16 @@ public class RectangleAddTag2ResizeBinding {
         this.subs = subs;
     }
 
-    public void bind() {
+    public RectangleAddTag2ResizeBinding bind() {
         addResizeTag(rectangle);
+        return this;
+    }
+
+    public void unbind() {
+        for (Map.Entry<Ellipse, EventHandler<MouseEvent>> entry : binds.entrySet()) {
+            entry.getKey().removeEventHandler(MouseEvent.ANY, entry.getValue());
+        }
+        binds.clear();
     }
 
     private void addResizeTag(Rectangle rectangle) {
@@ -132,6 +145,8 @@ public class RectangleAddTag2ResizeBinding {
 
     private void addResizeEvent(Ellipse ellipse, Rectangle rectangle, ResizeType resizeType) {
         ellipse.visibleProperty().bind(rectangle.visibleProperty());
-        ellipse.addEventHandler(MouseEvent.ANY, new ResizeTagRectangleEventHandler(resizeType, rectangle, parent, subs));
+        ResizeTagRectangleEventHandler resizeTagRectangleEventHandler = new ResizeTagRectangleEventHandler(resizeType, rectangle, parent, subs);
+        ellipse.addEventHandler(MouseEvent.ANY, resizeTagRectangleEventHandler);
+        binds.put(ellipse, resizeTagRectangleEventHandler);
     }
 }

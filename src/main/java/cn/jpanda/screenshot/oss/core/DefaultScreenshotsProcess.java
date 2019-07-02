@@ -7,12 +7,8 @@ import cn.jpanda.screenshot.oss.store.img.ImageStore;
 import cn.jpanda.screenshot.oss.store.img.ImageStoreRegisterManager;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.shape.Rectangle;
-import javafx.stage.Stage;
 
 import java.awt.image.BufferedImage;
 
@@ -33,7 +29,7 @@ public class DefaultScreenshotsProcess implements ScreenshotsProcess {
         WritableImage wImage = scene.snapshot(null);
         // 将图片转为BufferedImage
         BufferedImage bufferedImage = SwingFXUtils.fromFXImage(wImage, null);
-        return bufferedImage.getSubimage(rectangle.xProperty().intValue() , rectangle.yProperty().intValue(), rectangle.widthProperty().intValue() , rectangle.heightProperty().intValue());
+        return bufferedImage.getSubimage(rectangle.xProperty().intValue(), rectangle.yProperty().intValue(), rectangle.widthProperty().intValue(), rectangle.heightProperty().intValue());
     }
 
     @Override

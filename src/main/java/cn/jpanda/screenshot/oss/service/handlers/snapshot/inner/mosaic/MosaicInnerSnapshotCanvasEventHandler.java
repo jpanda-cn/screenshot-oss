@@ -37,10 +37,6 @@ public class MosaicInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEv
         super(canvasProperties, canvasDrawEventHandler);
     }
 
-    @Override
-    protected void move(MouseEvent event) {
-        rectangle.setCursor(Cursor.DISAPPEAR);
-    }
 
     @Override
     @SneakyThrows
@@ -61,7 +57,7 @@ public class MosaicInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEv
 
     @Override
     protected void release(MouseEvent event) {
-//        clear();
+        clear();
     }
 
     protected void clear() {

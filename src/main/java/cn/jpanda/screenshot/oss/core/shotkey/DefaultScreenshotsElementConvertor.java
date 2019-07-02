@@ -1,9 +1,12 @@
 package cn.jpanda.screenshot.oss.core.shotkey;
 
 import cn.jpanda.screenshot.oss.core.annotations.Component;
+import lombok.Getter;
 
 @Component
 public class DefaultScreenshotsElementConvertor implements ScreenshotsElementConvertor {
+
+    @Getter
     private ScreenshotsElementsHolder screenshotsElementsHolder;
 
     public DefaultScreenshotsElementConvertor(ScreenshotsElementsHolder screenshotsElementsHolder) {
@@ -30,5 +33,9 @@ public class DefaultScreenshotsElementConvertor implements ScreenshotsElementCon
         }
         elements.destroy();
         screenshotsElementsHolder.putInvalidElement(elements);
+    }
+    @Override
+    public void  clear(){
+        screenshotsElementsHolder.clear();
     }
 }

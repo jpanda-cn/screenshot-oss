@@ -11,6 +11,7 @@ public class DestroyGroupBeanHolder {
     public void destroy() {
         if (destroyGroupBean != null) {
             destroyGroupBean.destroy();
+            destroyGroupBean = null;
         }
     }
 }

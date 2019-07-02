@@ -2,7 +2,6 @@ package cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.arrow;
 
 import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
 import cn.jpanda.screenshot.oss.core.shotkey.DefaultGroupScreenshotsElements;
-import cn.jpanda.screenshot.oss.core.shotkey.ScreenshotsElementsHolder;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.InnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.shape.Arrow;
@@ -63,10 +62,10 @@ public class ArrowInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEve
     @Override
     protected void drag(MouseEvent event) {
         // 获取需要移动的元素变更其展示位置,不得超出外部区域
-        if (event.getSceneX()>=rectangle.getX()&&event.getSceneX()<=rectangle.getX()+rectangle.getWidth()){
+        if (event.getSceneX() >= rectangle.getX() && event.getSceneX() <= rectangle.getX() + rectangle.getWidth()) {
             arrow.endXProperty().set(event.getSceneX());
         }
-        if (event.getSceneY()>=rectangle.getY()&&event.getSceneY()<=rectangle.getY()+rectangle.getHeight()){
+        if (event.getSceneY() >= rectangle.getY() && event.getSceneY() <= rectangle.getY() + rectangle.getHeight()) {
             arrow.endYProperty().set(event.getSceneY());
         }
     }

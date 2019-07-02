@@ -5,12 +5,12 @@ import cn.jpanda.screenshot.oss.common.toolkit.RectangleAddTag2ResizeBinding;
 import cn.jpanda.screenshot.oss.common.toolkit.RectangleBinding;
 import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
 import cn.jpanda.screenshot.oss.core.shotkey.DefaultGroupScreenshotsElements;
-import cn.jpanda.screenshot.oss.core.shotkey.ScreenshotsElementsHolder;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.InnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import cn.jpanda.screenshot.oss.view.tray.toolkits.CutInnerType;
 import cn.jpanda.screenshot.oss.view.tray.toolkits.TrayConfig;
+import javafx.event.EventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.input.MouseEvent;
@@ -23,6 +23,8 @@ public class DrawRectangleInnerSnapshotCanvasEventHandler extends InnerSnapshotC
     private Rectangle dragRectangle;
     // 矩形所属组
     private Group rectangleGroup;
+    private RectangleAddTag2ResizeBinding rectangleAddTag2ResizeBinding;
+    private EventHandler<MouseEvent> dragRectangleEventHandler;
 
     public DrawRectangleInnerSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler) {
         super(canvasProperties, canvasDrawEventHandler);
@@ -100,9 +102,10 @@ public class DrawRectangleInnerSnapshotCanvasEventHandler extends InnerSnapshotC
         // 绑定拖动矩形和矩形的关系
         dragRectangle = RectangleBinding.doBind(rectangleGroup, currentRectangle);
         // 添加拖动事件
-        dragRectangle.addEventFilter(MouseEvent.ANY, new DragRectangleEventHandler(dragRectangle, rectangle, null));
+        dragRectangleEventHandler = new DragRectangleEventHandler(dragRectangle, rectangle, null);
+        dragRectangle.addEventFilter(MouseEvent.ANY, dragRectangleEventHandler);
         // 添加变更大小事件
-        new RectangleAddTag2ResizeBinding(dragRectangle, rectangle).bind();
+        rectangleAddTag2ResizeBinding = new RectangleAddTag2ResizeBinding(dragRectangle, rectangle).bind();
         dragRectangle.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue) {
                 clear();
@@ -120,7 +123,16 @@ public class DrawRectangleInnerSnapshotCanvasEventHandler extends InnerSnapshotC
                     dragRectangle.visibleProperty().setValue(false);
                     currentRectangle.strokeProperty().unbind();
                     currentRectangle.strokeWidthProperty().unbind();
+                    if (dragRectangleEventHandler != null) {
+                        dragRectangle.removeEventFilter(MouseEvent.ANY, dragRectangleEventHandler);
+                        dragRectangleEventHandler = null;
+                    }
+                    dragRectangle = null;
                 }
+            }
+            if (rectangleAddTag2ResizeBinding != null) {
+                rectangleAddTag2ResizeBinding.unbind();
+                rectangleAddTag2ResizeBinding = null;
             }
         });
     }

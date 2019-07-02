@@ -4,8 +4,6 @@ import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.ScreenshotsProcess;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
 import cn.jpanda.screenshot.oss.core.capture.ScreenCapture;
-import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
-import cn.jpanda.screenshot.oss.core.shotkey.ScreenshotsElementsHolder;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
@@ -31,7 +29,8 @@ import java.util.ResourceBundle;
 @Controller
 public class SnapshotView implements Initializable {
     private Configuration configuration;
-    private ScreenCapture screenCapture;
+    private CanvasDrawEventHandler canvasDrawEventHandler;
+    private Canvas canvas;
 
     public SnapshotView(Configuration configuration) {
         this.configuration = configuration;
@@ -42,14 +41,16 @@ public class SnapshotView implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        screenCapture = configuration.getUniqueBean(ScreenCapture.class);
+        ScreenCapture screenCapture = configuration.getUniqueBean(ScreenCapture.class);
         BufferedImage image = getDesktopSnapshot();
+        // 一个用于计算，一个用于绘制，比较占内存
         WritableImage writableImage = new WritableImage(image.getWidth(), image.getHeight());
         WritableImage computerImage = new WritableImage(image.getWidth(), image.getHeight());
         SwingFXUtils.toFXImage(image, writableImage);
         SwingFXUtils.toFXImage(getDesktopSnapshot(), computerImage);
         imageView.setImage(writableImage);
-        Canvas canvas = new Canvas(image.getWidth(), image.getHeight());
+
+        canvas = new Canvas(image.getWidth(), image.getHeight());
         GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
         graphicsContext.setStroke(Color.rgb(50, 161, 255));
         ((AnchorPane) imageView.getParent()).getChildren().add(canvas);
@@ -58,7 +59,8 @@ public class SnapshotView implements Initializable {
         graphicsContext.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
         // 黑化之后，剩余的就交给绘制处理器来完成了
-        canvas.addEventHandler(MouseEvent.ANY, new CanvasDrawEventHandler(Color.rgb(0, 0, 0, 0.3), graphicsContext, configuration, writableImage, computerImage));
+        canvasDrawEventHandler = new CanvasDrawEventHandler(Color.rgb(0, 0, 0, 0.3), graphicsContext, configuration, writableImage, computerImage);
+        canvas.addEventHandler(MouseEvent.ANY, canvasDrawEventHandler);
 
         // 双击完成截图
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
@@ -76,7 +78,7 @@ public class SnapshotView implements Initializable {
     }
 
     private BufferedImage getDesktopSnapshot() {
-        return screenCapture.screenshotImage();
+        return configuration.getUniqueBean(ScreenCapture.class).screenshotImage();
     }
 
     protected void saveAndClose(Canvas canvas) {
@@ -89,10 +91,10 @@ public class SnapshotView implements Initializable {
         }
         screenshotsProcess.done(screenshotsProcess.snapshot(canvas.getScene(), canvasProperties.getCutRectangle()));
         // 关闭
-        stage.getProperties().clear();
-        canvasProperties.getConfiguration().getUniqueBean(DestroyGroupBeanHolder.class).destroy();
-        canvasProperties.getConfiguration().getUniqueBean(ScreenshotsElementsHolder.class).clear();
-        canvasProperties = null;
+        ((WaitRemoveElementsHolder) (stage.getProperties().getOrDefault(WaitRemoveElementsHolder.class, new WaitRemoveElementsHolder()))).clear();
+        canvas.removeEventHandler(MouseEvent.ANY, canvasDrawEventHandler);
+        canvasDrawEventHandler = null;
+        this.canvas = null;
         stage.close();
     }
 }

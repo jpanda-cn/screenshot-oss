@@ -9,7 +9,8 @@ import cn.jpanda.screenshot.oss.core.persistence.strategy.DataPersistenceStrateg
 import cn.jpanda.screenshot.oss.core.scan.AfterBootstrapLoaderProcess;
 import cn.jpanda.screenshot.oss.core.toolkit.BeanInstance;
 import cn.jpanda.screenshot.oss.core.toolkit.DefaultBeanInstance;
-import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.stage.Stage;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -49,7 +50,7 @@ public class Configuration {
      * 正在截图中
      */
     @Getter
-    private volatile SimpleBooleanProperty cutting = new SimpleBooleanProperty(false);
+    private volatile SimpleObjectProperty<Stage> cutting = new SimpleObjectProperty<>();
     /**
      * 程序执行器所处的工作目录
      */

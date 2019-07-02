@@ -11,7 +11,6 @@ import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
 import cn.jpanda.screenshot.oss.core.mouse.GlobalMousePoint;
 import cn.jpanda.screenshot.oss.core.shotkey.DefaultGroupScreenshotsElements;
 import cn.jpanda.screenshot.oss.core.shotkey.ScreenshotsElementConvertor;
-import cn.jpanda.screenshot.oss.shape.TextRectangle;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -155,13 +154,16 @@ public class SnapshotRegionKeyEventHandler implements EventHandler<KeyEvent> {
                 rectangle.toBack();
                 // 添加拖动事件
                 // 添加变更大小事件
-                new RectangleAddTag2ResizeBinding(currentRectangle, rectangle).bind();
+                RectangleAddTag2ResizeBinding rectangleAddTag2ResizeBinding = new RectangleAddTag2ResizeBinding(currentRectangle, rectangle).bind();
 
                 canvasProperties.getConfiguration().getUniqueBean(DestroyGroupBeanHolder.class).set(() -> {
                     // 鼠标按下时，清理之前生成的矩形组的事件
                     group.setMouseTransparent(true);
                     canvasProperties.putGroup(group);
                     currentRectangle.visibleProperty().setValue(false);
+                    if (rectangleAddTag2ResizeBinding != null) {
+                        rectangleAddTag2ResizeBinding.unbind();
+                    }
                 });
 
             } else {

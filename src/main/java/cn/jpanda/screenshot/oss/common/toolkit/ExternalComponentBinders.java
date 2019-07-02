@@ -19,7 +19,7 @@ public class ExternalComponentBinders {
 
     }
 
-    public void doRegistry() {
+    public ExternalComponentBinders doRegistry() {
         toolbar.visibleProperty().bind(cutRec.visibleProperty());
         // 绑定数据
         cutRec.yProperty().addListener((observable, oldValue, newValue) -> {
@@ -34,6 +34,17 @@ public class ExternalComponentBinders {
         cutRec.heightProperty().addListener((observable, oldValue, newValue) -> {
             response();
         });
+        return this;
+    }
+
+    public void unbind() {
+        toolbar.visibleProperty().unbind();
+        cutRec.yProperty().unbind();
+        cutRec.xProperty().unbind();
+        cutRec.widthProperty().unbind();
+        cutRec.heightProperty().unbind();
+        toolbar = null;
+        cutRec = null;
     }
 
     public void response() {

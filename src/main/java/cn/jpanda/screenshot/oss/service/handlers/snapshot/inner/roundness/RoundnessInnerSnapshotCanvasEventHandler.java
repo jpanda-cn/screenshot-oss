@@ -6,12 +6,12 @@ import cn.jpanda.screenshot.oss.common.toolkit.RectangleAddTag2ResizeBinding;
 import cn.jpanda.screenshot.oss.common.utils.MathUtils;
 import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
 import cn.jpanda.screenshot.oss.core.shotkey.DefaultGroupScreenshotsElements;
-import cn.jpanda.screenshot.oss.core.shotkey.ScreenshotsElementsHolder;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.InnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import cn.jpanda.screenshot.oss.view.tray.toolkits.CutInnerType;
 import cn.jpanda.screenshot.oss.view.tray.toolkits.TrayConfig;
+import javafx.event.EventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.input.MouseEvent;
@@ -26,6 +26,8 @@ public class RoundnessInnerSnapshotCanvasEventHandler extends InnerSnapshotCanva
     private Ellipse ellipse;
     private Group ellipseGroup;
     private Rectangle outRectangle;
+    private RectangleAddTag2ResizeBinding rectangleAddTag2ResizeBinding;
+    private EventHandler<MouseEvent> dragRectangleEventHandler;
 
     public RoundnessInnerSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler) {
         super(canvasProperties, canvasDrawEventHandler);
@@ -92,15 +94,12 @@ public class RoundnessInnerSnapshotCanvasEventHandler extends InnerSnapshotCanva
         // 圆形绘制完毕，为其创建一个隐藏的矩形区域，用于拖动和变更圆形的大小
         // 点击按钮发生在边界上，生成一个矩形框，框住矩形
         outRectangle = EllipseRectangleBinding.doBind(ellipseGroup, ellipse);
+
         // 为矩形添加六个标点，用来拖动变更矩形的大小
-        new RectangleAddTag2ResizeBinding(outRectangle, rectangle).bind();
+        rectangleAddTag2ResizeBinding = new RectangleAddTag2ResizeBinding(outRectangle, rectangle).bind();
         // 圆形转矩形
-        outRectangle.addEventFilter(MouseEvent.ANY, new DragRectangleEventHandler(outRectangle, rectangle, null));
-        outRectangle.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue) {
-                clear();
-            }
-        });
+        dragRectangleEventHandler = new DragRectangleEventHandler(outRectangle, rectangle, null);
+        outRectangle.addEventFilter(MouseEvent.ANY, dragRectangleEventHandler);
         canvasProperties.putGroup(ellipseGroup);
         // 移除矩形内部事件
         // 为圆形添加事件，该事件确保在鼠标移动到圆形边界时，展示移动样式的鼠标，如果此时拖动，则移动该圆形的位置
@@ -115,7 +114,15 @@ public class RoundnessInnerSnapshotCanvasEventHandler extends InnerSnapshotCanva
                     outRectangle.visibleProperty().setValue(false);
                     ellipse.strokeProperty().unbind();
                     ellipse.strokeWidthProperty().unbind();
+                    if (dragRectangleEventHandler != null) {
+                        outRectangle.removeEventFilter(MouseEvent.ANY, dragRectangleEventHandler);
+                        dragRectangleEventHandler=null;
+                    }
                 }
+            }
+            if (rectangleAddTag2ResizeBinding != null) {
+                rectangleAddTag2ResizeBinding.unbind();
+                rectangleAddTag2ResizeBinding = null;
             }
         });
     }

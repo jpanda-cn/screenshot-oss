@@ -4,6 +4,8 @@ import cn.jpanda.screenshot.oss.common.toolkit.Bounds;
 import cn.jpanda.screenshot.oss.common.toolkit.ExternalComponentBinders;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
+import cn.jpanda.screenshot.oss.view.snapshot.EveryScreenshotWaitRemoveElement;
+import cn.jpanda.screenshot.oss.view.snapshot.WaitRemoveElementsHolder;
 import cn.jpanda.screenshot.oss.view.tray.CanvasCutTrayView;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
@@ -18,6 +20,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Window;
 
 import static cn.jpanda.screenshot.oss.common.utils.MathUtils.*;
 
@@ -32,7 +35,9 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
     private Pane pane;
     private Rectangle cutRec;
     private Group group;
-
+    private RoutingSnapshotCanvasEventHandler routingSnapshotCanvasEventHandler;
+    private SnapshotRegionKeyEventHandler snapshotRegionKeyEventHandler;
+    private ExternalComponentBinders externalComponentBinders;
     private boolean start = true;
 
     private WritableImage backgroundImage;
@@ -59,7 +64,6 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
 
         if (MouseEvent.MOUSE_PRESSED.equals(event.getEventType())) {
             // 理论上,每一次点击，都会生成一个新的区域，同时移除老的截图区域的内容。
-//            initParam(event);
             start = true;
         } else if (MouseEvent.MOUSE_DRAGGED.equals(event.getEventType())) {
             if (start) {
@@ -76,10 +80,7 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
     }
 
     protected void initParam(MouseEvent event) {
-        // 移除之前的截图区域
-        if (group != null) {
-            pane.getChildren().remove(group);
-        }
+        ((WaitRemoveElementsHolder) (pane.getScene().getWindow().getProperties().get(WaitRemoveElementsHolder.class))).clear();
         // 重新绘制整个蒙版
         drawMasking(new Bounds(0, 0, graphicsContext.getCanvas().getWidth(), graphicsContext.getCanvas().getHeight()));
         // 生成一个截图区域
@@ -88,13 +89,11 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
         cutRec.visibleProperty().setValue(false);
 
         // 每次点击都要清理到原有的工具栏
-//        AnchorPane cutPane = new AnchorPane(cutRec);
         group = new Group(cutRec, toolbar);
         // 添加工具托盘和截图位置
         pane.getChildren().addAll(group);
         // 绑定托盘和截图区域的关系
-        new ExternalComponentBinders(cutRec, toolbar).doRegistry();
-
+        externalComponentBinders = new ExternalComponentBinders(cutRec, toolbar).doRegistry();
         //  在这里，截图区域单属一个容器，工具托盘和截图容器共同存放在一个容器内。
         // 获取鼠标点击位置，该位置用于初始化截图区域的坐标
         startX = event.getSceneX();
@@ -153,24 +152,32 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
             return;
         }
         // 鼠标划选了一个区域
-        if (last.getWidth() > 0 && last.getHeight() > 0) {
+        if (last.getWidth() > 2 && last.getHeight() > 2) {
             // 生成需要处理区域的矩形
-            cutRec.xProperty().set(last.getX());
-            cutRec.yProperty().set(last.getY());
-            cutRec.widthProperty().set(last.getWidth());
-            cutRec.heightProperty().set(last.getHeight());
+            cutRec.xProperty().set(last.getX() + 1);
+            cutRec.yProperty().set(last.getY() + 1);
+            cutRec.widthProperty().set(last.getWidth() - 2);
+            cutRec.heightProperty().set(last.getHeight() - 2);
             cutRec.visibleProperty().setValue(true);
             cutRec.setCursor(Cursor.CROSSHAIR);
             cutRec.setFill(Color.TRANSPARENT);
-            CanvasProperties canvasProperties = new CanvasProperties(graphicsContext, cutRec, configuration, backgroundImage,computerImage);
+            CanvasProperties canvasProperties = new CanvasProperties(graphicsContext, cutRec, configuration, backgroundImage, computerImage);
             // 为截图区域注册事件
-            cutRec.addEventHandler(MouseEvent.ANY, new RoutingSnapshotCanvasEventHandler(canvasProperties, this));
-            cutRec.getScene().getWindow().addEventHandler(KeyEvent.KEY_PRESSED, new SnapshotRegionKeyEventHandler(
+            routingSnapshotCanvasEventHandler = new RoutingSnapshotCanvasEventHandler(canvasProperties, this);
+            cutRec.addEventHandler(MouseEvent.ANY, routingSnapshotCanvasEventHandler);
+
+
+            snapshotRegionKeyEventHandler = new SnapshotRegionKeyEventHandler(
                     canvasProperties.getScreenshotsElementConvertor()
                     , configuration
-                    , canvasProperties));
+                    , canvasProperties);
+
+            Window window = cutRec.getScene().getWindow();
+            window.addEventHandler(KeyEvent.KEY_PRESSED, snapshotRegionKeyEventHandler);
             // 存放截图相关数据
-            pane.getScene().getWindow().getProperties().put(CanvasProperties.class, canvasProperties);
+            window.getProperties().put(CanvasProperties.class, canvasProperties);
         }
+
+        ((WaitRemoveElementsHolder) (pane.getScene().getWindow().getProperties().get(WaitRemoveElementsHolder.class))).add(new EveryScreenshotWaitRemoveElement(group, pane, cutRec, routingSnapshotCanvasEventHandler, snapshotRegionKeyEventHandler, externalComponentBinders, cutRec.getScene().getWindow()));
     }
 }
