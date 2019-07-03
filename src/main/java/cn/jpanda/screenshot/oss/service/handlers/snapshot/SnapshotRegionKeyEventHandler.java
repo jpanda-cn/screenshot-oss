@@ -159,7 +159,6 @@ public class SnapshotRegionKeyEventHandler implements EventHandler<KeyEvent> {
                 canvasProperties.getConfiguration().getUniqueBean(DestroyGroupBeanHolder.class).set(() -> {
                     // 鼠标按下时，清理之前生成的矩形组的事件
                     group.setMouseTransparent(true);
-                    canvasProperties.putGroup(group);
                     currentRectangle.visibleProperty().setValue(false);
                     if (rectangleAddTag2ResizeBinding != null) {
                         rectangleAddTag2ResizeBinding.unbind();
@@ -195,7 +194,6 @@ public class SnapshotRegionKeyEventHandler implements EventHandler<KeyEvent> {
                 canvasProperties.getConfiguration().getUniqueBean(DestroyGroupBeanHolder.class).set(() -> {
                     // 鼠标按下时，清理之前生成的矩形组的事件
                     group.setMouseTransparent(true);
-                    canvasProperties.putGroup(group);
                     dragRec.visibleProperty().setValue(false);
                 });
             }

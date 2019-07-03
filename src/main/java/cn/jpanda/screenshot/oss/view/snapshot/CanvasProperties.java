@@ -54,15 +54,11 @@ public class CanvasProperties {
     /**
      * 存放所有的子节点
      */
-    private List<Group> allGroupNodes = new ArrayList<>();
 
     private ScreenshotsElementsHolder screenshotsElementsHolder = new ScreenshotsElementsHolder();
 
     private ScreenshotsElementConvertor screenshotsElementConvertor = new DefaultScreenshotsElementConvertor(screenshotsElementsHolder);
 
-    public void putGroup(Group group) {
-        allGroupNodes.add(group);
-    }
 
     public List<Node> listGroups() {
         return screenshotsElementsHolder.listEffective().stream().map(ScreenshotsElements::getTopNode).collect(Collectors.toList());

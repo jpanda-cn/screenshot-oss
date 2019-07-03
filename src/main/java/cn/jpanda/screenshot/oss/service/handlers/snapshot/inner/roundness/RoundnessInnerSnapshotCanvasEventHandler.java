@@ -100,7 +100,6 @@ public class RoundnessInnerSnapshotCanvasEventHandler extends InnerSnapshotCanva
         // 圆形转矩形
         dragRectangleEventHandler = new DragRectangleEventHandler(outRectangle, rectangle, null);
         outRectangle.addEventFilter(MouseEvent.ANY, dragRectangleEventHandler);
-        canvasProperties.putGroup(ellipseGroup);
         // 移除矩形内部事件
         // 为圆形添加事件，该事件确保在鼠标移动到圆形边界时，展示移动样式的鼠标，如果此时拖动，则移动该圆形的位置
     }

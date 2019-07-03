@@ -83,7 +83,6 @@ public class PathPenInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasE
         canvasProperties.getConfiguration().getUniqueBean(DestroyGroupBeanHolder.class).set(() -> {
             if (group != null) {
                 group.setMouseTransparent(true);
-                canvasProperties.putGroup(group);
             }
             if (path != null) {
                 path.strokeProperty().unbind();

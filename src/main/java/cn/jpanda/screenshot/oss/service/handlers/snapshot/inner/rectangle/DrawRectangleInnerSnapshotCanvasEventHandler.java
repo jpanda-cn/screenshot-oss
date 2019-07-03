@@ -117,7 +117,6 @@ public class DrawRectangleInnerSnapshotCanvasEventHandler extends InnerSnapshotC
         canvasProperties.getConfiguration().getUniqueBean(DestroyGroupBeanHolder.class).set(() -> {
             // 鼠标按下时，清理之前生成的矩形组的事件
             if (rectangleGroup != null) {
-                canvasProperties.putGroup(rectangleGroup);
                 rectangleGroup.setMouseTransparent(true);
                 if (dragRectangle != null) {
                     dragRectangle.visibleProperty().setValue(false);

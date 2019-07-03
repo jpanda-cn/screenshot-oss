@@ -1,5 +1,8 @@
 package cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.mosaic;
 
+import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
+import cn.jpanda.screenshot.oss.core.shotkey.DefaultGroupScreenshotsElements;
+import cn.jpanda.screenshot.oss.core.shotkey.MosaicScreenshotsElements;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import cn.jpanda.screenshot.oss.view.tray.toolkits.CutInnerType;
@@ -91,6 +94,7 @@ public class DotMatrixMosaicInnerSnapshotCanvasEventHandler extends MosaicInnerS
         // 处理
         Bounds bounds = path.getLayoutBounds();
         updateColor((int) ((int) bounds.getMinX() - rectangle.getX()), (int) ((int) bounds.getMinY() - rectangle.getY()), (int) ((int) bounds.getMaxX() - rectangle.getX()), (int) ((int) bounds.getMaxY() - rectangle.getY()));
+        canvasProperties.getScreenshotsElementsHolder().putEffectiveElement(new MosaicScreenshotsElements(group,  canvasProperties,path,rectangle,mosaicRegionWidth));
         path = new Path();
         group.getChildren().add(path);
         path.visibleProperty().set(false);
@@ -162,5 +166,13 @@ public class DotMatrixMosaicInnerSnapshotCanvasEventHandler extends MosaicInnerS
         return result;
     }
 
+    @Override
+    protected void clear() {
+        canvasProperties.getConfiguration().getUniqueBean(DestroyGroupBeanHolder.class).set(() -> {
+            if (group != null) {
+                group.setMouseTransparent(true);
+            }
+        });
 
+    }
 }

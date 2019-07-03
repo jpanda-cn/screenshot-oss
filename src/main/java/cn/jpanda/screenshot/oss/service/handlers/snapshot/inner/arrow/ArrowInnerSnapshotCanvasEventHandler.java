@@ -78,7 +78,6 @@ public class ArrowInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEve
         canvasProperties.getConfiguration().getUniqueBean(DestroyGroupBeanHolder.class).set(() -> {
             if (group != null) {
                 group.setMouseTransparent(true);
-                canvasProperties.putGroup(group);
             }
         });
     }

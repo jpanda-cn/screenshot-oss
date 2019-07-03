@@ -7,8 +7,8 @@ import javafx.scene.Node;
 import javafx.scene.shape.Rectangle;
 
 public class DefaultGroupScreenshotsElements implements ScreenshotsElements {
-    private Group group;
-    private CanvasProperties canvasProperties;
+    protected Group group;
+    protected CanvasProperties canvasProperties;
 
     public DefaultGroupScreenshotsElements(Group group, CanvasProperties canvasProperties) {
         this.group = group;

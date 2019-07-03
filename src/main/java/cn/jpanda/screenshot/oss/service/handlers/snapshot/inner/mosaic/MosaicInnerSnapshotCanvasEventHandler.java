@@ -51,7 +51,6 @@ public class MosaicInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEv
         path.getElements().add(new MoveTo(x, y));
         group = new Group(path);
         canvasProperties.getCutPane().getChildren().add(group);
-        canvasProperties.getScreenshotsElementsHolder().putEffectiveElement(new DefaultGroupScreenshotsElements(group, canvasProperties));
     }
 
 
@@ -64,7 +63,6 @@ public class MosaicInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEv
         canvasProperties.getConfiguration().getUniqueBean(DestroyGroupBeanHolder.class).set(() -> {
             if (group != null) {
                 group.setMouseTransparent(true);
-                canvasProperties.putGroup(group);
             }
         });
     }

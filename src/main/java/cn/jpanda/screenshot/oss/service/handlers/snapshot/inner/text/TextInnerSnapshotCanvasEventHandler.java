@@ -79,7 +79,6 @@ public class TextInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEven
             // 鼠标按下时，清理之前生成的矩形组的事件
             if (group != null) {
                 group.setMouseTransparent(true);
-                canvasProperties.putGroup(group);
             }
             // 移除绑定关系
             if (text != null) {
