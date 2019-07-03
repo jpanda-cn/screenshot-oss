@@ -165,14 +165,4 @@ public class DotMatrixMosaicInnerSnapshotCanvasEventHandler extends MosaicInnerS
         }
         return result;
     }
-
-    @Override
-    protected void clear() {
-        canvasProperties.getConfiguration().getUniqueBean(DestroyGroupBeanHolder.class).set(() -> {
-            if (group != null) {
-                group.setMouseTransparent(true);
-            }
-        });
-
-    }
 }

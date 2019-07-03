@@ -4,6 +4,7 @@ import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.Rectangle;
@@ -21,6 +22,11 @@ public class MosaicScreenshotsElements extends DefaultGroupScreenshotsElements {
         this.path = path;
         this.rectangle = rectangle;
         this.mosaicRegionWidth = mosaicRegionWidth;
+    }
+
+    @Override
+    public Node getTopNode() {
+        return path;
     }
 
     @Override

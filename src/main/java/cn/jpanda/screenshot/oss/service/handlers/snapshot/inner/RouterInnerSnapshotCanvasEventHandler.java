@@ -5,7 +5,6 @@ import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.arrow.ArrowInner
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.drag.LimitDragInnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.mosaic.DotMatrixMosaicInnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.mosaic.MosaicInnerSnapshotCanvasEventHandler;
-import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.mosaic.TypicalMosaicInnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.pen.PathPenInnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.rectangle.DrawRectangleInnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.roundness.RoundnessInnerSnapshotCanvasEventHandler;
