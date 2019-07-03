@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * 不完善
  * 典型的马赛克截图实现
  * 鼠标的xy坐标向外扩展{@link #mosaicRadius}构成一个mosaic
  * 画笔的宽度决定x、y轴上有几个mosaic对象

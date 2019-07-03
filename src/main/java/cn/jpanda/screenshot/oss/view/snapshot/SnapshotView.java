@@ -41,7 +41,6 @@ public class SnapshotView implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        ScreenCapture screenCapture = configuration.getUniqueBean(ScreenCapture.class);
         BufferedImage image = getDesktopSnapshot();
         // 一个用于计算，一个用于绘制，比较占内存
         WritableImage writableImage = new WritableImage(image.getWidth(), image.getHeight());

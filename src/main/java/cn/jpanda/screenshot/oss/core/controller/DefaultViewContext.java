@@ -56,9 +56,7 @@ public class DefaultViewContext implements ViewContext {
     @Override
     @SneakyThrows
     public Scene getScene(Class<? extends Initializable> clazz, boolean isNew, boolean override) {
-//        if (1==1){
-//            return loadScene(clazz);
-//        }
+
         String key = generatorViewKey(clazz);
 
         if (isNew) {

@@ -35,8 +35,7 @@ public class DotMatrixMosaicInnerSnapshotCanvasEventHandler extends MosaicInnerS
 
     protected WritableImage computerImage;
 
-    Image image = new Image("/images/cursor/mosaic.png", mosaicRegionWidth, mosaicRegionWidth, true, false);
-    private ImageCursor cursor = new ImageCursor(image, image.getWidth() / 2, image.getHeight() / 2);
+    private Map<Integer, ImageCursor> cursorMap = new HashMap<>(3);
 
     public DotMatrixMosaicInnerSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler) {
         super(canvasProperties, canvasDrawEventHandler);
@@ -47,12 +46,26 @@ public class DotMatrixMosaicInnerSnapshotCanvasEventHandler extends MosaicInnerS
     @Override
     protected void move(MouseEvent event) {
         // 使用自定义鼠标
-        rectangle.setCursor(cursor);
+        rectangle.setCursor(getImageCursor());
     }
 
     @Override
     protected void press(MouseEvent event) {
         super.press(event);
+        // 确定马赛克大小
+        updateMosaicRegionWidth();
+    }
+
+    private ImageCursor getImageCursor() {
+        int width = updateMosaicRegionWidth();
+        if (!cursorMap.containsKey(width)) {
+            Image image = new Image("/images/cursor/mosaic.png", width, width, true, false);
+            cursorMap.putIfAbsent(width, new ImageCursor(image, image.getWidth() / 2, image.getHeight() / 2));
+        }
+        return cursorMap.get(width);
+    }
+
+    private int updateMosaicRegionWidth() {
         // 确定马赛克大小
         TrayConfig trayConfig = canvasProperties.getTrayConfig(CutInnerType.MOSAIC);
         int ratio = trayConfig.getStroke().intValue();
@@ -63,6 +76,7 @@ public class DotMatrixMosaicInnerSnapshotCanvasEventHandler extends MosaicInnerS
             ratio = 4;
         }
         mosaicRegionWidth = mosaicRegionRadius * 2 * ratio + 1;
+        return mosaicRegionWidth;
     }
 
     @Override

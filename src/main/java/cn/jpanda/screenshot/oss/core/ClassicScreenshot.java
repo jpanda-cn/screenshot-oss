@@ -77,7 +77,6 @@ public class ClassicScreenshot implements Snapshot {
         GlobalConfigPersistence globalConfigPersistence = configuration.getPersistence(GlobalConfigPersistence.class);
         if (globalConfigPersistence.isHideIndexScreen()) {
             Stage stage = configuration.getViewContext().getStage();
-
             Platform.runLater(() -> {
                 stage.opacityProperty().set(0);
                 stage.hide();
@@ -94,9 +93,11 @@ public class ClassicScreenshot implements Snapshot {
         // 注意顺序
         CanvasProperties canvasProperties = ((CanvasProperties) stage.getProperties().get(CanvasProperties.class));
 
-        canvasProperties.getConfiguration().getUniqueBean(DestroyGroupBeanHolder.class).destroy();
+        if (canvasProperties != null) {
+            canvasProperties.getConfiguration().getUniqueBean(DestroyGroupBeanHolder.class).destroy();
+            canvasProperties.getScreenshotsElementConvertor().clear();
+        }
 
-        canvasProperties.getScreenshotsElementConvertor().clear();
         ((WaitRemoveElementsHolder) (stage.getProperties().get(WaitRemoveElementsHolder.class))).clear();
         stage.getProperties().clear();
         Stage defaultStage = configuration.getViewContext().getStage();
