@@ -158,7 +158,11 @@
                         <installdirChooser>true</installdirChooser>
                     </bundleArguments>
                     <jvmArgs>
-                        <arg>-Xms200m -Xmx200m -Xmn40m -XX:+UseParallelGC -XX:MaxTenuringThreshold=0</arg>
+                        <arg>-Xms200m</arg>
+                        <arg>-Xmx200m</arg>
+                        <arg>-Xmn40m</arg>
+                        <arg>-XX:+UseParallelGC</arg>
+                        <arg>-XX:MaxTenuringThreshold=0</arg>
                     </jvmArgs>
                     <vendor>jpanda.cn</vendor>
                     <!-- 获取所有权限 -->
