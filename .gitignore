@@ -108,3 +108,4 @@ rebel.xml
 out/*
 bootstrap.properties
 screenshot4oss.properties
+*.log

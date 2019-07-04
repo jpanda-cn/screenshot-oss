@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Data
@@ -54,7 +55,6 @@ public class CanvasProperties {
     /**
      * 存放所有的子节点
      */
-
     private ScreenshotsElementsHolder screenshotsElementsHolder = new ScreenshotsElementsHolder();
 
     private ScreenshotsElementConvertor screenshotsElementConvertor = new DefaultScreenshotsElementConvertor(screenshotsElementsHolder);

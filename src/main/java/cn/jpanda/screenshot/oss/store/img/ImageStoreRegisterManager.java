@@ -43,9 +43,9 @@ public class ImageStoreRegisterManager {
     public void registry(ImgStore imgStore, ImageStore imageStore) {
         String name = imgStore.name();
         ImageType type = imgStore.type();
-        log.debug("registry new imageStore named:%s, handle type is %s.", name, type);
+        log.debug("registry new imageStore named:{0}, handle type is {1}.", name, type);
         if (nameMap.keySet().contains(name)) {
-            log.err("find two beans with the same name :%s", name);
+            log.err("find two beans with the same name :{0}", name);
             return;
         }
         nameMap.put(name, imageStore);

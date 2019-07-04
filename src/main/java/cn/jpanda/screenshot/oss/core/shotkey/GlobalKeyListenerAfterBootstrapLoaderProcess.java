@@ -30,8 +30,6 @@ public class GlobalKeyListenerAfterBootstrapLoaderProcess implements AfterBootst
     @Override
     @SneakyThrows
     public void after() {
-        LogManager.getLogManager().reset();
-        Logger.getGlobal().setLevel(Level.OFF);
         DaemonGlobalScreen.registerNativeHook();
         Set<KeyCode> codes = new ConcurrentSkipListSet<>();
         DaemonGlobalScreen.addNativeKeyListener(new NativeKeyListener() {

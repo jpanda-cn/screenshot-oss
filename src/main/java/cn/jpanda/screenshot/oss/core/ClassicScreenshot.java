@@ -34,12 +34,12 @@ public class ClassicScreenshot implements Snapshot {
             Platform.runLater(() -> {
                 configuration.getCutting().get().toFront();
             });
-            log.debug("is cutting ...");
+            log.info("is cutting ...");
             return;
         }
         // 判断是否已经初始化完成，决定是否可以启用
         if (!configuration.isStarted()) {
-            log.debug("The application has not started yet.");
+            log.info("The application has not started yet.");
             return;
         }
         beforeCut();

@@ -3,21 +3,26 @@ package cn.jpanda.screenshot.oss.core;
 import cn.jpanda.screenshot.oss.common.utils.JarUtils;
 import cn.jpanda.screenshot.oss.common.utils.ReflectionUtils;
 import cn.jpanda.screenshot.oss.core.annotations.Order;
-import cn.jpanda.screenshot.oss.core.log.*;
-import cn.jpanda.screenshot.oss.core.scan.DefaultClassScan;
+import cn.jpanda.screenshot.oss.core.log.Log;
+import cn.jpanda.screenshot.oss.core.log.LogFactory;
+import cn.jpanda.screenshot.oss.core.log.LogHolder;
+import cn.jpanda.screenshot.oss.core.log.logging.LoggingFactory;
 import cn.jpanda.screenshot.oss.core.persistence.strategy.DataPersistenceStrategy;
 import cn.jpanda.screenshot.oss.core.persistence.strategy.StandardPropertiesDataPersistenceStrategy;
 import cn.jpanda.screenshot.oss.core.persistence.visitor.CachedPropertiesVisitor;
 import cn.jpanda.screenshot.oss.core.persistence.visitor.DefaultPropertiesVisitor;
 import cn.jpanda.screenshot.oss.core.scan.ClassScan;
+import cn.jpanda.screenshot.oss.core.scan.DefaultClassScan;
 import cn.jpanda.screenshot.oss.core.scan.filters.ComponentAnnotationClassScanFilter;
 import cn.jpanda.screenshot.oss.core.toolkit.BeanInstance;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
 
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.LogManager;
 import java.util.stream.Collectors;
 
 /**
@@ -78,14 +83,15 @@ public abstract class BootstrapLoader {
     /**
      * 加载日志实例
      */
+    @SneakyThrows
     protected void initLogInstance() {
-        DefaultOutLogConfig defaultOutLogConfig = new DefaultOutLogConfig(Loglevel.TRACE);
-        LogFactory logFactory = new DefaultOutLogFactory(defaultOutLogConfig);
-        log = logFactory.getLog(getClass());
-
-        log.debug("Use log instance named:%s", logFactory.getClass().getSimpleName());
+        LogManager logManager = LogManager.getLogManager();
+        logManager.readConfiguration(getClass().getClassLoader().getResourceAsStream("logging.properties"));
+        LogFactory logFactory = new LoggingFactory();
         configuration.setLogFactory(logFactory);
         LogHolder.getInstance().initLogFactory(logFactory);
+        log = logFactory.getLog(getClass());
+        log.info("Use log instance named:{0}", logFactory.getClass().getCanonicalName());
     }
 
     /**
@@ -94,7 +100,7 @@ public abstract class BootstrapLoader {
     protected void configWorkParams() {
 
         String currentPath = Paths.get(JarUtils.getCurrentJarDirectory()).toFile().getAbsolutePath();
-        log.debug("Current working director is %s.", currentPath);
+        log.info("Current working director is {0}.", currentPath);
         configuration.setWorkPath(currentPath);
     }
 

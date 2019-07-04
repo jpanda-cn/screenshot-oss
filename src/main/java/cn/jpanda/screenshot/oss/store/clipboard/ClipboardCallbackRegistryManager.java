@@ -38,9 +38,9 @@ public class ClipboardCallbackRegistryManager {
 
         String name = clipType.name();
         ClipboardType type = clipType.type();
-        log.debug("registry new clipboardCallback named:%s, handle type is %s.", name, type);
+        log.debug("registry new clipboardCallback named:{0}, handle type is {1}.", name, type);
         if (nameMap.keySet().contains(name)) {
-            log.err("find two beans with the same name :%s", name);
+            log.err("find two beans with the same name :{0}", name);
             return;
         }
         nameMap.put(name, clipboardCallback);

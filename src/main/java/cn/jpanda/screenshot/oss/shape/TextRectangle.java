@@ -198,11 +198,11 @@ public class TextRectangle extends StackPane {
         Optional<String> longContent = Stream.of(text.split(String.valueOf(ENTER_CHAR))).max(Comparator.comparingDouble(this::computerStrWidth));
         log.trace(textArea.getPadding().toString());
         // 更新文本内容
-        log.trace("text:%s", text);
+        log.trace("text:{0}", text);
         textArea.textProperty().setValue(text);
 
         // 更新高度
-        log.trace("rowCount:%d", rowCount);
+        log.trace("rowCount:{0}", rowCount);
         textArea.prefRowCountProperty().set(rowCount);
         double height = computerStrHeight(rowCount);
         textArea.minHeightProperty().setValue(height);
@@ -212,7 +212,7 @@ public class TextRectangle extends StackPane {
             double width = computerStrWidth(longContent.get());
             textArea.prefWidthProperty().set(width + 5);
             textArea.minWidthProperty().set(textArea.prefWidthProperty().get());
-            log.trace("width:%f", textArea.prefWidthProperty().getValue());
+            log.trace("width:{0}", textArea.prefWidthProperty().getValue());
         }
     }
 

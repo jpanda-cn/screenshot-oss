@@ -24,7 +24,7 @@ public class ValueInterceptorBeanRegistry implements BeanRegistry {
             ValueInterceptor o = beanInstance.instance(c);
             // 注册该拦截器
             configuration.registryInterceptor(o);
-            log.info("registry new interceptor named : %s", c.getSimpleName());
+            log.info("registry new interceptor named : {0}", c.getSimpleName());
 
         }
     }
