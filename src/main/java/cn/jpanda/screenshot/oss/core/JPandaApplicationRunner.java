@@ -3,7 +3,7 @@ package cn.jpanda.screenshot.oss.core;
 import cn.jpanda.screenshot.oss.core.controller.ControllerAnnotationSameNameFXMLSearch;
 import cn.jpanda.screenshot.oss.core.controller.DefaultViewContext;
 import cn.jpanda.screenshot.oss.core.controller.ViewContext;
-import cn.jpanda.screenshot.oss.core.scan.AfterBootstrapLoaderProcess;
+import cn.jpanda.screenshot.oss.core.log.Log;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
 
@@ -14,7 +14,9 @@ import javafx.stage.Stage;
  * 3.加载引导配置文件
  */
 public class JPandaApplicationRunner {
+    private Log log;
     protected ViewContext viewContext;
+
     protected BootstrapLoader bootstrapLoader = new DefaultBootstrapLoader();
 
     /**
@@ -26,8 +28,12 @@ public class JPandaApplicationRunner {
     public ViewContext run(Stage stage, Class startClass, String... args) {
         // 引导程序启动,此时已经完成了程序的引导状态，可以交付使用了
         Configuration configuration = bootstrapLoader.load(startClass);
+        log = configuration.getLogFactory().getLog(getClass());
         // 执行引导程序后置操作
-        configuration.getAfterBootstrapLoaderProcesses().forEach(AfterBootstrapLoaderProcess::after);
+        configuration.getAfterBootstrapLoaderProcesses().forEach((b) -> {
+            log.info("start AfterBootstrapLoaderProcesses Named:{0}",b.getClass().getCanonicalName());
+            b.after();
+        });
         // 加载视图上下文，准备处理视图问题
         viewContext = new DefaultViewContext(stage, new ControllerAnnotationSameNameFXMLSearch(FXMLLoader.getDefaultClassLoader()), configuration);
         configuration.setViewContext(viewContext);

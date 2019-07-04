@@ -89,6 +89,7 @@ public abstract class BootstrapLoader {
         logManager.readConfiguration(getClass().getClassLoader().getResourceAsStream("logging.properties"));
         LogFactory logFactory = new LoggingFactory();
         configuration.setLogFactory(logFactory);
+        configuration.setLog(logFactory.getLog(configuration.getClass()));
         LogHolder.getInstance().initLogFactory(logFactory);
         log = logFactory.getLog(getClass());
         log.info("Use log instance named:{0}", logFactory.getClass().getCanonicalName());

@@ -3,6 +3,7 @@ package cn.jpanda.screenshot.oss.core;
 import cn.jpanda.screenshot.oss.common.utils.OrderComparator;
 import cn.jpanda.screenshot.oss.core.controller.ViewContext;
 import cn.jpanda.screenshot.oss.core.interceptor.value.ValueInterceptor;
+import cn.jpanda.screenshot.oss.core.log.Log;
 import cn.jpanda.screenshot.oss.core.log.LogFactory;
 import cn.jpanda.screenshot.oss.core.persistence.Persistence;
 import cn.jpanda.screenshot.oss.core.persistence.strategy.DataPersistenceStrategy;
@@ -24,6 +25,8 @@ import java.util.stream.Collectors;
  * Configuration对象，是一个比较重的对象，他在当前工程中处于核心的地位
  */
 public class Configuration {
+    @Setter
+    private Log log;
     /**
      * 默认使用的引导配置文件的名称
      */
@@ -166,6 +169,7 @@ public class Configuration {
      * @param value 拦截器对象
      */
     public void registryAfterBootstrapLoaderProcesses(AfterBootstrapLoaderProcess value) {
+        log.info("registry new after bootstrap loader processes :{0}",value.getClass().getCanonicalName());
         afterBootstrapLoaderProcesses.add(value);
         afterBootstrapLoaderProcesses = afterBootstrapLoaderProcesses.stream().sorted((pre, nex) -> new OrderComparator().compare(pre.getClass(), nex.getClass())).collect(Collectors.toList());
     }

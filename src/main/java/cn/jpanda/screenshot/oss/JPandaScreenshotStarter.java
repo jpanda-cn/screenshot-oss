@@ -4,6 +4,7 @@ import cn.jpanda.screenshot.oss.core.JPandaApplicationRunner;
 import cn.jpanda.screenshot.oss.core.controller.ViewContext;
 import cn.jpanda.screenshot.oss.core.i18n.I18nConstants;
 import cn.jpanda.screenshot.oss.core.i18n.I18nResource;
+import cn.jpanda.screenshot.oss.core.log.Log;
 import cn.jpanda.screenshot.oss.core.persistence.BootstrapPersistence;
 import cn.jpanda.screenshot.oss.view.main.IndexCutView;
 import cn.jpanda.screenshot.oss.view.password.enter.EnterPassword;
@@ -18,24 +19,30 @@ import javafx.stage.StageStyle;
 
 public class JPandaScreenshotStarter extends Application {
     private ViewContext viewContext;
+    private Log log;
 
     @Override
     public void start(Stage primaryStage) {
         viewContext = new JPandaApplicationRunner().run(primaryStage, getClass());
+        log = viewContext.getConfiguration().getLogFactory().getLog(getClass());
         // 执行业务逻辑
         // 加载配置全局配置文件
         load();
     }
 
     private void load() {
+        log.debug("load bootstrap config...");
         BootstrapPersistence bootstrapPersistence = viewContext.getConfiguration().getPersistence(BootstrapPersistence.class);
         bootstrapPersistence.updateUseCount();
         viewContext.getConfiguration().storePersistence(bootstrapPersistence);
+
         // 校验是否为第一次使用该系统
         if (bootstrapPersistence.getUseCount() == 1) {
+            log.debug("For the first time, initialize the password");
             //  展示初始化密码页面
             showInitPassword();
         } else if (bootstrapPersistence.isUsePassword()) {
+            log.debug("show password");
             // 校验是否需要展示密码
             showEnterPassword();
         }
@@ -45,6 +52,7 @@ public class JPandaScreenshotStarter extends Application {
     }
 
     protected void doStart() {
+        log.debug("load index cut page");
         Stage stage = viewContext.getStage();
         stage.setTitle(viewContext.getConfiguration().getUniqueBean(I18nResource.class).get(I18nConstants.titleIndex));
         stage.setResizable(false);
