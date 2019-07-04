@@ -7,7 +7,9 @@ import cn.jpanda.screenshot.oss.common.utils.MathUtils;
 import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.ScreenshotsProcess;
+import cn.jpanda.screenshot.oss.core.capture.ScreenCapture;
 import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
+import cn.jpanda.screenshot.oss.core.log.Log;
 import cn.jpanda.screenshot.oss.core.mouse.GlobalMousePoint;
 import cn.jpanda.screenshot.oss.core.shotkey.DefaultGroupScreenshotsElements;
 import cn.jpanda.screenshot.oss.core.shotkey.ScreenshotsElementConvertor;
@@ -29,6 +31,7 @@ import javafx.stage.Stage;
 import java.awt.*;
 
 public class SnapshotRegionKeyEventHandler implements EventHandler<KeyEvent> {
+    private Log log;
     private ScreenshotsElementConvertor screenshotsElementConvertor;
     private Configuration configuration;
     private CanvasProperties canvasProperties;
@@ -37,6 +40,7 @@ public class SnapshotRegionKeyEventHandler implements EventHandler<KeyEvent> {
         this.screenshotsElementConvertor = screenshotsElementConvertor;
         this.configuration = configuration;
         this.canvasProperties = canvasProperties;
+        this.log = configuration.getLogFactory().getLog(getClass());
     }
 
 
@@ -107,9 +111,14 @@ public class SnapshotRegionKeyEventHandler implements EventHandler<KeyEvent> {
     }
 
     private void paste() {
+        log.info("will paste ...");
         Rectangle rectangle = canvasProperties.getCutRectangle();
         GlobalMousePoint globalMousePoint = configuration.getUniqueBean(GlobalMousePoint.class);
         Point point = globalMousePoint.pointSimpleObjectProperty.get();
+        // 处理坐标，将坐标转换为矩形
+        ScreenCapture screenCapture = configuration.getUniqueBean(ScreenCapture.class);
+        point = new Point(point.x - screenCapture.minx(), point.y - screenCapture.miny());
+        log.info("The mouse point:{0}", point);
         if (rectangle.contains(point.getX(), point.getY())) {
             Clipboard clipboard = Clipboard.getSystemClipboard();
             Image image = clipboard.getImage();
