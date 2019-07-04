@@ -42,8 +42,8 @@ public class ClassicScreenshot implements Snapshot {
             log.info("The application has not started yet.");
             return;
         }
-        beforeCut();
         Platform.runLater(() -> {
+            beforeCut();
             // 调用截图操作
             // 执行截图操作
             // 处理ICON
@@ -77,10 +77,7 @@ public class ClassicScreenshot implements Snapshot {
         GlobalConfigPersistence globalConfigPersistence = configuration.getPersistence(GlobalConfigPersistence.class);
         if (globalConfigPersistence.isHideIndexScreen()) {
             Stage stage = configuration.getViewContext().getStage();
-            Platform.runLater(() -> {
-                stage.opacityProperty().set(0);
-                stage.hide();
-            });
+            stage.opacityProperty().set(0);
         }
     }
 
@@ -101,9 +98,9 @@ public class ClassicScreenshot implements Snapshot {
         ((WaitRemoveElementsHolder) (stage.getProperties().get(WaitRemoveElementsHolder.class))).clear();
         stage.getProperties().clear();
         Stage defaultStage = configuration.getViewContext().getStage();
-        if (defaultStage.showingProperty().not().get()) {
+        if (configuration.getPersistence(GlobalConfigPersistence.class).isHideIndexScreen()) {
             defaultStage.opacityProperty().set(1);
-            defaultStage.show();
         }
+
     }
 }
