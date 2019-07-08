@@ -173,7 +173,7 @@ public class IndexCutView implements Initializable {
         pwd.getItems().addAll(bootstrapPersistence.isUsePassword() ? new MenuItem[]{stopUsePwd, cpwd} : new MenuItem[]{usePwd});
         options.getItems().add(general);
         options.getItems().add(pwd);
-        MenuItem failList = new MenuItem("失败列表");
+        MenuItem failList = new MenuItem("失败任务列表");
         options.getItems().add(failList);
         failList.setOnAction(event -> {
             // 展示失败列表设置页面

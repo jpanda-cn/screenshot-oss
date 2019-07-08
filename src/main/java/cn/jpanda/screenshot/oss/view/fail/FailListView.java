@@ -6,6 +6,7 @@ import cn.jpanda.screenshot.oss.store.ImageStoreResult;
 import cn.jpanda.screenshot.oss.store.ImageStoreResultHandler;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -16,6 +17,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -35,6 +37,7 @@ public class FailListView implements Initializable {
     public TableColumn<ImageStoreResult, Button> image;
     public TableColumn<ImageStoreResult, String> store;
     public TableColumn<ImageStoreResult, TextArea> path;
+    public TableColumn<ImageStoreResult, VBox> operation;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -66,6 +69,29 @@ public class FailListView implements Initializable {
         });
         path.sortableProperty().set(false);
         path.editableProperty().set(true);
+
+        // 添加查看异常和删除的操作
+        operation.setCellValueFactory((c) -> {
+            VBox box = new VBox();
+            Button show = new Button("查看异常信息");
+            Button delete = new Button("删除");
+            box.getChildren().addAll(show, delete);
+            show.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+                    Exception e = c.getValue().getException().get();
+
+                }
+            });
+            delete.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+
+                }
+            });
+            return new SimpleObjectProperty<>(box);
+        });
+
         table.setItems(configuration.getUniqueBean(ImageStoreResultHandler.class).getImageStoreResults());
         table.editableProperty().set(true);
     }
