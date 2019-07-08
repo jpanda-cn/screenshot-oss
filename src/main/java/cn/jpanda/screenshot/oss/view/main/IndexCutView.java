@@ -9,6 +9,7 @@ import cn.jpanda.screenshot.oss.core.persistence.PersistenceBeanCatalogManagemen
 import cn.jpanda.screenshot.oss.core.shotkey.HotKey2CutPersistence;
 import cn.jpanda.screenshot.oss.core.shotkey.SettingsHotKeyPropertyHolder;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
+import cn.jpanda.screenshot.oss.view.fail.FailListView;
 import cn.jpanda.screenshot.oss.view.password.modify.ModifyPassword;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -172,8 +173,22 @@ public class IndexCutView implements Initializable {
         pwd.getItems().addAll(bootstrapPersistence.isUsePassword() ? new MenuItem[]{stopUsePwd, cpwd} : new MenuItem[]{usePwd});
         options.getItems().add(general);
         options.getItems().add(pwd);
-    }
+        MenuItem failList = new MenuItem("失败列表");
+        options.getItems().add(failList);
+        failList.setOnAction(event -> {
+            // 展示失败列表设置页面
+            toFailList();
+        });
 
+    }
+    public void  toFailList(){
+        Stage stage = configuration.getViewContext().newStage();
+        stage.initOwner(configuration.getViewContext().getStage());
+        stage.initStyle(StageStyle.UTILITY);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setScene(configuration.getViewContext().getScene(FailListView.class, true, false));
+        stage.showAndWait();
+    }
 
     public void doCut() {
         configuration.getUniqueBean(Snapshot.class).cut();

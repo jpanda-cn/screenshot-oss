@@ -6,6 +6,9 @@ import cn.jpanda.screenshot.oss.core.annotations.Controller;
 import cn.jpanda.screenshot.oss.core.controller.ViewContext;
 import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
+import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallback;
+import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallbackRegistryManager;
+import cn.jpanda.screenshot.oss.store.clipboard.instances.ImageClipboardCallback;
 import cn.jpanda.screenshot.oss.view.main.SettingsView;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import cn.jpanda.screenshot.oss.view.tray.subs.TrayColorView;
@@ -18,16 +21,18 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
+import java.awt.image.BufferedImage;
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 /**
@@ -38,6 +43,7 @@ public class CanvasCutTrayView implements Initializable {
 
     public Button settings;
     public Button mosaic;
+    public Button save;
     private Configuration configuration;
 
     public CanvasCutTrayView(Configuration configuration) {
@@ -191,26 +197,58 @@ public class CanvasCutTrayView implements Initializable {
         ((Stage) scene.getWindow()).close();
     }
 
-    public void doDone() {
+    public void doSave() {
 
         // 执行销毁操作
         DestroyGroupBeanHolder destroyGroupBeanHolder = configuration.getUniqueBean(DestroyGroupBeanHolder.class);
         destroyGroupBeanHolder.destroy();
 
-        ScreenshotsProcess screenshotsProcess = configuration.getUniqueBean(ScreenshotsProcess.class);
-
         initRectangle();
-        // 获取截图区域的图片交由图片处理器来完成保存图片的操作
-        if (canvasProperties == null) {
-            return;
-        }
         Scene scene = canvasProperties.getCutPane().getScene();
         Rectangle rectangle = canvasProperties.getCutRectangle();
-        try {
-            screenshotsProcess.done(screenshotsProcess.snapshot(scene, rectangle));
-        }finally {
-            Stage stage = ((Stage) scene.getWindow());
-            stage.close();
+        Stage stage = ((Stage) scene.getWindow());
+
+        // 提示用户当前采用保存方式
+        GlobalConfigPersistence globalConfigPersistence = configuration.getPersistence(GlobalConfigPersistence.class);
+        String imageStore = globalConfigPersistence.getImageStore();
+        String clipboard = globalConfigPersistence.getClipboardCallback();
+
+        // 弹窗提示
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("提示");
+        alert.setHeaderText(String.format("本次操作会采用【%s】方式保存图片,并以【%s】形式保存在剪切板内", imageStore, clipboard));
+        alert.setContentText("如需变更保存方式或者剪切板内容，请【取消】之后，点击左侧【设置】按钮");
+        alert.getButtonTypes().clear();
+        alert.getButtonTypes().addAll(new ButtonType("取消", ButtonBar.ButtonData.BACK_PREVIOUS), new ButtonType("保存至云", ButtonBar.ButtonData.OK_DONE));
+        alert.initOwner(stage);
+        alert.initStyle(StageStyle.UTILITY);
+        alert.initModality(Modality.APPLICATION_MODAL);
+        // 调整位置，将其放置在截图框的正中间
+        alert.showingProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                double aw = alert.widthProperty().get();
+                double offsetW = (rectangle.getWidth() - aw) / 2;
+                alert.setX(rectangle.getX() + offsetW);
+                double ah = alert.heightProperty().get();
+                double offsetH = (rectangle.getHeight() - ah) / 2;
+                alert.setY(rectangle.getY() + offsetH);
+            }
+        });
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent()) {
+            if (result.get().getButtonData() == ButtonBar.ButtonData.OK_DONE) {
+                ScreenshotsProcess screenshotsProcess = configuration.getUniqueBean(ScreenshotsProcess.class);
+                // 获取截图区域的图片交由图片处理器来完成保存图片的操作
+                if (canvasProperties == null) {
+                    return;
+                }
+                try {
+                    screenshotsProcess.done(screenshotsProcess.snapshot(scene, rectangle));
+                } finally {
+                    stage.close();
+                }
+            }
         }
 
     }
@@ -232,6 +270,35 @@ public class CanvasCutTrayView implements Initializable {
                 continue;
             }
             bar.getChildren().add(n);
+        }
+
+    }
+
+    public void doDone() {
+        // 获取
+        // 执行销毁操作
+        DestroyGroupBeanHolder destroyGroupBeanHolder = configuration.getUniqueBean(DestroyGroupBeanHolder.class);
+        destroyGroupBeanHolder.destroy();
+
+        ScreenshotsProcess screenshotsProcess = configuration.getUniqueBean(ScreenshotsProcess.class);
+
+        initRectangle();
+        // 获取截图区域的图片交由图片处理器来完成保存图片的操作
+        if (canvasProperties == null) {
+            return;
+        }
+        Scene scene = canvasProperties.getCutPane().getScene();
+        Rectangle rectangle = canvasProperties.getCutRectangle();
+        try {
+            // 获取截图
+            BufferedImage bufferedImage = screenshotsProcess.snapshot(scene, rectangle);
+            // 不执行图片保存操作
+            // 将图片放置剪切板
+            ClipboardCallback clipboardCallback = configuration.getUniqueBean(ClipboardCallbackRegistryManager.class).get(ImageClipboardCallback.NAME);
+            clipboardCallback.callback(bufferedImage, "");
+        } finally {
+            Stage stage = ((Stage) scene.getWindow());
+            stage.close();
         }
 
     }

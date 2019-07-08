@@ -3,20 +3,27 @@ package cn.jpanda.screenshot.oss.store.img.instances.alioss;
 import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.ImgStore;
+import cn.jpanda.screenshot.oss.store.ImageStoreResult;
+import cn.jpanda.screenshot.oss.store.ImageStoreResultHandler;
 import cn.jpanda.screenshot.oss.store.img.AbstractConfigImageStore;
 import cn.jpanda.screenshot.oss.view.image.AliOssFileImageStoreConfig;
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.model.PutObjectResult;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import lombok.SneakyThrows;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.UUID;
 
-@ImgStore(name = "阿里OSS", config = AliOssFileImageStoreConfig.class)
+@ImgStore(name = AliOssImageStore.NAME, config = AliOssFileImageStoreConfig.class)
 public class AliOssImageStore extends AbstractConfigImageStore {
+    public static final String NAME = "阿里OSS";
 
     public AliOssImageStore(Configuration configuration) {
         super(configuration);
@@ -46,7 +53,6 @@ public class AliOssImageStore extends AbstractConfigImageStore {
         );
     }
 
-    @SneakyThrows
     public void upload(BufferedImage image, AliOssPersistence aliOssPersistence, String name) {
 
         OSSClient ossClient = new OSSClient(aliOssPersistence.getEndpoint(), aliOssPersistence.getAccessKeyId(), aliOssPersistence.getAccessKeySecret());
@@ -55,6 +61,15 @@ public class AliOssImageStore extends AbstractConfigImageStore {
             ImageIO.write(image, "png", os);
             PutObjectResult result = ossClient.putObject(aliOssPersistence.getBucket(), name, new ByteArrayInputStream(os.toByteArray()));
 
+        } catch (IOException e) {
+            configuration.getUniqueBean(ImageStoreResultHandler.class).add(ImageStoreResult
+                    .builder()
+                    .image(new SimpleObjectProperty<>(image))
+                    .imageStore(new SimpleStringProperty(NAME))
+                    .path(new SimpleStringProperty(name))
+                    .success(new SimpleBooleanProperty(false))
+                    .exception(new SimpleObjectProperty<>(e))
+                    .build());
         } finally {
             ossClient.shutdown();
         }
@@ -73,7 +88,6 @@ public class AliOssImageStore extends AbstractConfigImageStore {
                 && StringUtils.isNotEmpty(aliOssPersistence.getAccessKeySecret())
                 && StringUtils.isNotEmpty(aliOssPersistence.getAccessUrl());
     }
-
 
 
 }

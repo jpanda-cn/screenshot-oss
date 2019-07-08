@@ -69,7 +69,15 @@
             </ImageView>
         </graphic>
     </Button>
-    <Button fx:id="cancel" layoutX="365.0" layoutY="15.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0"
+    <Button fx:id="save" layoutX="370.0" layoutY="15.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0"
+            onMouseClicked="#doSave">
+        <graphic>
+            <ImageView fitHeight="25.0" fitWidth="25.0">
+                <Image url="@/images/tray/save.png"/>
+            </ImageView>
+        </graphic>
+    </Button>
+    <Button fx:id="cancel" layoutX="415.0" layoutY="15.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0"
             onMouseClicked="#doCancel">
         <graphic>
             <ImageView fitHeight="25.0" fitWidth="25.0">
@@ -77,7 +85,7 @@
             </ImageView>
         </graphic>
     </Button>
-    <Button fx:id="submit" layoutX="410.0" layoutY="15.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0"
+    <Button fx:id="submit" layoutX="460.0" layoutY="15.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0"
             onMouseClicked="#doDone">
         <graphic>
             <ImageView fitHeight="25.0" fitWidth="25.0">

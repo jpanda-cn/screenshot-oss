@@ -5,13 +5,18 @@ import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.ImgStore;
 import cn.jpanda.screenshot.oss.persistences.LocalImageStorePersistence;
+import cn.jpanda.screenshot.oss.store.ImageStoreResult;
+import cn.jpanda.screenshot.oss.store.ImageStoreResultHandler;
 import cn.jpanda.screenshot.oss.store.img.AbstractConfigImageStore;
 import cn.jpanda.screenshot.oss.view.image.LocalFileImageStoreConfig;
-import lombok.SneakyThrows;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.UUID;
 
@@ -49,10 +54,25 @@ public class LocalImageStore extends AbstractConfigImageStore {
         return UUID.randomUUID().toString();
     }
 
-    @SneakyThrows
     protected void save(BufferedImage image, String suffix, String path) {
         // 本地图片存储
-        ImageIO.write(image, suffix, Paths.get(path).toFile());
+        try {
+            File file = Paths.get(path).toFile();
+            if (!file.exists() && file.mkdirs() && file.createNewFile()) {
+                ImageIO.write(image, "PNG", file);
+            } else {
+                throw new RuntimeException(String.format("can not create file named:%s", path));
+            }
+        } catch (IOException e) {
+            configuration.getUniqueBean(ImageStoreResultHandler.class).add(ImageStoreResult
+                    .builder()
+                    .image(new SimpleObjectProperty<>(image))
+                    .imageStore(new SimpleStringProperty(NAME))
+                    .path(new SimpleStringProperty(path))
+                    .success(new SimpleBooleanProperty(false))
+                    .exception(new SimpleObjectProperty<>(e))
+                    .build());
+        }
     }
 
     @Override

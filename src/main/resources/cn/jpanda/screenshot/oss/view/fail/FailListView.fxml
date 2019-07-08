@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane prefHeight="400.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/10.0.1"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.jpanda.screenshot.oss.view.fail.FailListView">
+    <TableView fx:id="table" layoutY="2.0" prefHeight="400.0" prefWidth="400.0">
+        <columns>
+            <TableColumn fx:id="image" prefWidth="100.0" text="图片缩略图"/>
+            <TableColumn fx:id="store" prefWidth="100.0" text="图片存储方式"/>
+            <TableColumn fx:id="path" prefWidth="200" text="图片存储地址"/>
+        </columns>
+    </TableView>
+</AnchorPane>

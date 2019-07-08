@@ -12,8 +12,10 @@ import java.awt.image.BufferedImage;
 /**
  * 将图片放到剪切板
  */
-@ClipType(name = "图片", type = ClipboardType.NOT_NEED)
+@ClipType(name = ImageClipboardCallback.NAME, type = ClipboardType.NOT_NEED)
 public class ImageClipboardCallback implements ClipboardCallback {
+    public static final String NAME = "图片";
+
     @Override
     public void callback(BufferedImage image, String path) {
         Clipboard clipboard = Clipboard.getSystemClipboard();
