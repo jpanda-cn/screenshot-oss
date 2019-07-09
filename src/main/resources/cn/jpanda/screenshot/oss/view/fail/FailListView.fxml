@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
-<AnchorPane prefHeight="400.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/10.0.1"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.jpanda.screenshot.oss.view.fail.FailListView">
-    <TableView fx:id="table" layoutY="2.0" prefHeight="400.0" prefWidth="525.0">
+
+<AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.jpanda.screenshot.oss.view.fail.FailListView">
+    <ImageView fitHeight="130.0" fitWidth="767.0" layoutX="17.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
+        <!--<Image url="/images/logo.png" />-->
+    </ImageView>
+    <TableView fx:id="table" layoutX="11.0" layoutY="146.0" prefHeight="431.0" prefWidth="767.0">
         <columns>
-            <TableColumn fx:id="image" prefWidth="100.0" text="图片缩略图"/>
-            <TableColumn fx:id="store" prefWidth="100.0" text="图片存储方式"/>
-            <TableColumn fx:id="path" prefWidth="168.0" text="图片存储地址"/>
-            <TableColumn fx:id="operation" prefWidth="156.0" text="操作"/>
+            <TableColumn fx:id="image" prefWidth="101.0" text="图片缩略图" />
+            <TableColumn fx:id="store" prefWidth="88.0" text="图片存储方式" />
+            <TableColumn fx:id="path" prefWidth="169.0" text="图片存储地址" />
+            <TableColumn fx:id="exception" prefWidth="311.0" text="错误原因" />
+            <TableColumn fx:id="operation" prefWidth="96.0" text="操作" />
         </columns>
     </TableView>
 </AnchorPane>

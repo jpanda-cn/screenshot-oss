@@ -6,6 +6,7 @@ import cn.jpanda.screenshot.oss.core.annotations.ImgStore;
 import cn.jpanda.screenshot.oss.store.ExceptionWrapper;
 import cn.jpanda.screenshot.oss.store.ImageStoreResult;
 import cn.jpanda.screenshot.oss.store.ImageStoreResultHandler;
+import cn.jpanda.screenshot.oss.store.ImageStoreResultWrapper;
 import cn.jpanda.screenshot.oss.store.img.AbstractConfigImageStore;
 import cn.jpanda.screenshot.oss.view.image.AliOssFileImageStoreConfig;
 import com.aliyun.oss.OSSClient;
@@ -52,6 +53,11 @@ public class AliOssImageStore extends AbstractConfigImageStore {
                 , aliOssPersistence.getAccessUrl()
                 , name
         );
+    }
+
+    @Override
+    public boolean retry(ImageStoreResultWrapper imageStoreResultWrapper) {
+        return false;
     }
 
     public void upload(BufferedImage image, AliOssPersistence aliOssPersistence, String name) {

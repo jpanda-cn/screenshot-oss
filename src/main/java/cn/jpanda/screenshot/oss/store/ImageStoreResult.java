@@ -36,4 +36,9 @@ public class ImageStoreResult {
      * 对应的异常数据
      */
     private SimpleObjectProperty<ExceptionWrapper> exception;
+
+    /**
+     * 异常类型
+     */
+    private ExceptionType exceptionType;
 }

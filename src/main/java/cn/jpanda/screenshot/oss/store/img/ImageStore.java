@@ -1,5 +1,6 @@
 package cn.jpanda.screenshot.oss.store.img;
 
+import cn.jpanda.screenshot.oss.store.ImageStoreResultWrapper;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.WritableImage;
 
@@ -30,6 +31,8 @@ public interface ImageStore {
      * @param image 图片
      */
     String store(BufferedImage image);
+
+    boolean retry(ImageStoreResultWrapper imageStoreResultWrapper);
 
     /**
      * 执行存储图片的操作

@@ -8,6 +8,7 @@ import cn.jpanda.screenshot.oss.persistences.LocalImageStorePersistence;
 import cn.jpanda.screenshot.oss.store.ExceptionWrapper;
 import cn.jpanda.screenshot.oss.store.ImageStoreResult;
 import cn.jpanda.screenshot.oss.store.ImageStoreResultHandler;
+import cn.jpanda.screenshot.oss.store.ImageStoreResultWrapper;
 import cn.jpanda.screenshot.oss.store.img.AbstractConfigImageStore;
 import cn.jpanda.screenshot.oss.view.image.LocalFileImageStoreConfig;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -49,6 +50,11 @@ public class LocalImageStore extends AbstractConfigImageStore {
         // 本地图片存储
         save(image, suffix, path);
         return path;
+    }
+
+    @Override
+    public boolean retry(ImageStoreResultWrapper imageStoreResultWrapper) {
+        return false;
     }
 
     protected String fileNameGenerator() {

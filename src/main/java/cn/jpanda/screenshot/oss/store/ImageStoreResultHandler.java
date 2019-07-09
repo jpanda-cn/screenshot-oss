@@ -14,6 +14,7 @@ import javafx.stage.StageStyle;
 import lombok.Getter;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import net.sf.json.JSONSerializer;
 import net.sf.json.JsonConfig;
 
 import javax.imageio.ImageIO;
@@ -44,6 +45,7 @@ public class ImageStoreResultHandler {
             JSONArray jsonArray = JSONArray.fromObject(json);
             for (int i = 0; i < jsonArray.size(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
+                JsonConfig jsonConfig=new JsonConfig();
                 ImageStoreResultWrapper imageStoreResultWrapper = (ImageStoreResultWrapper) JSONObject.toBean(jsonObject, ImageStoreResultWrapper.class);
                 imageStoreResults.add(imageStoreResultWrapper.toImageStoreResult());
             }

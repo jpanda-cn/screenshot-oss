@@ -1,6 +1,13 @@
 package cn.jpanda.screenshot.oss.store.img;
 
 import cn.jpanda.screenshot.oss.core.Configuration;
+import cn.jpanda.screenshot.oss.store.ExceptionType;
+import cn.jpanda.screenshot.oss.store.ExceptionWrapper;
+import cn.jpanda.screenshot.oss.store.ImageStoreResult;
+import cn.jpanda.screenshot.oss.store.ImageStoreResultHandler;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -9,6 +16,7 @@ import javafx.scene.control.ButtonType;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.awt.image.BufferedImage;
 import java.util.Optional;
 
 public abstract class AbstractConfigImageStore implements ImageStore {
@@ -56,7 +64,17 @@ public abstract class AbstractConfigImageStore implements ImageStore {
         }
         return false;
     }
-
+    protected void addException(BufferedImage image, String path, boolean success, Exception e, ExceptionType exceptionType) {
+        configuration.getUniqueBean(ImageStoreResultHandler.class).add(ImageStoreResult
+                .builder()
+                .image(new SimpleObjectProperty<>(image))
+                .imageStore(new SimpleStringProperty(getName()))
+                .path(new SimpleStringProperty(path))
+                .success(new SimpleBooleanProperty(success))
+                .exception(new SimpleObjectProperty<>(new ExceptionWrapper(e)))
+                .exceptionType(exceptionType)
+                .build());
+    }
     public boolean canUse() {
         return true;
     }

@@ -4,17 +4,15 @@ import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.ImgStore;
 import cn.jpanda.screenshot.oss.core.log.Log;
-import cn.jpanda.screenshot.oss.store.ExceptionWrapper;
-import cn.jpanda.screenshot.oss.store.ImageStoreResult;
-import cn.jpanda.screenshot.oss.store.ImageStoreResultHandler;
+import cn.jpanda.screenshot.oss.store.ExceptionType;
+import cn.jpanda.screenshot.oss.store.ImageStoreResultWrapper;
 import cn.jpanda.screenshot.oss.store.img.AbstractConfigImageStore;
 import cn.jpanda.screenshot.oss.view.image.GitFileImageStoreConfig;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 import lombok.SneakyThrows;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.JGitInternalException;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 import javax.imageio.ImageIO;
@@ -76,56 +74,193 @@ public class GitImageStore extends AbstractConfigImageStore {
     }
 
     private void save(GitPersistence gitPersistence, BufferedImage image, String suffix, String path, String name) {
-        try {
-            UsernamePasswordCredentialsProvider usernamePasswordCredentialsProvider = new UsernamePasswordCredentialsProvider(gitPersistence.getUsername(), gitPersistence.getPassword());
 
-            Git git;
-            if (isCloned(gitPersistence)) {
+        UsernamePasswordCredentialsProvider usernamePasswordCredentialsProvider = new UsernamePasswordCredentialsProvider(gitPersistence.getUsername(), gitPersistence.getPassword());
+
+        Git git = createGit(usernamePasswordCredentialsProvider, gitPersistence, image, suffix, path, name);
+        if (git == null) {
+            return;
+        }
+        if (checkSubDir(usernamePasswordCredentialsProvider, gitPersistence, image, suffix, path, name)
+                && saveLocal(usernamePasswordCredentialsProvider, gitPersistence, image, suffix, path, name)
+                && add2Git(git, usernamePasswordCredentialsProvider, gitPersistence, image, suffix, path, name)
+                && gitPull(git, usernamePasswordCredentialsProvider, gitPersistence, image, suffix, path, name)
+                && gitAdd(git, usernamePasswordCredentialsProvider, gitPersistence, image, suffix, path, name)
+                && gitCommit(git, usernamePasswordCredentialsProvider, gitPersistence, image, suffix, path, name)
+                && gitPush(git, usernamePasswordCredentialsProvider, gitPersistence, image, suffix, path, name)
+
+        ) {
+            return;
+        }
+
+    }
+
+    @Override
+    public boolean retry(ImageStoreResultWrapper imageStoreResultWrapper) {
+        ExceptionType exceptionType = imageStoreResultWrapper.getExceptionType();
+        if (exceptionType instanceof GitExceptionType) {
+            GitPersistence gitPersistence = configuration.getPersistence(GitPersistence.class);
+            UsernamePasswordCredentialsProvider usernamePasswordCredentialsProvider = new UsernamePasswordCredentialsProvider(gitPersistence.getUsername(), gitPersistence.getPassword());
+            BufferedImage bufferedImage = null;
+            try {
+                bufferedImage = ImageIO.read(Paths.get(imageStoreResultWrapper.getPath()).toFile());
+            } catch (IOException e) {
+
+                return false;
+            }
+            String path = imageStoreResultWrapper.getPath();
+            String suffix = path.substring(path.lastIndexOf("."));
+            String name = path.substring(path.lastIndexOf(File.separator));
+            name = name.substring(0, name.length() - suffix.length());
+            Git git = createGit(usernamePasswordCredentialsProvider, gitPersistence, bufferedImage, suffix, path, name);
+            if (git == null) {
+                return false;
+            }
+            if (exceptionType.getLevel() >= GitExceptionType.CANT_CREATE_SUB_DIRECTORY.getLevel()) {
+                if (!checkSubDir(usernamePasswordCredentialsProvider, gitPersistence, bufferedImage, suffix, path, name)) {
+                    return false;
+                }
+            }
+            if (exceptionType.getLevel() >= GitExceptionType.CANT_SAVE_TO_LOCAL.getLevel()) {
+                if (!saveLocal(usernamePasswordCredentialsProvider, gitPersistence, bufferedImage, suffix, path, name)) {
+                    return false;
+                }
+            }
+            if (exceptionType.getLevel() >= GitExceptionType.CANT_ADD_GIT_FILE.getLevel()) {
+                if (!add2Git(git, usernamePasswordCredentialsProvider, gitPersistence, bufferedImage, suffix, path, name)) {
+                    return false;
+                }
+            }
+
+            if (exceptionType.getLevel() >= GitExceptionType.CANT_UPDATE.getLevel()) {
+                if (!gitPull(git, usernamePasswordCredentialsProvider, gitPersistence, bufferedImage, suffix, path, name)) {
+                    return false;
+                }
+            }
+            if (exceptionType.getLevel() >= GitExceptionType.CANT_COMMIT.getLevel()) {
+                if (!gitCommit(git, usernamePasswordCredentialsProvider, gitPersistence, bufferedImage, suffix, path, name)) {
+                    return false;
+                }
+            }
+            if (exceptionType.getLevel() >= GitExceptionType.CANT_PUSH.getLevel()) {
+                if (!gitPush(git, usernamePasswordCredentialsProvider, gitPersistence, bufferedImage, suffix, path, name)) {
+                    return false;
+                }
+            }
+        }
+        return false;
+    }
+
+    private Git createGit(UsernamePasswordCredentialsProvider usernamePasswordCredentialsProvider, GitPersistence gitPersistence, BufferedImage image, String suffix, String path, String name) {
+        // 基础校验
+        Git git;
+        if (isCloned(gitPersistence)) {
+            try {
                 git = Git.open(Paths.get(gitPersistence.getLocalRepositoryDir()).toFile());
-            } else {
-                CloneCommand cloneCommand = Git.cloneRepository();
+            } catch (IOException e) {
+                addException(image, path, false, e, GitExceptionType.CANT_CREATE_FILE);
+                return null;
+            }
+        } else {
+            CloneCommand cloneCommand = Git.cloneRepository();
+            try {
                 git = cloneCommand
                         .setURI(gitPersistence.getRemoteRepositoryUrl())
                         .setBranch(gitPersistence.getBranch())
                         .setDirectory(Paths.get(gitPersistence.getLocalRepositoryDir()).toFile())
                         .setCredentialsProvider(usernamePasswordCredentialsProvider)
                         .call();
+            } catch (GitAPIException | JGitInternalException e) {
+                addException(image, path, false, e, GitExceptionType.CANT_CREATE_FILE);
+                return null;
             }
-            // 存储图片到本地仓库
-            // 获取保存图片类型
+        }
+        return git;
+    }
 
-            // 本地图片存储
-            Path sp = Paths.get(gitPersistence.getLocalRepositoryDir(), gitPersistence.getSubDir());
-            File subDir = sp.toFile();
+    private boolean checkSubDir(UsernamePasswordCredentialsProvider usernamePasswordCredentialsProvider, GitPersistence gitPersistence, BufferedImage image, String suffix, String path, String name) {
+        Path sp = Paths.get(gitPersistence.getLocalRepositoryDir(), gitPersistence.getSubDir());
+        File subDir = sp.toFile();
 
-            if (!subDir.exists()) {
+        if (!subDir.exists()) {
+            try {
                 Files.createDirectory(sp);
-                git.add().addFilepattern("./" + gitPersistence.getSubDir()).call();
+            } catch (IOException e) {
+                addException(image, path, false, e, GitExceptionType.CANT_CREATE_SUB_DIRECTORY);
+                return false;
             }
+        }
+        return true;
+    }
+
+    private boolean saveLocal(UsernamePasswordCredentialsProvider usernamePasswordCredentialsProvider, GitPersistence gitPersistence, BufferedImage image, String suffix, String path, String name) {
+        // 本地图片存储
+        try {
             save(image, suffix, path);
-            // 更新仓库
+        } catch (IOException e) {
+            addException(image, path, false, e, GitExceptionType.CANT_SAVE_TO_LOCAL);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean add2Git(Git git, UsernamePasswordCredentialsProvider usernamePasswordCredentialsProvider, GitPersistence gitPersistence, BufferedImage image, String suffix, String path, String name) {
+        try {
+            git.add().addFilepattern("./" + gitPersistence.getSubDir()).call();
+        } catch (GitAPIException e) {
+            addException(image, path, false, e, GitExceptionType.CANT_ADD_GIT_FILE);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean gitPull(Git git, UsernamePasswordCredentialsProvider usernamePasswordCredentialsProvider, GitPersistence gitPersistence, BufferedImage image, String suffix, String path, String name) {
+        // 更新仓库
+        try {
             git.pull().setCredentialsProvider(usernamePasswordCredentialsProvider).call();
-            // 现将图片存放到本地仓库中
+        } catch (GitAPIException e) {
+            addException(image, path, false, e, GitExceptionType.CANT_UPDATE);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean gitAdd(Git git, UsernamePasswordCredentialsProvider usernamePasswordCredentialsProvider, GitPersistence gitPersistence, BufferedImage image, String suffix, String path, String name) {
+        // 现将图片存放到本地仓库中
+        try {
             git.add().addFilepattern(StringUtils.isEmpty(gitPersistence.getSubDir()) ? "." : gitPersistence.getSubDir()).call();
-            // 提交代码
+        } catch (GitAPIException e) {
+            addException(image, path, false, e, GitExceptionType.CANT_ADD_GIT_FILE);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean gitCommit(Git git, UsernamePasswordCredentialsProvider usernamePasswordCredentialsProvider, GitPersistence gitPersistence, BufferedImage image, String suffix, String path, String name) {
+        // 现将图片存放到本地仓库中
+        // 提交代码
+        try {
             git.commit()
                     .setMessage(String.format("add new image named:%s", name + "." + suffix))
                     .call();
-            // 推送到远程仓库
-            git.push().setCredentialsProvider(usernamePasswordCredentialsProvider).call();
-            // 转换为git地址
-        } catch (Exception e) {
-            configuration.getUniqueBean(ImageStoreResultHandler.class).add(ImageStoreResult
-                    .builder()
-                    .image(new SimpleObjectProperty<>(image))
-                    .imageStore(new SimpleStringProperty(NAME))
-                    .path(new SimpleStringProperty(path))
-                    .success(new SimpleBooleanProperty(false))
-                    .exception(new SimpleObjectProperty<>(new ExceptionWrapper(e)))
-                    .build());
+        } catch (GitAPIException e) {
+            addException(image, path, false, e, GitExceptionType.CANT_COMMIT);
+            return false;
         }
-
+        return true;
     }
+
+    private boolean gitPush(Git git, UsernamePasswordCredentialsProvider usernamePasswordCredentialsProvider, GitPersistence gitPersistence, BufferedImage image, String suffix, String path, String name) {
+        // 推送到远程仓库
+        try {
+            git.push().setCredentialsProvider(usernamePasswordCredentialsProvider).call();
+        } catch (GitAPIException e) {
+            addException(image, path, false, e, GitExceptionType.CANT_PUSH);
+            return false;
+        }
+        return true;
+    }
+
 
     @SneakyThrows
     private boolean isCloned(GitPersistence gitPersistence) {

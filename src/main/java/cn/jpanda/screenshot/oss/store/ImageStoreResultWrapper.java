@@ -18,6 +18,7 @@ public class ImageStoreResultWrapper {
         this.path = imageStoreResult.getPath().get();
         this.imageStore = imageStoreResult.getImageStore().get();
         this.exception = imageStoreResult.getException().get();
+        this.exceptionType = imageStoreResult.getExceptionType();
     }
 
     /**
@@ -43,7 +44,9 @@ public class ImageStoreResultWrapper {
      */
     private ExceptionWrapper exception;
 
+    private ExceptionType exceptionType;
+
     public ImageStoreResult toImageStoreResult() {
-        return new ImageStoreResult(new SimpleBooleanProperty(success), new SimpleObjectProperty<>(image), new SimpleStringProperty(path), new SimpleStringProperty(imageStore), new SimpleObjectProperty<>(exception));
+        return new ImageStoreResult(new SimpleBooleanProperty(success), new SimpleObjectProperty<>(image), new SimpleStringProperty(path), new SimpleStringProperty(imageStore), new SimpleObjectProperty<>(exception), exceptionType);
     }
 }
