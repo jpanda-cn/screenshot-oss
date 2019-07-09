@@ -208,7 +208,6 @@ public class CanvasCutTrayView implements Initializable {
         Scene scene = canvasProperties.getCutPane().getScene();
         Rectangle rectangle = canvasProperties.getCutRectangle();
         Stage stage = ((Stage) scene.getWindow());
-
         // 提示用户当前采用保存方式
         GlobalConfigPersistence globalConfigPersistence = configuration.getPersistence(GlobalConfigPersistence.class);
         String imageStore = globalConfigPersistence.getImageStore();
@@ -222,6 +221,7 @@ public class CanvasCutTrayView implements Initializable {
         alert.getButtonTypes().clear();
         alert.getButtonTypes().addAll(new ButtonType("取消", ButtonBar.ButtonData.BACK_PREVIOUS), new ButtonType("保存至云", ButtonBar.ButtonData.OK_DONE));
         alert.initOwner(stage);
+        ((Stage)(alert.getDialogPane().getScene().getWindow())).toFront();
         alert.initStyle(StageStyle.UTILITY);
         alert.initModality(Modality.APPLICATION_MODAL);
         // 调整位置，将其放置在截图框的正中间
