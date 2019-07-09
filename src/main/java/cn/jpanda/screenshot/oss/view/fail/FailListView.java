@@ -4,15 +4,12 @@ import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
 import cn.jpanda.screenshot.oss.store.ImageStoreResult;
 import cn.jpanda.screenshot.oss.store.ImageStoreResultHandler;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -21,6 +18,9 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -43,20 +43,26 @@ public class FailListView implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         image.sortableProperty().set(false);
         image.setCellValueFactory((cell) -> {
-            Image image = SwingFXUtils.toFXImage(cell.getValue().getImage().get(), null);
-            ImageView imageView = new ImageView(image);
-            imageView.setFitWidth(80);
-            imageView.setFitHeight(80);
-            Button button = new Button("", imageView);
-            button.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-                Stage stage = configuration.getViewContext().newStage();
-                stage.initOwner(table.getScene().getWindow());
-                stage.initModality(Modality.APPLICATION_MODAL);
-                ImageView imageView1 = new ImageView(image);
-                stage.setScene(new Scene(new AnchorPane(imageView1)));
-                stage.showAndWait();
-            });
-            return new SimpleObjectProperty<>(button);
+            try {
+
+                Image image = new Image(new FileInputStream(new File(cell.getValue().getPath().get())));
+                ImageView imageView = new ImageView(image);
+                imageView.setFitWidth(80);
+                imageView.setFitHeight(80);
+                Button button = new Button("", imageView);
+                button.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+                    Stage stage = configuration.getViewContext().newStage();
+                    stage.initOwner(table.getScene().getWindow());
+                    stage.initModality(Modality.APPLICATION_MODAL);
+                    ImageView imageView1 = new ImageView(image);
+                    stage.setScene(new Scene(new AnchorPane(imageView1)));
+                    stage.showAndWait();
+                });
+                return new SimpleObjectProperty<>(button);
+            } catch (FileNotFoundException f) {
+                return new SimpleObjectProperty<>(new Button());
+            }
+
         });
         store.setCellValueFactory(cell -> cell.getValue().getImageStore());
         store.sortableProperty().set(false);
@@ -76,19 +82,17 @@ public class FailListView implements Initializable {
             Button show = new Button("查看异常信息");
             Button delete = new Button("删除");
             box.getChildren().addAll(show, delete);
-            show.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent event) {
-                    Exception e = c.getValue().getException().get();
-
-                }
+            show.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+                Platform.runLater(() -> {
+                    Alert info = new Alert(Alert.AlertType.INFORMATION);
+                    info.setTitle("异常信息");
+                    info.setHeaderText(c.getValue().getException().get().getMessage());
+                    info.setContentText(c.getValue().getException().get().getDetails());
+                    info.initModality(Modality.APPLICATION_MODAL);
+                    info.showAndWait();
+                });
             });
-            delete.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent event) {
-
-                }
-            });
+            delete.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> configuration.getUniqueBean(ImageStoreResultHandler.class).remove(c.getValue().getPath().get()));
             return new SimpleObjectProperty<>(box);
         });
 

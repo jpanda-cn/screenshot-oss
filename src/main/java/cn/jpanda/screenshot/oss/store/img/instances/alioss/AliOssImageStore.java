@@ -3,6 +3,7 @@ package cn.jpanda.screenshot.oss.store.img.instances.alioss;
 import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.ImgStore;
+import cn.jpanda.screenshot.oss.store.ExceptionWrapper;
 import cn.jpanda.screenshot.oss.store.ImageStoreResult;
 import cn.jpanda.screenshot.oss.store.ImageStoreResultHandler;
 import cn.jpanda.screenshot.oss.store.img.AbstractConfigImageStore;
@@ -68,7 +69,7 @@ public class AliOssImageStore extends AbstractConfigImageStore {
                     .imageStore(new SimpleStringProperty(NAME))
                     .path(new SimpleStringProperty(name))
                     .success(new SimpleBooleanProperty(false))
-                    .exception(new SimpleObjectProperty<>(e))
+                    .exception(new SimpleObjectProperty<>(new ExceptionWrapper(e)))
                     .build());
         } finally {
             ossClient.shutdown();

@@ -183,6 +183,7 @@ public class IndexCutView implements Initializable {
     }
     public void  toFailList(){
         Stage stage = configuration.getViewContext().newStage();
+        stage.setTitle("失败任务列表");
         stage.initOwner(configuration.getViewContext().getStage());
         stage.initStyle(StageStyle.UTILITY);
         stage.initModality(Modality.APPLICATION_MODAL);

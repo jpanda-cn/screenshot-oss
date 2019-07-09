@@ -1,5 +1,6 @@
 package cn.jpanda.screenshot.oss.store;
 
+import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.log.Log;
 import javafx.application.Platform;
@@ -11,24 +12,49 @@ import javafx.scene.control.ButtonType;
 import javafx.stage.Modality;
 import javafx.stage.StageStyle;
 import lombok.Getter;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sf.json.JsonConfig;
 
 import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class ImageStoreResultHandler {
     private Log log;
     private Configuration configuration;
 
+    @Getter
+    private ObservableList<ImageStoreResult> imageStoreResults = FXCollections.observableArrayList();
+
     public ImageStoreResultHandler(Configuration configuration) {
         this.configuration = configuration;
         this.log = configuration.getLogFactory().getLog(getClass());
+        init();
     }
 
-    @Getter
-    private ObservableList<ImageStoreResult> imageStoreResults = FXCollections.observableArrayList();
+
+    public void init() {
+        ImageStoreResultPersistence imageStoreResultPersistence = configuration.getPersistence(ImageStoreResultPersistence.class);
+        String json = imageStoreResultPersistence.getJson();
+        if (StringUtils.isNotEmpty(json)) {
+            JSONArray jsonArray = JSONArray.fromObject(json);
+            for (int i = 0; i < jsonArray.size(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                ImageStoreResultWrapper imageStoreResultWrapper = (ImageStoreResultWrapper) JSONObject.toBean(jsonObject, ImageStoreResultWrapper.class);
+                imageStoreResults.add(imageStoreResultWrapper.toImageStoreResult());
+            }
+        }
+    }
+
+    private String toJson() {
+        JsonConfig jsonConfig = new JsonConfig();
+        jsonConfig.setExcludes(new String[]{"image"});
+        return JSONArray.fromObject(imageStoreResults.stream().map(ImageStoreResultWrapper::new).collect(Collectors.toList()), jsonConfig).toString();
+    }
 
     public void add(ImageStoreResult imageStoreResult) {
         if (imageStoreResult.getSuccess().get()) {
@@ -42,16 +68,35 @@ public class ImageStoreResultHandler {
             try {
 
                 File file = Paths.get(path).toFile();
-                if (!file.exists() && file.mkdirs() && file.createNewFile()) {
-                    ImageIO.write(imageStoreResult.getImage().get(), "PNG", file);
+                if (!file.exists()) {
+                    File parent = file.getParentFile();
+                    if (parent.exists()) {
+                        parent.mkdirs();
+                    }
                 }
+                ImageIO.write(imageStoreResult.getImage().get(), "PNG", file);
             } catch (IOException e) {
                 e.printStackTrace();
             }
             // 图片保存失败，需要提示，此处采用弹窗提示，并提供再次保存的能力
             log.err("{0}", imageStoreResult.getException().get());
+
+            // 将其记录到失败列表
+            ImageStoreResultPersistence configurationPersistence = configuration.getPersistence(ImageStoreResultPersistence.class);
+            configurationPersistence.setJson(toJson());
+            configuration.storePersistence(configurationPersistence);
             // 临时保存图片
             showAlert(imageStoreResult);
+        }
+    }
+
+    public void remove(String path) {
+        Optional<ImageStoreResult> imageStoreResult = imageStoreResults.stream().filter((i) -> i.getPath().get().equals(path)).findFirst();
+        if (imageStoreResult.isPresent()) {
+            imageStoreResults.remove(imageStoreResult.get());
+            ImageStoreResultPersistence configurationPersistence = configuration.getPersistence(ImageStoreResultPersistence.class);
+            configurationPersistence.setJson(toJson());
+            configuration.storePersistence(configurationPersistence);
         }
     }
 
@@ -69,17 +114,11 @@ public class ImageStoreResultHandler {
             if (result.isPresent()) {
                 if (result.get().getButtonData() == ButtonBar.ButtonData.OK_DONE) {
                     // 获取异常对象
-                    Throwable exception = imageStoreResult.getException().get();
-                    // 展示五十行日志
-                    StackTraceElement[] traceElements = exception.getStackTrace();
-                    StringBuilder stackTrace = new StringBuilder();
-                    for (StackTraceElement traceElement : traceElements) {
-                        stackTrace.append(traceElement.toString()).append("\r\n");
-                    }
                     Platform.runLater(() -> {
                         Alert info = new Alert(Alert.AlertType.INFORMATION);
-                        info.setHeaderText(exception.getMessage());
-                        info.setContentText(stackTrace.toString());
+                        alert.setTitle("异常信息");
+                        info.setHeaderText(imageStoreResult.getException().get().getMessage());
+                        info.setContentText(imageStoreResult.getException().get().getDetails());
                         info.initModality(Modality.APPLICATION_MODAL);
                         info.setOnCloseRequest(event -> info.close());
                         info.showAndWait();

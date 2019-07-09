@@ -5,6 +5,7 @@ import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.ImgStore;
 import cn.jpanda.screenshot.oss.persistences.LocalImageStorePersistence;
+import cn.jpanda.screenshot.oss.store.ExceptionWrapper;
 import cn.jpanda.screenshot.oss.store.ImageStoreResult;
 import cn.jpanda.screenshot.oss.store.ImageStoreResultHandler;
 import cn.jpanda.screenshot.oss.store.img.AbstractConfigImageStore;
@@ -70,7 +71,7 @@ public class LocalImageStore extends AbstractConfigImageStore {
                     .imageStore(new SimpleStringProperty(NAME))
                     .path(new SimpleStringProperty(path))
                     .success(new SimpleBooleanProperty(false))
-                    .exception(new SimpleObjectProperty<>(e))
+                    .exception(new SimpleObjectProperty<>(new ExceptionWrapper(e)))
                     .build());
         }
     }

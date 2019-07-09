@@ -35,5 +35,5 @@ public class ImageStoreResult {
     /**
      * 对应的异常数据
      */
-    private SimpleObjectProperty<Exception> exception;
+    private SimpleObjectProperty<ExceptionWrapper> exception;
 }
