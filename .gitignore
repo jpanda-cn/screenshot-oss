@@ -108,4 +108,5 @@ rebel.xml
 out/*
 bootstrap.properties
 screenshot4oss.properties
+image-store-result.properties
 *.log
