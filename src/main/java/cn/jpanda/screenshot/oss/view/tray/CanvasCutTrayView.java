@@ -3,6 +3,7 @@ package cn.jpanda.screenshot.oss.view.tray;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.ScreenshotsProcess;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
+import cn.jpanda.screenshot.oss.core.capture.ScreenCapture;
 import cn.jpanda.screenshot.oss.core.controller.ViewContext;
 import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
@@ -221,18 +222,19 @@ public class CanvasCutTrayView implements Initializable {
         alert.getButtonTypes().clear();
         alert.getButtonTypes().addAll(new ButtonType("取消", ButtonBar.ButtonData.BACK_PREVIOUS), new ButtonType("保存至云", ButtonBar.ButtonData.OK_DONE));
         alert.initOwner(stage);
-        ((Stage)(alert.getDialogPane().getScene().getWindow())).toFront();
         alert.initStyle(StageStyle.UTILITY);
         alert.initModality(Modality.APPLICATION_MODAL);
         // 调整位置，将其放置在截图框的正中间
+        ScreenCapture screenCapture=configuration.getUniqueBean(ScreenCapture.class);
         alert.showingProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
+                //  转换为全局坐标
                 double aw = alert.widthProperty().get();
                 double offsetW = (rectangle.getWidth() - aw) / 2;
-                alert.setX(rectangle.getX() + offsetW);
+                alert.setX(screenCapture.minx()+rectangle.getX() + offsetW);
                 double ah = alert.heightProperty().get();
                 double offsetH = (rectangle.getHeight() - ah) / 2;
-                alert.setY(rectangle.getY() + offsetH);
+                alert.setY(screenCapture.miny()+rectangle.getY() + offsetH);
             }
         });
 
