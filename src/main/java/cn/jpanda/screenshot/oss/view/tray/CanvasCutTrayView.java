@@ -84,6 +84,7 @@ public class CanvasCutTrayView implements Initializable {
         text.tooltipProperty().setValue(new Tooltip("文字"));
         mosaic.tooltipProperty().setValue(new Tooltip("马赛克"));
         settings.tooltipProperty().setValue(new Tooltip("设置"));
+        save.tooltipProperty().setValue(new Tooltip("上传至云"));
         cancel.tooltipProperty().setValue(new Tooltip("取消"));
         submit.tooltipProperty().setValue(new Tooltip("保存"));
     }
