@@ -1,5 +1,6 @@
 package cn.jpanda.screenshot.oss.store.img.instances.git;
 
+import cn.jpanda.screenshot.oss.common.utils.MathUtils;
 import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.ImgStore;
@@ -81,13 +82,13 @@ public class GitImageStore extends AbstractConfigImageStore {
         if (git == null) {
             return;
         }
-        if (checkSubDir(usernamePasswordCredentialsProvider, gitPersistence, image, suffix, path, name)
-                && saveLocal(usernamePasswordCredentialsProvider, gitPersistence, image, suffix, path, name)
-                && add2Git(git, usernamePasswordCredentialsProvider, gitPersistence, image, suffix, path, name)
-                && gitPull(git, usernamePasswordCredentialsProvider, gitPersistence, image, suffix, path, name)
-                && gitAdd(git, usernamePasswordCredentialsProvider, gitPersistence, image, suffix, path, name)
-                && gitCommit(git, usernamePasswordCredentialsProvider, gitPersistence, image, suffix, path, name)
-                && gitPush(git, usernamePasswordCredentialsProvider, gitPersistence, image, suffix, path, name)
+        if (checkSubDir(gitPersistence, image, path)
+                && saveLocal(image, suffix, path)
+                && add2Git(git, gitPersistence, image, path)
+                && gitPull(git, usernamePasswordCredentialsProvider, image, path)
+                && gitAdd(git, gitPersistence, image, path)
+                && gitCommit(git, image, suffix, path, name)
+                && gitPush(git, usernamePasswordCredentialsProvider, image, path)
 
         ) {
             return;
@@ -110,40 +111,40 @@ public class GitImageStore extends AbstractConfigImageStore {
             }
             String path = imageStoreResultWrapper.getPath();
             String suffix = path.substring(path.lastIndexOf("."));
-            String name = path.substring(path.lastIndexOf(File.separator));
+            String name = path.substring((int) MathUtils.max(path.lastIndexOf("/"), path.lastIndexOf("\\")));
             name = name.substring(0, name.length() - suffix.length());
             Git git = createGit(usernamePasswordCredentialsProvider, gitPersistence, bufferedImage, suffix, path, name);
             if (git == null) {
                 return false;
             }
             if (exceptionType.getLevel() >= GitExceptionType.CANT_CREATE_SUB_DIRECTORY.getLevel()) {
-                if (!checkSubDir(usernamePasswordCredentialsProvider, gitPersistence, bufferedImage, suffix, path, name)) {
+                if (!checkSubDir(gitPersistence, bufferedImage, path)) {
                     return false;
                 }
             }
             if (exceptionType.getLevel() >= GitExceptionType.CANT_SAVE_TO_LOCAL.getLevel()) {
-                if (!saveLocal(usernamePasswordCredentialsProvider, gitPersistence, bufferedImage, suffix, path, name)) {
+                if (!saveLocal(bufferedImage, suffix, path)) {
                     return false;
                 }
             }
             if (exceptionType.getLevel() >= GitExceptionType.CANT_ADD_GIT_FILE.getLevel()) {
-                if (!add2Git(git, usernamePasswordCredentialsProvider, gitPersistence, bufferedImage, suffix, path, name)) {
+                if (!add2Git(git, gitPersistence, bufferedImage, path)) {
                     return false;
                 }
             }
 
             if (exceptionType.getLevel() >= GitExceptionType.CANT_UPDATE.getLevel()) {
-                if (!gitPull(git, usernamePasswordCredentialsProvider, gitPersistence, bufferedImage, suffix, path, name)) {
+                if (!gitPull(git, usernamePasswordCredentialsProvider, bufferedImage, path)) {
                     return false;
                 }
             }
             if (exceptionType.getLevel() >= GitExceptionType.CANT_COMMIT.getLevel()) {
-                if (!gitCommit(git, usernamePasswordCredentialsProvider, gitPersistence, bufferedImage, suffix, path, name)) {
+                if (!gitCommit(git, bufferedImage, suffix, path, name)) {
                     return false;
                 }
             }
             if (exceptionType.getLevel() >= GitExceptionType.CANT_PUSH.getLevel()) {
-                if (!gitPush(git, usernamePasswordCredentialsProvider, gitPersistence, bufferedImage, suffix, path, name)) {
+                if (!gitPush(git, usernamePasswordCredentialsProvider, bufferedImage, path)) {
                     return false;
                 }
             }
@@ -178,7 +179,7 @@ public class GitImageStore extends AbstractConfigImageStore {
         return git;
     }
 
-    private boolean checkSubDir(UsernamePasswordCredentialsProvider usernamePasswordCredentialsProvider, GitPersistence gitPersistence, BufferedImage image, String suffix, String path, String name) {
+    private boolean checkSubDir(GitPersistence gitPersistence, BufferedImage image, String path) {
         Path sp = Paths.get(gitPersistence.getLocalRepositoryDir(), gitPersistence.getSubDir());
         File subDir = sp.toFile();
 
@@ -193,7 +194,7 @@ public class GitImageStore extends AbstractConfigImageStore {
         return true;
     }
 
-    private boolean saveLocal(UsernamePasswordCredentialsProvider usernamePasswordCredentialsProvider, GitPersistence gitPersistence, BufferedImage image, String suffix, String path, String name) {
+    private boolean saveLocal(BufferedImage image, String suffix, String path) {
         // 本地图片存储
         try {
             save(image, suffix, path);
@@ -204,7 +205,7 @@ public class GitImageStore extends AbstractConfigImageStore {
         return true;
     }
 
-    private boolean add2Git(Git git, UsernamePasswordCredentialsProvider usernamePasswordCredentialsProvider, GitPersistence gitPersistence, BufferedImage image, String suffix, String path, String name) {
+    private boolean add2Git(Git git, GitPersistence gitPersistence, BufferedImage image, String path) {
         try {
             git.add().addFilepattern("./" + gitPersistence.getSubDir()).call();
         } catch (GitAPIException e) {
@@ -214,7 +215,7 @@ public class GitImageStore extends AbstractConfigImageStore {
         return true;
     }
 
-    private boolean gitPull(Git git, UsernamePasswordCredentialsProvider usernamePasswordCredentialsProvider, GitPersistence gitPersistence, BufferedImage image, String suffix, String path, String name) {
+    private boolean gitPull(Git git, UsernamePasswordCredentialsProvider usernamePasswordCredentialsProvider, BufferedImage image, String path) {
         // 更新仓库
         try {
             git.pull().setCredentialsProvider(usernamePasswordCredentialsProvider).call();
@@ -225,7 +226,7 @@ public class GitImageStore extends AbstractConfigImageStore {
         return true;
     }
 
-    private boolean gitAdd(Git git, UsernamePasswordCredentialsProvider usernamePasswordCredentialsProvider, GitPersistence gitPersistence, BufferedImage image, String suffix, String path, String name) {
+    private boolean gitAdd(Git git, GitPersistence gitPersistence, BufferedImage image, String path) {
         // 现将图片存放到本地仓库中
         try {
             git.add().addFilepattern(StringUtils.isEmpty(gitPersistence.getSubDir()) ? "." : gitPersistence.getSubDir()).call();
@@ -236,7 +237,7 @@ public class GitImageStore extends AbstractConfigImageStore {
         return true;
     }
 
-    private boolean gitCommit(Git git, UsernamePasswordCredentialsProvider usernamePasswordCredentialsProvider, GitPersistence gitPersistence, BufferedImage image, String suffix, String path, String name) {
+    private boolean gitCommit(Git git, BufferedImage image, String suffix, String path, String name) {
         // 现将图片存放到本地仓库中
         // 提交代码
         try {
@@ -250,7 +251,7 @@ public class GitImageStore extends AbstractConfigImageStore {
         return true;
     }
 
-    private boolean gitPush(Git git, UsernamePasswordCredentialsProvider usernamePasswordCredentialsProvider, GitPersistence gitPersistence, BufferedImage image, String suffix, String path, String name) {
+    private boolean gitPush(Git git, UsernamePasswordCredentialsProvider usernamePasswordCredentialsProvider, BufferedImage image, String path) {
         // 推送到远程仓库
         try {
             git.push().setCredentialsProvider(usernamePasswordCredentialsProvider).call();
