@@ -106,13 +106,12 @@ public class GitImageStore extends AbstractConfigImageStore {
             try {
                 bufferedImage = ImageIO.read(Paths.get(imageStoreResultWrapper.getPath()).toFile());
             } catch (IOException e) {
-
                 return false;
             }
             String path = imageStoreResultWrapper.getPath();
-            String suffix = path.substring(path.lastIndexOf("."));
-            String name = path.substring((int) MathUtils.max(path.lastIndexOf("/"), path.lastIndexOf("\\")));
-            name = name.substring(0, name.length() - suffix.length());
+            String suffix = path.substring(path.lastIndexOf(".") + 1);
+            String name = path.substring((int) MathUtils.max(path.lastIndexOf("/"), path.lastIndexOf("\\")) + 1);
+            name = name.substring(0, name.length() - suffix.length() - 1);
             Git git = createGit(usernamePasswordCredentialsProvider, gitPersistence, bufferedImage, suffix, path, name);
             if (git == null) {
                 return false;
@@ -198,7 +197,7 @@ public class GitImageStore extends AbstractConfigImageStore {
         // 本地图片存储
         try {
             save(image, suffix, path);
-        } catch (IOException e) {
+        } catch (RuntimeException | IOException e) {
             addException(image, path, false, e, GitExceptionType.CANT_SAVE_TO_LOCAL);
             return false;
         }
@@ -276,12 +275,16 @@ public class GitImageStore extends AbstractConfigImageStore {
     protected void save(BufferedImage image, String suffix, String path) throws IOException {
         // 本地图片存储
         File file = Paths.get(path).toFile();
-        if (!file.exists() && file.mkdirs() && file.createNewFile()) {
-            ImageIO.write(image, suffix, file);
-        } else {
-            throw new RuntimeException(String.format("can not create file named:%s", path));
-        }
-    }
 
+        if (!file.exists()) {
+            File parent = file.getParentFile();
+            if (!parent.exists()) {
+                parent.mkdirs();
+            }
+            file.createNewFile();
+            ImageIO.write(image, suffix, file);
+        }
+        ImageIO.write(image, suffix, file);
+    }
 
 }

@@ -14,6 +14,8 @@ import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.JGitInternalException;
+import org.eclipse.jgit.transport.RemoteConfig;
+import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 import java.io.File;
@@ -22,6 +24,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 
@@ -131,6 +134,7 @@ public class GitFileImageStoreConfig implements Initializable {
     }
 
     public void save() {
+        GitPersistence old = configuration.getPersistence(GitPersistence.class);
         GitPersistence gitPersistence = new GitPersistence();
         String localRep = localRepositoryDir.textProperty().get();
         String subDirName = subDir.textProperty().get();
@@ -155,27 +159,54 @@ public class GitFileImageStoreConfig implements Initializable {
         gitPersistence.setUsername(un);
         gitPersistence.setPassword(pd);
         gitPersistence.setAsync(asy);
+
+        // 生成访问口令
         UsernamePasswordCredentialsProvider usernamePasswordCredentialsProvider = new UsernamePasswordCredentialsProvider(gitPersistence.getUsername(), gitPersistence.getPassword());
         Git git;
         try {
-            if (isCloned(gitPersistence)) {
+            // 判断是否需要重新Clone工程
+            boolean needCloned = !isCloned(gitPersistence);
+            needCloned = needCloned || !gitPersistence.getLocalRepositoryDir().equals(old.getLocalRepositoryDir());
+            // 校验是否需要重新Clone工程
+            if (!needCloned) {
                 try {
                     git = Git.open(Paths.get(gitPersistence.getLocalRepositoryDir()).toFile());
                 } catch (IOException e) {
                     throw new RuntimeException(String.format("仓库:{%s}已存在，但无法打开!\r\n建议在备份数据后，清空该目录，并重试该步骤。\r\n!!!请注意备份数据,部分异常数据为:%s", Paths.get(gitPersistence.getLocalRepositoryDir()).toFile().getAbsolutePath(), e.getMessage()));
                 }
             } else {
-                CloneCommand cloneCommand = Git.cloneRepository();
-                try {
-                    git = cloneCommand
-                            .setURI(gitPersistence.getRemoteRepositoryUrl())
-                            .setBranch(gitPersistence.getBranch())
-                            .setDirectory(Paths.get(gitPersistence.getLocalRepositoryDir()).toFile())
-                            .setCredentialsProvider(usernamePasswordCredentialsProvider)
-                            .call();
-                } catch (GitAPIException | JGitInternalException e ) {
-                    throw new RuntimeException(String.format("无法Clone仓库,请检查配置，部分异常数据为:%s", e.getMessage()));
+                git = cloned(gitPersistence, usernamePasswordCredentialsProvider);
+                old.setLocalRepositoryDir(gitPersistence.getLocalRepositoryDir());
+            }
+
+            boolean anyChange = false;
+            // 判断是否需要变更远程路径
+            if (!gitPersistence.getRemoteRepositoryUrl().equals(old.getRemoteRepositoryUrl())) {
+                List<RemoteConfig> list = git.remoteList().call();
+                for (RemoteConfig rc : list) {
+                    git.remoteRemove().setRemoteName(rc.getName()).call();
                 }
+                git.remoteSetUrl().setRemoteUri(new URIish(gitPersistence.getRemoteRepositoryUrl())).call();
+                git.branchRename().setNewName(old.getBranch()).call();
+                old.setRemoteRepositoryUrl(gitPersistence.getRemoteRepositoryUrl());
+                anyChange = true;
+                // ping
+                git.lsRemote().call();
+            }
+
+            // 是否需要修改分支名称
+            if (!gitPersistence.getBranch().equals(old.getBranch())) {
+                if (gitPersistence.getBranch().trim().equals("")) {
+                    gitPersistence.setBranch("master");
+                }
+                if (git.branchList().call().stream().noneMatch((ref -> gitPersistence.getBranch().equals(ref.getName())))) {
+                    git.branchRename().setNewName(gitPersistence.getBranch()).call();
+                    old.setBranch(gitPersistence.getBranch());
+                    anyChange = true;
+                }
+            }
+            if (anyChange) {
+                git.pull().call();
             }
             // 本地图片存储
             Path sp = Paths.get(gitPersistence.getLocalRepositoryDir(), gitPersistence.getSubDir());
@@ -197,8 +228,14 @@ public class GitFileImageStoreConfig implements Initializable {
             // 不能完成配置，执行弹窗提示
             e.printStackTrace();
             AlertUtils.alert(Alert.AlertType.WARNING, e.getMessage());
-
+            configuration.storePersistence(old);
             return;
+        }
+        try {
+
+            git.status().call();
+        } catch (Exception e) {
+            throw new RuntimeException(String.format("无法保存Git配置，部分异常数据为:%s\"", e.getMessage()));
         }
 
         configuration.storePersistence(gitPersistence);
@@ -212,6 +249,22 @@ public class GitFileImageStoreConfig implements Initializable {
     public void close() {
         // 取消
         ((Stage) async.getScene().getWindow()).close();
+    }
+
+    private Git cloned(GitPersistence gitPersistence, UsernamePasswordCredentialsProvider usernamePasswordCredentialsProvider) {
+        CloneCommand cloneCommand = Git.cloneRepository();
+        try {
+            Git git = cloneCommand
+                    .setURI(gitPersistence.getRemoteRepositoryUrl())
+                    .setBranch(gitPersistence.getBranch())
+                    .setDirectory(Paths.get(gitPersistence.getLocalRepositoryDir()).toFile())
+                    .setCredentialsProvider(usernamePasswordCredentialsProvider)
+                    .call();
+            git.fetch().call();
+            return git;
+        } catch (GitAPIException | JGitInternalException e) {
+            throw new RuntimeException(String.format("无法Clone仓库,请检查配置，部分异常数据为:%s", e.getMessage()));
+        }
     }
 
     @SneakyThrows

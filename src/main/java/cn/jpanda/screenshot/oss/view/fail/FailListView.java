@@ -105,7 +105,11 @@ public class FailListView implements Initializable {
                     Alert info = new Alert(Alert.AlertType.INFORMATION);
                     info.setTitle("异常信息");
                     info.setHeaderText(c.getValue().getException().get().getMessage());
-                    info.setContentText(c.getValue().getException().get().getDetails());
+                    DialogPane pane = info.getDialogPane();
+                    TextArea textArea = new TextArea();
+                    pane.contentProperty().setValue(textArea);
+                    textArea.textProperty().setValue(c.getValue().getException().get().getDetails());
+                    textArea.wrapTextProperty().set(true);
                     info.initModality(Modality.APPLICATION_MODAL);
                     info.showAndWait();
                 });
@@ -131,7 +135,7 @@ public class FailListView implements Initializable {
                         info.initModality(Modality.APPLICATION_MODAL);
                         info.showAndWait();
                     });
-                }else {
+                } else {
                     Platform.runLater(() -> {
                         Alert info = new Alert(Alert.AlertType.INFORMATION);
                         info.setTitle("成功");
