@@ -5,9 +5,10 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 
+<?import javafx.scene.image.Image?>
 <AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.jpanda.screenshot.oss.view.fail.FailListView">
     <ImageView fitHeight="130.0" fitWidth="767.0" layoutX="17.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
-        <!--<Image url="/images/logo.png" />-->
+        <Image url="/images/logo.png" />
     </ImageView>
     <TableView fx:id="table" layoutX="11.0" layoutY="146.0" prefHeight="431.0" prefWidth="767.0">
         <columns>

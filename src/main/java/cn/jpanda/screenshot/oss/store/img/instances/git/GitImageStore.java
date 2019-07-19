@@ -14,6 +14,7 @@ import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.JGitInternalException;
+import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 import javax.imageio.ImageIO;
@@ -71,7 +72,14 @@ public class GitImageStore extends AbstractConfigImageStore {
         } else {
             save(gitPersistence, image, suffix, path, name);
         }
-        return gitPersistence.getRemoteRepositoryUrl() + "/" + subPath;
+        String accessPath = "";
+        if (gitPersistence.getRemoteRepositoryUrl().endsWith(".git")) {
+            accessPath = gitPersistence.getRemoteRepositoryUrl().substring(0, gitPersistence.getRemoteRepositoryUrl().length() - ".git".length());
+        } else {
+            accessPath = gitPersistence.getRemoteRepositoryUrl();
+        }
+        // 追加分支
+        return accessPath + ("/raw/" + gitPersistence.getBranch() + "/" + subPath);
     }
 
     private void save(GitPersistence gitPersistence, BufferedImage image, String suffix, String path, String name) {
@@ -102,7 +110,7 @@ public class GitImageStore extends AbstractConfigImageStore {
         if (exceptionType instanceof GitExceptionType) {
             GitPersistence gitPersistence = configuration.getPersistence(GitPersistence.class);
             UsernamePasswordCredentialsProvider usernamePasswordCredentialsProvider = new UsernamePasswordCredentialsProvider(gitPersistence.getUsername(), gitPersistence.getPassword());
-            BufferedImage bufferedImage = null;
+            BufferedImage bufferedImage;
             try {
                 bufferedImage = ImageIO.read(Paths.get(imageStoreResultWrapper.getPath()).toFile());
             } catch (IOException e) {
@@ -143,12 +151,10 @@ public class GitImageStore extends AbstractConfigImageStore {
                 }
             }
             if (exceptionType.getLevel() >= GitExceptionType.CANT_PUSH.getLevel()) {
-                if (!gitPush(git, usernamePasswordCredentialsProvider, bufferedImage, path)) {
-                    return false;
-                }
+                return gitPush(git, usernamePasswordCredentialsProvider, bufferedImage, path);
             }
         }
-        return false;
+        return true;
     }
 
     private Git createGit(UsernamePasswordCredentialsProvider usernamePasswordCredentialsProvider, GitPersistence gitPersistence, BufferedImage image, String suffix, String path, String name) {
@@ -217,8 +223,13 @@ public class GitImageStore extends AbstractConfigImageStore {
     private boolean gitPull(Git git, UsernamePasswordCredentialsProvider usernamePasswordCredentialsProvider, BufferedImage image, String path) {
         // 更新仓库
         try {
-            git.pull().setCredentialsProvider(usernamePasswordCredentialsProvider).call();
+
+            try {
+                git.pull().setCredentialsProvider(usernamePasswordCredentialsProvider).call();
+            } catch (TransportException ignored) {
+            }
         } catch (GitAPIException e) {
+            e.printStackTrace();
             addException(image, path, false, e, GitExceptionType.CANT_UPDATE);
             return false;
         }

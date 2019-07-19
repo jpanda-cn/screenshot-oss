@@ -4,6 +4,7 @@ import cn.jpanda.screenshot.oss.common.utils.AlertUtils;
 import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
+import cn.jpanda.screenshot.oss.store.ExceptionWrapper;
 import cn.jpanda.screenshot.oss.store.img.instances.git.GitPersistence;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -14,6 +15,7 @@ import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.JGitInternalException;
+import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.transport.RemoteConfig;
 import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
@@ -31,6 +33,9 @@ import java.util.regex.Pattern;
 @Controller
 public class GitFileImageStoreConfig implements Initializable {
     public static final String DEFAULT_REPOSITORY_DIRECTOR_NAME = "screenshot";
+    public static final String DEFAULT_REMOTE_NAME = "origin";
+    public static final String DEFAULT_BRANCH_NAME = "master";
+    public static final String BRANCH_NAME_PREFIX = "refs/heads/";
     /**
      * 本地仓库地址
      */
@@ -179,34 +184,47 @@ public class GitFileImageStoreConfig implements Initializable {
                 old.setLocalRepositoryDir(gitPersistence.getLocalRepositoryDir());
             }
 
-            boolean anyChange = false;
             // 判断是否需要变更远程路径
-            if (!gitPersistence.getRemoteRepositoryUrl().equals(old.getRemoteRepositoryUrl())) {
+            boolean anyChanged = false;
+
+
+            if (
+                    (!gitPersistence.getRemoteRepositoryUrl().equals(old.getRemoteRepositoryUrl()))
+                            ||
+                            (git.remoteList().call().stream().noneMatch((u -> u.toString().equals(gitPersistence.getRemoteRepositoryUrl()))))
+            ) {
                 List<RemoteConfig> list = git.remoteList().call();
                 for (RemoteConfig rc : list) {
                     git.remoteRemove().setRemoteName(rc.getName()).call();
                 }
-                git.remoteSetUrl().setRemoteUri(new URIish(gitPersistence.getRemoteRepositoryUrl())).call();
-                git.branchRename().setNewName(old.getBranch()).call();
+                git.remoteSetUrl().setRemoteUri(new URIish(gitPersistence.getRemoteRepositoryUrl())).setRemoteName(DEFAULT_REMOTE_NAME).call();
+
+                if (git.branchList().call().stream().noneMatch((ref -> old.getBranch().equals(ref.getName().replaceFirst(BRANCH_NAME_PREFIX, ""))))) {
+                    git.branchRename().setNewName(old.getBranch()).call();
+                }
+                anyChanged = true;
                 old.setRemoteRepositoryUrl(gitPersistence.getRemoteRepositoryUrl());
-                anyChange = true;
                 // ping
-                git.lsRemote().call();
+                git.lsRemote().setCredentialsProvider(usernamePasswordCredentialsProvider).call();
             }
 
             // 是否需要修改分支名称
             if (!gitPersistence.getBranch().equals(old.getBranch())) {
                 if (gitPersistence.getBranch().trim().equals("")) {
-                    gitPersistence.setBranch("master");
+                    gitPersistence.setBranch(DEFAULT_BRANCH_NAME);
                 }
-                if (git.branchList().call().stream().noneMatch((ref -> gitPersistence.getBranch().equals(ref.getName())))) {
+                if (git.branchList().call().stream().noneMatch((ref -> gitPersistence.getBranch().equals(ref.getName().replaceFirst(BRANCH_NAME_PREFIX, ""))))) {
                     git.branchRename().setNewName(gitPersistence.getBranch()).call();
                     old.setBranch(gitPersistence.getBranch());
-                    anyChange = true;
+                    anyChanged = true;
                 }
             }
-            if (anyChange) {
-                git.pull().call();
+            git.lsRemote().setCredentialsProvider(usernamePasswordCredentialsProvider).call();
+            if (anyChanged) {
+                try {
+                    git.pull().setCredentialsProvider(usernamePasswordCredentialsProvider).call();
+                } catch (TransportException ignored) {
+                }
             }
             // 本地图片存储
             Path sp = Paths.get(gitPersistence.getLocalRepositoryDir(), gitPersistence.getSubDir());
@@ -227,17 +245,10 @@ public class GitFileImageStoreConfig implements Initializable {
         } catch (Exception e) {
             // 不能完成配置，执行弹窗提示
             e.printStackTrace();
-            AlertUtils.alert(Alert.AlertType.WARNING, e.getMessage());
+            AlertUtils.exception(new ExceptionWrapper(e)).showAndWait();
             configuration.storePersistence(old);
             return;
         }
-        try {
-
-            git.status().call();
-        } catch (Exception e) {
-            throw new RuntimeException(String.format("无法保存Git配置，部分异常数据为:%s\"", e.getMessage()));
-        }
-
         configuration.storePersistence(gitPersistence);
         close();
     }

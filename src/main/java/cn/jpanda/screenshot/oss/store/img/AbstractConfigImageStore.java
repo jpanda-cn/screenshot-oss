@@ -65,6 +65,7 @@ public abstract class AbstractConfigImageStore implements ImageStore {
         return false;
     }
     protected void addException(BufferedImage image, String path, boolean success, Exception e, ExceptionType exceptionType) {
+        e.printStackTrace();
         configuration.getUniqueBean(ImageStoreResultHandler.class).add(ImageStoreResult
                 .builder()
                 .image(new SimpleObjectProperty<>(image))

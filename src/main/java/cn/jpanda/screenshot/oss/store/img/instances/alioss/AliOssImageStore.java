@@ -1,12 +1,10 @@
 package cn.jpanda.screenshot.oss.store.img.instances.alioss;
 
+import cn.jpanda.screenshot.oss.common.utils.MathUtils;
 import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.ImgStore;
-import cn.jpanda.screenshot.oss.store.ExceptionWrapper;
-import cn.jpanda.screenshot.oss.store.ImageStoreResult;
-import cn.jpanda.screenshot.oss.store.ImageStoreResultHandler;
-import cn.jpanda.screenshot.oss.store.ImageStoreResultWrapper;
+import cn.jpanda.screenshot.oss.store.*;
 import cn.jpanda.screenshot.oss.store.img.AbstractConfigImageStore;
 import cn.jpanda.screenshot.oss.view.image.AliOssFileImageStoreConfig;
 import com.aliyun.oss.OSSClient;
@@ -21,6 +19,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.UUID;
 
 @ImgStore(name = AliOssImageStore.NAME, config = AliOssFileImageStoreConfig.class)
@@ -57,17 +56,26 @@ public class AliOssImageStore extends AbstractConfigImageStore {
 
     @Override
     public boolean retry(ImageStoreResultWrapper imageStoreResultWrapper) {
-        return false;
+        BufferedImage bufferedImage;
+        try {
+            bufferedImage = ImageIO.read(Paths.get(imageStoreResultWrapper.getPath()).toFile());
+        } catch (IOException e) {
+            return false;
+        }
+        String path = imageStoreResultWrapper.getPath();
+        String suffix = path.substring(path.lastIndexOf(".") + 1);
+        String name = path.substring((int) MathUtils.max(path.lastIndexOf("/"), path.lastIndexOf("\\")) + 1);
+        name = name.substring(0, name.length() - suffix.length() - 1);
+        return upload(bufferedImage, configuration.getPersistence(AliOssPersistence.class), name);
     }
 
-    public void upload(BufferedImage image, AliOssPersistence aliOssPersistence, String name) {
+    public boolean upload(BufferedImage image, AliOssPersistence aliOssPersistence, String name) {
 
         OSSClient ossClient = new OSSClient(aliOssPersistence.getEndpoint(), aliOssPersistence.getAccessKeyId(), aliOssPersistence.getAccessKeySecret());
-        try {
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
+
+        try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             ImageIO.write(image, "png", os);
             PutObjectResult result = ossClient.putObject(aliOssPersistence.getBucket(), name, new ByteArrayInputStream(os.toByteArray()));
-
         } catch (IOException e) {
             configuration.getUniqueBean(ImageStoreResultHandler.class).add(ImageStoreResult
                     .builder()
@@ -76,10 +84,13 @@ public class AliOssImageStore extends AbstractConfigImageStore {
                     .path(new SimpleStringProperty(name))
                     .success(new SimpleBooleanProperty(false))
                     .exception(new SimpleObjectProperty<>(new ExceptionWrapper(e)))
+                    .exceptionType(AliOSSExceptionType.CANT_SAVE)
                     .build());
+            return false;
         } finally {
             ossClient.shutdown();
         }
+        return true;
     }
 
     protected String fileNameGenerator() {
