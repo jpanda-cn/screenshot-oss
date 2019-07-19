@@ -16,11 +16,67 @@
 启用该截图工具
 
 - 首先是截图工具的主要窗口：
-![主窗口](https://github.com/jpanda-cn/screenshot-oss/raw/master/docs\images/faea0d06-c0d5-43d5-a4ac-1a8ecdf63c49.png)
-- 配置截图工具
-![设置](https://github.com/jpanda-cn/screenshot-oss/raw/master/docs/images/3cedd34a-34a8-418f-8eb9-fbe6be8c4aed.png)
-系统默认快捷键为`Ctrl + Shift + Alt + J`,快捷键可以在`选型`-`通用设置`-`系统快捷键`处设置，暂时未提供禁用快捷键的入口。
+> 在该窗口主要有三个功能区，包括，选型下列框，截图按钮，截图时隐藏单选按钮。
 
+![主窗口](https://github.com/jpanda-cn/screenshot-oss/raw/master/docs/images/faea0d06-c0d5-43d5-a4ac-1a8ecdf63c49.png)
+
+其中选型下拉框中分为三个子选单：
+
+![请输入图片描述](https://github.com/jpanda-cn/screenshot-oss/raw/master/docs/images/014b0313-70f1-476b-a905-3d96038bce77.png)
+
+
+- 通用设置
+> 通用设置提供了管理截图工具基本功能的能力
+其中主要包括，配置图片存储方式，剪切板内容，以及全局系统快捷键
+
+![设置](https://github.com/jpanda-cn/screenshot-oss/raw/master/docs/images/3cedd34a-34a8-418f-8eb9-fbe6be8c4aed.png)
+
+系统默认快捷键为`Ctrl + Shift + Alt + J`,快捷键可以在`选型`-`通用设置`-`系统快捷键`处设置，暂时未提供禁用快捷键的入口。
+- 配置截图工具
+
+
+  - 选择不同的存储方式
+
+![存储方式](https://github.com/jpanda-cn/screenshot-oss/raw/master/docs/images/22954951-cda8-4892-b91f-0c303a6eb500.png)
+
+  - 选择截图后在剪切板中放置的内容
+
+![请输入图片描述](https://github.com/jpanda-cn/screenshot-oss/raw/master/docs/images/f44a259f-3e0c-481d-bcd4-0506f27c5fc9.png)
+
+  - 配置系统快键键
+
+![请输入图片描述](https://github.com/jpanda-cn/screenshot-oss/raw/master/docs/images/3545acdc-8842-4947-a3bb-06f80e913a33.png)
+
+  - 配置当前存储方式需要使用的参数
+
+![请输入图片描述](https://github.com/jpanda-cn/screenshot-oss/raw/master/docs/images/4ba92f42-85e2-4540-bfb6-c5ff1900d580.png)
+
+  - 比如git方式存储需要进行下列配置
+
+![请输入图片描述](https://github.com/jpanda-cn/screenshot-oss/raw/master/docs/images/7b6d4e11-d5ec-49d0-a3a9-ffd134ff0393.png)
+
+
+
+- 密码管理
+> 密码管理有两种状态，一种是当前已配置了密码，一种是当前未配置密码。
+
+针对于已配置密码的情况，提供了停用密码和修改密码的能力，针对于未配置密码的情况，则提供新增密码的能力，但无论哪种情况，都不需要输入当前密码。
+
+![请输入图片描述](https://github.com/jpanda-cn/screenshot-oss/raw/master/docs/images/26691676-5bb8-48bc-b031-529c42827fab.png)
+
+![请输入图片描述](https://github.com/jpanda-cn/screenshot-oss/raw/master/docs/images/f55e41e9-3827-4f9b-806a-aaf4e22579ee.png)
+- 失败任务列表
+> 
+![请输入图片描述](https://github.com/jpanda-cn/screenshot-oss/raw/master/docs/images/0b280974-39b9-47f8-a823-3ffc5b5026a3.png)
+
+  - 查看异常详细信息
+  
+  ![请输入图片描述](https://github.com/jpanda-cn/screenshot-oss/raw/master/docs/images/7ffe4b80-3e04-48b6-8082-9c0ff3c03a0c.png)
+  
+
+- 展示截图窗口
+
+![请输入图片描述](https://github.com/jpanda-cn/screenshot-oss/raw/master/docs/images/959d7c89-35e9-4bb8-8862-f15ef1a95db1.png)
 
 ## 主要工作流程
 在执行截图工作的时候，主要流程是 
