@@ -232,7 +232,7 @@ public class GitFileImageStoreConfig implements Initializable {
 
             if (!subDir.exists()) {
                 try {
-                    Files.createDirectory(sp);
+                    Files.createDirectories(sp);
                 } catch (IOException e) {
                     throw new RuntimeException(String.format("无法创建图片存储子目录,请检查配置，部分异常数据为:%s", e.getMessage()));
                 }
@@ -242,6 +242,7 @@ public class GitFileImageStoreConfig implements Initializable {
                     throw new RuntimeException(String.format("无法提交子目录到Git仓库，部分异常数据为:%s\"", e.getMessage()));
                 }
             }
+            git.add().addFilepattern("./" + gitPersistence.getSubDir()).call();
         } catch (Exception e) {
             // 不能完成配置，执行弹窗提示
             e.printStackTrace();
