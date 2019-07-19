@@ -9,38 +9,47 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.Rectangle;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MosaicScreenshotsElements extends DefaultGroupScreenshotsElements {
-    private Path path;
     private Rectangle rectangle;
     private Integer mosaicRegionWidth;
+    private List<Path> paths = new ArrayList<>();
 
-    public MosaicScreenshotsElements(Group group, CanvasProperties canvasProperties, Path path, Rectangle rectangle, Integer mosaicRegionWidth) {
+    public void addPath(Path path) {
+        paths.add(path);
+    }
+
+    public MosaicScreenshotsElements(Group group, CanvasProperties canvasProperties, Rectangle rectangle, Integer mosaicRegionWidth) {
         super(group, canvasProperties);
-        this.path = path;
         this.rectangle = rectangle;
         this.mosaicRegionWidth = mosaicRegionWidth;
     }
 
     @Override
     public Node getTopNode() {
-        return path;
+        return group;
     }
 
     @Override
     public void active() {
-        Bounds bounds = path.getLayoutBounds();
-        updateColor((int) ((int) bounds.getMinX() - rectangle.getX()), (int) ((int) bounds.getMinY() - rectangle.getY()), (int) ((int) bounds.getMaxX() - rectangle.getX()), (int) ((int) bounds.getMaxY() - rectangle.getY()));
-
+        for (Path path : paths) {
+            Bounds bounds = path.getLayoutBounds();
+            updateColor((int) ((int) bounds.getMinX() - rectangle.getX()), (int) ((int) bounds.getMinY() - rectangle.getY()), (int) ((int) bounds.getMaxX() - rectangle.getX()), (int) ((int) bounds.getMaxY() - rectangle.getY()));
+        }
     }
 
     @Override
     public void destroy() {
         // 处理
-        Bounds bounds = path.getLayoutBounds();
-        recoverColor((int) ((int) bounds.getMinX() - rectangle.getX()), (int) ((int) bounds.getMinY() - rectangle.getY()), (int) ((int) bounds.getMaxX() - rectangle.getX()), (int) ((int) bounds.getMaxY() - rectangle.getY()));
+        for (Path path : paths) {
+            Bounds bounds = path.getLayoutBounds();
+            recoverColor((int) ((int) bounds.getMinX() - rectangle.getX()), (int) ((int) bounds.getMinY() - rectangle.getY()), (int) ((int) bounds.getMaxX() - rectangle.getX()), (int) ((int) bounds.getMaxY() - rectangle.getY()));
+        }
+
     }
 
     private void updateColor(int x, int y, int ex, int ey) {

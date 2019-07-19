@@ -1,20 +1,15 @@
 package cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.mosaic;
 
-import cn.jpanda.screenshot.oss.core.ScreenshotsProcess;
 import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
 import cn.jpanda.screenshot.oss.core.shotkey.DefaultGroupScreenshotsElements;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.InnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
-import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import lombok.SneakyThrows;
-
-import java.awt.image.BufferedImage;
 
 /**
  * 对于马赛克的实现目前有两种思路：
@@ -30,7 +25,6 @@ public class MosaicInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEv
      * 当前路径
      */
     protected Path path;
-
 
 
     public MosaicInnerSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler) {

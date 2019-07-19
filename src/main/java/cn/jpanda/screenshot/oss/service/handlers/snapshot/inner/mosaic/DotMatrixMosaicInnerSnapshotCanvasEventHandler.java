@@ -1,7 +1,5 @@
 package cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.mosaic;
 
-import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
-import cn.jpanda.screenshot.oss.core.shotkey.DefaultGroupScreenshotsElements;
 import cn.jpanda.screenshot.oss.core.shotkey.MosaicScreenshotsElements;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
@@ -40,6 +38,8 @@ public class DotMatrixMosaicInnerSnapshotCanvasEventHandler extends MosaicInnerS
 
     private Map<Integer, ImageCursor> cursorMap = new HashMap<>(3);
 
+    private MosaicScreenshotsElements mosaicScreenshotsElements;
+
     public DotMatrixMosaicInnerSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler) {
         super(canvasProperties, canvasDrawEventHandler);
         computerImage = canvasProperties.getBackgroundImage();
@@ -55,6 +55,8 @@ public class DotMatrixMosaicInnerSnapshotCanvasEventHandler extends MosaicInnerS
     @Override
     protected void press(MouseEvent event) {
         super.press(event);
+        mosaicScreenshotsElements = new MosaicScreenshotsElements(group, canvasProperties, rectangle, mosaicRegionWidth);
+        canvasProperties.getScreenshotsElementsHolder().putEffectiveElement(mosaicScreenshotsElements);
         // 确定马赛克大小
         updateMosaicRegionWidth();
     }
@@ -94,7 +96,7 @@ public class DotMatrixMosaicInnerSnapshotCanvasEventHandler extends MosaicInnerS
         // 处理
         Bounds bounds = path.getLayoutBounds();
         updateColor((int) ((int) bounds.getMinX() - rectangle.getX()), (int) ((int) bounds.getMinY() - rectangle.getY()), (int) ((int) bounds.getMaxX() - rectangle.getX()), (int) ((int) bounds.getMaxY() - rectangle.getY()));
-        canvasProperties.getScreenshotsElementsHolder().putEffectiveElement(new MosaicScreenshotsElements(group,  canvasProperties,path,rectangle,mosaicRegionWidth));
+        mosaicScreenshotsElements.addPath(path);
         path = new Path();
         group.getChildren().add(path);
         path.visibleProperty().set(false);
