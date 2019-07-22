@@ -12,10 +12,12 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import lombok.SneakyThrows;
 import org.eclipse.jgit.api.CloneCommand;
+import org.eclipse.jgit.api.CreateBranchCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.JGitInternalException;
 import org.eclipse.jgit.api.errors.TransportException;
+import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.transport.RemoteConfig;
 import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
@@ -200,7 +202,13 @@ public class GitFileImageStoreConfig implements Initializable {
                 git.remoteSetUrl().setRemoteUri(new URIish(gitPersistence.getRemoteRepositoryUrl())).setRemoteName(DEFAULT_REMOTE_NAME).call();
 
                 if (git.branchList().call().stream().noneMatch((ref -> old.getBranch().equals(ref.getName().replaceFirst(BRANCH_NAME_PREFIX, ""))))) {
-                    git.branchCreate().setName(old.getBranch()).call();
+                    git
+                            .checkout()
+                            .setCreateBranch(true)
+                            .setName(old.getBranch())
+                            .setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.TRACK)
+                            .setStartPoint( Constants.DEFAULT_REMOTE_NAME + "/" + old.getBranch())
+                            .call();
                 }
                 anyChanged = true;
                 old.setRemoteRepositoryUrl(gitPersistence.getRemoteRepositoryUrl());
