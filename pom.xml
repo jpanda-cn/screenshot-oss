@@ -6,7 +6,7 @@
 
     <groupId>cn.jpanda</groupId>
     <artifactId>screenshot-oss</artifactId>
-    <version>1.0.0.4-SNAPSHOT</version>
+    <version>0.0.4-SNAPSHOT</version>
 
     <!--配置资源属性-->
     <properties>
@@ -167,7 +167,7 @@
                     <vendor>jpanda.cn</vendor>
                     <!-- 获取所有权限 -->
                     <allPermissions>true</allPermissions>
-                    <nativeReleaseVersion>v${version}</nativeReleaseVersion>
+                    <nativeReleaseVersion>${version}</nativeReleaseVersion>
                     <launcherArguments>
                         <launcherArgument>-Dfile.encoding=UTF-8</launcherArgument>
                         <launcherArgument>-Dvisualvm.display.name=Screenshot-oss</launcherArgument>

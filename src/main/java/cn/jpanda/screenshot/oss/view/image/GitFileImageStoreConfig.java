@@ -200,7 +200,7 @@ public class GitFileImageStoreConfig implements Initializable {
                 git.remoteSetUrl().setRemoteUri(new URIish(gitPersistence.getRemoteRepositoryUrl())).setRemoteName(DEFAULT_REMOTE_NAME).call();
 
                 if (git.branchList().call().stream().noneMatch((ref -> old.getBranch().equals(ref.getName().replaceFirst(BRANCH_NAME_PREFIX, ""))))) {
-                    git.branchRename().setNewName(old.getBranch()).call();
+                    git.branchCreate().setName(old.getBranch()).call();
                 }
                 anyChanged = true;
                 old.setRemoteRepositoryUrl(gitPersistence.getRemoteRepositoryUrl());
