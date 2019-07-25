@@ -92,7 +92,6 @@ public class GitImageStore extends AbstractConfigImageStore {
         }
         if (checkSubDir(gitPersistence, image, path)
                 && saveLocal(image, suffix, path)
-                && add2Git(git, gitPersistence, image, path)
                 && gitPull(git, usernamePasswordCredentialsProvider, image, path)
                 && gitAdd(git, gitPersistence, image, path)
                 && gitCommit(git, image, suffix, path, name)
@@ -135,7 +134,7 @@ public class GitImageStore extends AbstractConfigImageStore {
                 }
             }
             if (exceptionType.getLevel() >= GitExceptionType.CANT_ADD_GIT_FILE.getLevel()) {
-                if (!add2Git(git, gitPersistence, bufferedImage, path)) {
+                if (!gitAdd(git, gitPersistence, bufferedImage, path)) {
                     return false;
                 }
             }
@@ -210,15 +209,6 @@ public class GitImageStore extends AbstractConfigImageStore {
         return true;
     }
 
-    private boolean add2Git(Git git, GitPersistence gitPersistence, BufferedImage image, String path) {
-        try {
-            git.add().addFilepattern("./" + gitPersistence.getSubDir()).call();
-        } catch (GitAPIException e) {
-            addException(image, path, false, e, GitExceptionType.CANT_ADD_GIT_FILE);
-            return false;
-        }
-        return true;
-    }
 
     private boolean gitPull(Git git, UsernamePasswordCredentialsProvider usernamePasswordCredentialsProvider, BufferedImage image, String path) {
         // 更新仓库
@@ -239,7 +229,8 @@ public class GitImageStore extends AbstractConfigImageStore {
     private boolean gitAdd(Git git, GitPersistence gitPersistence, BufferedImage image, String path) {
         // 现将图片存放到本地仓库中
         try {
-            git.add().addFilepattern(StringUtils.isEmpty(gitPersistence.getSubDir()) ? "." : gitPersistence.getSubDir()).call();
+            String addPattern = StringUtils.isEmpty(gitPersistence.getSubDir()) ? "." : gitPersistence.getSubDir();
+            git.add().addFilepattern(addPattern).call();
         } catch (GitAPIException e) {
             addException(image, path, false, e, GitExceptionType.CANT_ADD_GIT_FILE);
             return false;
