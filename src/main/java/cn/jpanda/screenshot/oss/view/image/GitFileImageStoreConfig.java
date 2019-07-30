@@ -11,6 +11,7 @@ import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import lombok.SneakyThrows;
+import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.CreateBranchCommand;
 import org.eclipse.jgit.api.Git;
@@ -264,7 +265,20 @@ public class GitFileImageStoreConfig implements Initializable {
                     throw new RuntimeException(String.format("无法提交子目录到Git仓库，部分异常数据为:%s\"", e.getMessage()));
                 }
             }
-            git.add().addFilepattern(gitPersistence.getSubDir()).call();
+            String split = File.separator.equals("\\") ? "\\\\" : "/";
+            String[] paths = gitPersistence.getSubDir().split(split);
+            AddCommand addCommand = git.add();
+            String subP = "";
+            for (String p : paths) {
+                subP += p;
+                addCommand = addCommand.addFilepattern(subP);
+                subP += "/";
+            }
+            addCommand.call();
+            git.commit()
+                    .setMessage("init images directory")
+                    .call();
+            git.push().setCredentialsProvider(usernamePasswordCredentialsProvider).call();
         } catch (Exception e) {
             // 不能完成配置，执行弹窗提示
             e.printStackTrace();

@@ -10,6 +10,7 @@ import cn.jpanda.screenshot.oss.store.ImageStoreResultWrapper;
 import cn.jpanda.screenshot.oss.store.img.AbstractConfigImageStore;
 import cn.jpanda.screenshot.oss.view.image.GitFileImageStoreConfig;
 import lombok.SneakyThrows;
+import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -229,8 +230,16 @@ public class GitImageStore extends AbstractConfigImageStore {
     private boolean gitAdd(Git git, GitPersistence gitPersistence, BufferedImage image, String path) {
         // 现将图片存放到本地仓库中
         try {
-            String addPattern = StringUtils.isEmpty(gitPersistence.getSubDir()) ? "." : gitPersistence.getSubDir();
-            git.add().addFilepattern(addPattern).call();
+            String split = File.separator.equals("\\") ? "\\\\" : "/";
+            String[] paths = gitPersistence.getSubDir().split(split);
+            AddCommand addCommand = git.add();
+            String subP = "";
+            for (String p : paths) {
+                subP += p;
+                addCommand = addCommand.addFilepattern(subP);
+                subP += "/";
+            }
+            addCommand.call();
         } catch (GitAPIException e) {
             addException(image, path, false, e, GitExceptionType.CANT_ADD_GIT_FILE);
             return false;
