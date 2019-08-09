@@ -1,4 +1,7 @@
-package cn.jpanda.screenshot.oss.core.log;
+package cn.jpanda.screenshot.oss.core.log.defaults;
+
+import cn.jpanda.screenshot.oss.core.log.Log;
+import cn.jpanda.screenshot.oss.core.log.Loglevel;
 
 import java.time.LocalDateTime;
 

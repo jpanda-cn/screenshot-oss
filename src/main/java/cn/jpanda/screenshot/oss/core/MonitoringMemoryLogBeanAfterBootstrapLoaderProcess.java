@@ -24,8 +24,7 @@ public class MonitoringMemoryLogBeanAfterBootstrapLoaderProcess implements After
     public void after() {
         log.info("start monitoring memory ...");
         // 开一个新线程用来监控内存使用情况
-        Log timeTaskLog = configuration.getLogFactory().getLog(getClass().getCanonicalName() + "#timeTask");
-
+        Log timeTaskLog = configuration.getLogFactory().getLog(getClass().getCanonicalName());
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
@@ -33,14 +32,15 @@ public class MonitoringMemoryLogBeanAfterBootstrapLoaderProcess implements After
                 long total = runtime.totalMemory();
                 long free = runtime.freeMemory();
                 long max = runtime.maxMemory();
-                timeTaskLog.info("total:{0},max:{1},free:{2}", total, max, free);
+                timeTaskLog.debug("TOTAL={0}MB,MAX={1}MB,FREE={2}MB", total/1024/1024, max/1024/1024, free/1024/1024);
             }
         };
+
         // 守护线程
-        Timer timer = new Timer(true);
+        Timer timer = new Timer("Memory Monitoring Task",true);
+
         timer.schedule(timerTask
-                , 1000, 2000);
-        log.info("123");
+                , 1000, 10 * 1000);
     }
 
 }

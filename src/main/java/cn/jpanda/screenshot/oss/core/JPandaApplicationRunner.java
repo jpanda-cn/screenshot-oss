@@ -31,7 +31,7 @@ public class JPandaApplicationRunner {
         log = configuration.getLogFactory().getLog(getClass());
         // 执行引导程序后置操作
         configuration.getAfterBootstrapLoaderProcesses().forEach((b) -> {
-            log.info("start AfterBootstrapLoaderProcesses Named:{0}",b.getClass().getCanonicalName());
+            log.info("Start AfterBootstrapLoaderProcesses Named:{0}",b.getClass().getCanonicalName());
             b.after();
         });
         // 加载视图上下文，准备处理视图问题

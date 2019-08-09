@@ -6,7 +6,7 @@ import cn.jpanda.screenshot.oss.core.annotations.Order;
 import cn.jpanda.screenshot.oss.core.log.Log;
 import cn.jpanda.screenshot.oss.core.log.LogFactory;
 import cn.jpanda.screenshot.oss.core.log.LogHolder;
-import cn.jpanda.screenshot.oss.core.log.logging.LoggingFactory;
+import cn.jpanda.screenshot.oss.core.log.sl4j.LogBackSl4jLogFactory;
 import cn.jpanda.screenshot.oss.core.persistence.strategy.DataPersistenceStrategy;
 import cn.jpanda.screenshot.oss.core.persistence.strategy.StandardPropertiesDataPersistenceStrategy;
 import cn.jpanda.screenshot.oss.core.persistence.visitor.CachedPropertiesVisitor;
@@ -85,14 +85,16 @@ public abstract class BootstrapLoader {
      */
     @SneakyThrows
     protected void initLogInstance() {
-        LogManager logManager = LogManager.getLogManager();
-        logManager.readConfiguration(getClass().getClassLoader().getResourceAsStream("logging.properties"));
-        LogFactory logFactory = new LoggingFactory();
+//        LogManager logManager = LogManager.getLogManager();
+//        logManager.readConfiguration(getClass().getClassLoader().getResourceAsStream("logging.properties"));
+
+        LogFactory logFactory = new LogBackSl4jLogFactory();
         configuration.setLogFactory(logFactory);
         configuration.setLog(logFactory.getLog(configuration.getClass()));
         LogHolder.getInstance().initLogFactory(logFactory);
+
         log = logFactory.getLog(getClass());
-        log.info("Use log instance named:{0}", logFactory.getClass().getCanonicalName());
+        log.info("Use LogFactory Named:{0}", logFactory.getClass().getCanonicalName());
     }
 
     /**
@@ -101,7 +103,7 @@ public abstract class BootstrapLoader {
     protected void configWorkParams() {
 
         String currentPath = Paths.get(JarUtils.getCurrentJarDirectory()).toFile().getAbsolutePath();
-        log.info("Current working director is {0}.", currentPath);
+        log.info("Current working director is:{0}.", currentPath);
         configuration.setWorkPath(currentPath);
     }
 

@@ -1,4 +1,6 @@
-package cn.jpanda.screenshot.oss.core.log;
+package cn.jpanda.screenshot.oss.core.log.defaults;
+
+import cn.jpanda.screenshot.oss.core.log.Loglevel;
 
 public class DefaultOutLogConfig {
 
