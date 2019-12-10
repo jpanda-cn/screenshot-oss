@@ -4,7 +4,7 @@ import cn.jpanda.screenshot.oss.common.utils.AlertUtils;
 import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
-import cn.jpanda.screenshot.oss.store.img.instances.alioss.AliOssPersistence;
+import cn.jpanda.screenshot.oss.store.img.instances.jd.JdOssPersistence;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
@@ -15,8 +15,15 @@ import javafx.stage.Stage;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+/**
+ * 京东云配置项
+ *
+ * @author HanQi [Jpanda@aliyun.com]
+ * @version 1.0
+ * @since 2019/12/10 11:35
+ */
 @Controller
-public class AliOssFileImageStoreConfig implements Initializable {
+public class JdCloudFileImageStoreConfig implements Initializable {
     public TextField endpoint;
     public TextField bucket;
     public TextField accessKeyId;
@@ -25,7 +32,7 @@ public class AliOssFileImageStoreConfig implements Initializable {
     public TextField accessUrl;
     private Configuration configuration;
 
-    public AliOssFileImageStoreConfig(Configuration configuration) {
+    public JdCloudFileImageStoreConfig(Configuration configuration) {
         this.configuration = configuration;
     }
 
@@ -35,25 +42,25 @@ public class AliOssFileImageStoreConfig implements Initializable {
     }
 
     private void init() {
-        AliOssPersistence aliOssPersistence = configuration.getPersistence(AliOssPersistence.class);
+        JdOssPersistence JdOssPersistence = configuration.getPersistence(JdOssPersistence.class);
 
-        if (StringUtils.isNotEmpty(aliOssPersistence.getEndpoint())) {
-            endpoint.textProperty().setValue(aliOssPersistence.getEndpoint());
+        if (StringUtils.isNotEmpty(JdOssPersistence.getEndpoint())) {
+            endpoint.textProperty().setValue(JdOssPersistence.getEndpoint());
         }
-        if (StringUtils.isNotEmpty(aliOssPersistence.getBucket())) {
-            bucket.textProperty().setValue(aliOssPersistence.getBucket());
+        if (StringUtils.isNotEmpty(JdOssPersistence.getBucket())) {
+            bucket.textProperty().setValue(JdOssPersistence.getBucket());
         }
-        if (StringUtils.isNotEmpty(aliOssPersistence.getAccessKeyId())) {
-            accessKeyId.textProperty().setValue(aliOssPersistence.getAccessKeyId());
+        if (StringUtils.isNotEmpty(JdOssPersistence.getAccessKeyId())) {
+            accessKeyId.textProperty().setValue(JdOssPersistence.getAccessKeyId());
         }
-        if (StringUtils.isNotEmpty(aliOssPersistence.getAccessKeySecret())) {
-            accessKeySecret.textProperty().setValue(aliOssPersistence.getAccessKeySecret());
+        if (StringUtils.isNotEmpty(JdOssPersistence.getAccessKeySecret())) {
+            accessKeySecret.textProperty().setValue(JdOssPersistence.getAccessKeySecret());
         }
-        if (StringUtils.isNotEmpty(aliOssPersistence.getAccessUrl())) {
-            accessUrl.textProperty().setValue(aliOssPersistence.getAccessUrl());
+        if (StringUtils.isNotEmpty(JdOssPersistence.getAccessUrl())) {
+            accessUrl.textProperty().setValue(JdOssPersistence.getAccessUrl());
         }
 
-        async.selectedProperty().set(aliOssPersistence.isAsync());
+        async.selectedProperty().set(JdOssPersistence.isAsync());
     }
 
     public void close() {
@@ -64,14 +71,18 @@ public class AliOssFileImageStoreConfig implements Initializable {
         if (!check()) {
             return;
         }
-        AliOssPersistence aliOssPersistence = configuration.getPersistence(AliOssPersistence.class);
-        aliOssPersistence.setEndpoint(endpoint.textProperty().get());
-        aliOssPersistence.setBucket(bucket.textProperty().get());
-        aliOssPersistence.setAccessKeyId(accessKeyId.textProperty().get());
-        aliOssPersistence.setAccessKeySecret(accessKeySecret.textProperty().get());
-        aliOssPersistence.setAccessUrl(accessUrl.textProperty().get());
-        aliOssPersistence.setAsync(async.isSelected());
-        configuration.storePersistence(aliOssPersistence);
+        JdOssPersistence JdOssPersistence = configuration.getPersistence(JdOssPersistence.class);
+        JdOssPersistence.setEndpoint(endpoint.textProperty().get());
+        JdOssPersistence.setBucket(bucket.textProperty().get());
+        JdOssPersistence.setAccessKeyId(accessKeyId.textProperty().get());
+        JdOssPersistence.setAccessKeySecret(accessKeySecret.textProperty().get());
+        String access=accessUrl.textProperty().get();
+        if (access.endsWith("\\")){
+            access=access.substring(0,access.length()-1);
+        }
+        JdOssPersistence.setAccessUrl(access);
+        JdOssPersistence.setAsync(async.isSelected());
+        configuration.storePersistence(JdOssPersistence);
         close();
     }
 

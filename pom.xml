@@ -61,6 +61,11 @@
     <!-- 依赖配置 -->
     <dependencies>
         <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-s3</artifactId>
+            <version>1.11.490</version>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
@@ -119,6 +124,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
+                <version>3.0.0</version>
                 <executions>
                     <execution>
                         <phase>deploy</phase>
@@ -132,6 +138,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.5</version>
                 <configuration>
                     <source>8</source>
                     <target>8</target>
@@ -172,7 +179,7 @@
                     <vendor>jpanda.cn</vendor>
                     <!-- 获取所有权限 -->
                     <allPermissions>true</allPermissions>
-                    <nativeReleaseVersion>${version}</nativeReleaseVersion>
+                    <nativeReleaseVersion>${project.version}</nativeReleaseVersion>
                     <launcherArguments>
                         <launcherArgument>-Dfile.encoding=UTF-8</launcherArgument>
                         <launcherArgument>-Dvisualvm.display.name=Screenshot-oss</launcherArgument>
