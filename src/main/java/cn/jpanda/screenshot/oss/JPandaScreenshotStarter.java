@@ -54,6 +54,7 @@ public class JPandaScreenshotStarter extends Application {
     protected void doStart() {
         log.debug("load index cut page");
         Stage stage = viewContext.getStage();
+        stage.initStyle(StageStyle.UNDECORATED);
         stage.setTitle(viewContext.getConfiguration().getUniqueBean(I18nResource.class).get(I18nConstants.titleIndex));
         stage.setResizable(false);
         viewContext.getStage().getIcons().add(new Image("/images/icon.png"));

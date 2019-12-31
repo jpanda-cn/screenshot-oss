@@ -1,0 +1,10 @@
+/*鼠标覆盖按钮效果*/
+.button {
+    -fx-background-color: BLACK;
+    /*-size: 25px;*/
+    -fx-min-height: -size;
+    -fx-min-width: -size;
+    -fx-max-height: -size;
+    -fx-max-width: -size;
+    -fx-content-display: graphic-only;
+}

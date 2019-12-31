@@ -1,23 +1,82 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.text.Font?>
-<AnchorPane prefHeight="260.0" prefWidth="319.0" xmlns="http://javafx.com/javafx/10.0.1"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.jpanda.screenshot.oss.view.main.IndexCutView">
-    <ImageView fitHeight="87.0" fitWidth="308.0" layoutX="5.0" layoutY="29.0" pickOnBounds="true" preserveRatio="true">
-        <Image url="/images/logo.png"/>
-    </ImageView>
-    <Button fx:id="cutBtn" layoutX="42.0" layoutY="120.0" mnemonicParsing="false" onKeyPressed="#doKeyCut"
-            onMouseClicked="#doCut" prefHeight="87.0" prefWidth="238.0" text="截图" textFill="#010302">
-        <font>
-            <Font name="System Bold" size="38.0"/>
-        </font>
-    </Button>
-    <MenuButton fx:id="options" layoutX="259.0" layoutY="4.0" mnemonicParsing="false" text="选项"/>
-    <Label layoutX="128.0" layoutY="239.0" text="截图时隐藏该菜单"/>
-    <RadioButton fx:id="hidden" layoutX="96.0" layoutY="239.0" mnemonicParsing="false"/>
-    <Label fx:id="shotKey" alignment="CENTER" layoutX="48.0" layoutY="187.0" textFill="#1d27cf"/>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="517.0" prefWidth="367.0" styleClass="back" stylesheets="@/css/default.css,@IndexCutView.css" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.jpanda.screenshot.oss.view.main.IndexCutView">
+    <AnchorPane fx:id="mainContain" layoutX="8.0" layoutY="-2.0" prefHeight="556.0" prefWidth="357.0">
+        <!-- 顶部title区域-->
+        <AnchorPane id="contain-top" fx:id="containTop" layoutX="-8.0" layoutY="2.0" prefHeight="59.0" prefWidth="367.0" styleClass="top">
+            <ImageView fitHeight="49.0" fitWidth="150.0" layoutX="8.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true">
+                <Image url="/images/icon-white.png" />
+            </ImageView>
+            <Separator layoutX="214.0" layoutY="3.0" orientation="VERTICAL" prefHeight="49.0" prefWidth="11.0" />
+            <MenuButton fx:id="options" layoutX="234.0" layoutY="15.0" mnemonicParsing="false" prefHeight="29.0" prefWidth="91.0" style="-fx-background-color: rgba(176, 32, 29, 0.98);" styleClass="menu-bar" text="选项" textFill="WHITE">
+                <effect>
+                    <Blend mode="ADD">
+                        <topInput>
+                            <Shadow>
+                                <input>
+                                    <Lighting bumpInput="$null">
+                                        <light>
+                                            <Light.Distant />
+                                        </light>
+                                    </Lighting>
+                                </input>
+                            </Shadow>
+                        </topInput>
+                    </Blend>
+                </effect>
+                <cursor>
+                    <Cursor fx:constant="CLOSED_HAND" />
+                </cursor></MenuButton>
+            <Button fx:id="exit" layoutX="337.0" layoutY="22.0" onAction="#doClose" styleClass="exit-btn-svg" text="退出" AnchorPane.rightAnchor="12.0" AnchorPane.topAnchor="22.0">
+            </Button>
+        </AnchorPane>
+
+        <AnchorPane layoutY="68.0" prefHeight="158.0" prefWidth="353.0">
+
+            <ImageView fitHeight="87.0" fitWidth="287.0" layoutX="31.0" layoutY="57.0" pickOnBounds="true" preserveRatio="true">
+                <Image url="/images/logo.png"/>
+            </ImageView>
+        </AnchorPane>
+        <AnchorPane layoutX="26.0" layoutY="228.0" prefHeight="170.0" prefWidth="231.0">
+            <Button fx:id="storeEdit" layoutX="246.0" layoutY="22.0" mnemonicParsing="false"
+                    onMouseClicked="#editImageStore" prefHeight="29.0" prefWidth="68.0" styleClass="button" text="编辑">
+                <font>
+                    <Font name="System Bold" size="14.0"/>
+                </font>
+            </Button>
+            <Label layoutX="5.0" layoutY="28.0" prefHeight="18.0" prefWidth="67.0" text="存储方式"/>
+            <ComboBox fx:id="imageSave" layoutX="80.0" layoutY="25.0" prefWidth="150.0" styleClass="menu-bar"/>
+            <Label layoutX="5.0" layoutY="68.0" text="剪切板内容"/>
+            <ComboBox fx:id="clipboard" layoutX="80.0" layoutY="64.0" prefWidth="150.0" styleClass="menu-bar"/>
+            <Label fx:id="shotKeyL" layoutX="7.0" layoutY="103.0" text="系统快捷键"/>
+            <TextField fx:id="hotKey" layoutX="80.0" layoutY="99.0" onKeyPressed="#changeHotKey" prefHeight="23.0"
+                       prefWidth="150.0"/>
+        </AnchorPane>
+
+        <!-- 底部截图区域 -->
+        <AnchorPane layoutX="21.0" layoutY="387.0" prefHeight="158.0" prefWidth="314.0">
+            <Button fx:id="cutBtn" layoutX="37.0" layoutY="22.0" mnemonicParsing="false" onKeyPressed="#doKeyCut" onMouseClicked="#doCut" prefHeight="87.0" prefWidth="238.0" text="截图" textFill="#010302">
+                <font>
+                    <Font name="System Bold" size="38.0" />
+                </font>
+                <styleClass>
+                    <String fx:value="btn-radius-large" />
+                    <String fx:value="btn-basic" />
+                </styleClass>
+            </Button>
+            <Label layoutX="130.0" layoutY="118.0" text="截图时隐藏该菜单" />
+            <RadioButton fx:id="hidden" layoutX="98.0" layoutY="118.0" mnemonicParsing="false" />
+            <Label fx:id="shotKeyShower" alignment="CENTER" disable="true" layoutX="127.0" layoutY="99.0" opacity="0.0" prefHeight="19.0" prefWidth="183.0" textFill="#1d27cf" />
+            <ProgressBar fx:id="loadStatus" layoutX="21.0" layoutY="144.0" prefHeight="21.0" prefWidth="293.0" progress="0.0" />
+        </AnchorPane>
+    </AnchorPane>
+
 </AnchorPane>

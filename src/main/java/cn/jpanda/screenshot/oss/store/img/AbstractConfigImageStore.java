@@ -1,10 +1,12 @@
 package cn.jpanda.screenshot.oss.store.img;
 
 import cn.jpanda.screenshot.oss.core.Configuration;
+import cn.jpanda.screenshot.oss.shape.ModelDialog;
 import cn.jpanda.screenshot.oss.store.ExceptionType;
 import cn.jpanda.screenshot.oss.store.ExceptionWrapper;
 import cn.jpanda.screenshot.oss.store.ImageStoreResult;
 import cn.jpanda.screenshot.oss.store.ImageStoreResultHandler;
+import cn.jpanda.screenshot.oss.view.models.CloseModelView;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -36,12 +38,16 @@ public abstract class AbstractConfigImageStore implements ImageStore {
             return;
         }
         Scene scene = configuration.getViewContext().getScene(config);
-        Stage stage = configuration.getViewContext().newStage();
-        stage.getIcons().addAll(configuration.getViewContext().getStage().getIcons());
-        stage.setTitle(getName());
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setScene(scene);
-        stage.showAndWait();
+        Stage stage = configuration.getViewContext().getStage();
+        ModelDialog<String> modelDialog = new ModelDialog<>(stage);
+//        modelDialog.initModality(Modality.APPLICATION_MODAL);
+        modelDialog.setContent(scene.getRoot());
+//        stage.initModality(Modality.APPLICATION_MODAL);
+        modelDialog.showAndWait();
+//        stage.getIcons().addAll(configuration.getViewContext().getStage().getIcons());
+//        stage.setTitle(getName());
+//        stage.setScene(scene);
+//        stage.showAndWait();
     }
 
     public abstract String getName();
@@ -64,6 +70,7 @@ public abstract class AbstractConfigImageStore implements ImageStore {
         }
         return false;
     }
+
     protected void addException(BufferedImage image, String path, boolean success, Exception e, ExceptionType exceptionType) {
         e.printStackTrace();
         configuration.getUniqueBean(ImageStoreResultHandler.class).add(ImageStoreResult
@@ -76,6 +83,7 @@ public abstract class AbstractConfigImageStore implements ImageStore {
                 .exceptionType(exceptionType)
                 .build());
     }
+
     public boolean canUse() {
         return true;
     }

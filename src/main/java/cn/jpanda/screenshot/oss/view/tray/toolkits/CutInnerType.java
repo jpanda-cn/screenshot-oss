@@ -9,4 +9,6 @@ public enum CutInnerType {
     RESIZE,
     DRAG,
     MOSAIC,
+    RGB,
+    DRAWING_PIN
 }

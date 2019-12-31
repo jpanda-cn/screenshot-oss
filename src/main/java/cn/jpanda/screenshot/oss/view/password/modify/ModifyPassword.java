@@ -7,12 +7,13 @@ import cn.jpanda.screenshot.oss.core.annotations.Controller;
 import cn.jpanda.screenshot.oss.core.persistence.BootstrapPersistence;
 import cn.jpanda.screenshot.oss.core.persistence.Persistence;
 import cn.jpanda.screenshot.oss.core.persistence.PersistenceBeanCatalogManagement;
+import cn.jpanda.screenshot.oss.shape.ModelDialog;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
-import javafx.stage.Stage;
 
 import java.net.URL;
 import java.util.List;
@@ -90,6 +91,10 @@ public class ModifyPassword implements Initializable {
     }
 
     public void close() {
-        ((Stage) (pwd.getScene().getWindow())).close();
+        Parent root = pwd.getParent();
+        @SuppressWarnings("rawtypes") ModelDialog modelDialog = (ModelDialog) root.getProperties().get(ModelDialog.class);
+        //noinspection unchecked
+        modelDialog.resultProperty().setValue("cancel");
+        modelDialog.close();
     }
 }

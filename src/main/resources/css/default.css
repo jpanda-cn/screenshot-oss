@@ -1,0 +1,221 @@
+.root {
+    -fx-font-size: 14px;
+}
+.label {
+    -fx-font-size: 14px;
+}
+
+/*鼠标覆盖按钮效果*/
+.button {
+    /*文本对齐方式*/
+    -fx-text-alignment: center;
+    /*合适高度*/
+    /*-fx-pref-height: 38px;*/
+    /*内边距*/
+    -fx-padding: 0 18px;
+    /*无边框*/
+    -fx-border-style: none;
+    /*鼠标样式*/
+    -fx-cursor: pointer;
+    -fx-text-fill: white;
+    -fx-background-color: rgba(176, 32, 29, 0.98);
+}
+
+.button:hover {
+    /*粗体*/
+    /*-fx-font-weight: bold;*/
+    /*透明度*/
+    -fx-opacity: 0.8;
+    -fx-text-fill: rgba(176, 32, 29, 0.98);
+    -fx-background-color: #e6e6e6;
+}
+
+/*鼠标覆盖按钮效果*/
+.button:pressed {
+    /*粗体*/
+    /*-fx-font-weight: bold;*/
+    /*透明度*/
+    -fx-opacity: 0.8;
+    -fx-text-fill: rgb(0, 0, 0);
+    -fx-background-color: #e6e6e6;
+}
+
+.exit-btn-svg {
+    -icon-paint: WHITE;
+    -fx-background-color: -icon-paint;
+    -size: 12px;
+    -fx-min-height: -size;
+    -fx-min-width: -size;
+    -fx-max-height: -size;
+    -fx-max-width: -size;
+    -fx-content-display: graphic-only;
+    -fx-shape: "M604.16 512l110.08-110.08a64 64 0 0 0-90.24-90.88L512 421.76 403.2 311.04a64 64 0 0 0-90.24 90.88L423.04 512 312.96 622.08a64 64 0 1 0 90.24 90.88L512 602.24l110.08 110.08a64 64 0 0 0 90.24-90.24z";
+}
+
+.exit-btn-svg:hover {
+    -icon-paint: rgba(255, 99, 99, 0.36);
+}
+
+/* see https://stackoverflow.com/questions/12299162/how-to-style-menu-button-and-menu-items*/
+/* VARIABLE DEFINITIONS: Only these 4 variables have to be adjusted, the rest is copy-paste */
+* {
+    -fx-my-menu-color: rgba(176, 32, 29, 0.98); /* Change according to your needs */
+    -fx-my-menu-color-highlighted: #FFFFFF; /* Change according to your needs */
+    -fx-my-menu-font-color: #FFFFFF; /* Change according to your needs */
+    -fx-my-menu-font-color-highlighted: rgba(176, 32, 29, 0.98); /* Change according to your needs */
+}
+
+/* MENU BAR + Top-level MENU BUTTONS */
+/*** The menu bar itself ***/
+.menu-bar {
+    -fx-background-color: -fx-my-menu-color;
+}
+
+/*** Top-level menu itself (not selected / hovered) ***/
+.menu-bar > .container > .menu-button {
+    -fx-background-color: -fx-my-menu-color;
+    -fx-background-insets: 0, 1, 2;
+    -fx-background-radius: 0 6 6 6, 0 5 5 5, 0 4 4 4;
+}
+
+/*** Top-level menu's label (not selected / hovered) ***/
+.menu-bar > .container > .menu-button > .label {
+    -fx-text-fill: -fx-my-menu-font-color;
+}
+
+/*** Top-level menu's label (disabled) ***/
+.menu-bar > .container > .menu-button > .label:disabled {
+    -fx-opacity: 1.0;
+}
+
+/*** Top-level menu itself (selected / hovered) ***/
+.menu-bar > .container > .menu-button:hover,
+.menu-bar > .container > .menu-button:focused,
+.menu-bar > .container > .menu-button:showing {
+    -fx-background-color: -fx-my-menu-color-highlighted;
+}
+
+/*** Top-level menu's label (selected / hovered) ***/
+.menu-bar > .container > .menu-button:hover > .label,
+.menu-bar > .container > .menu-button:focused > .label,
+.menu-bar > .container > .menu-button:showing > .label {
+    -fx-text-fill: -fx-my-menu-font-color-highlighted;
+}
+
+/* MENU ITEM (children of a MENU BUTTON) */
+/*** The item itself (not hovered / focused) ***/
+.menu-item {
+    -fx-background-color: -fx-my-menu-color;
+}
+
+/*** The item's label (not hovered / focused) ***/
+.menu-item .label {
+    -fx-text-fill: -fx-my-menu-font-color;
+}
+
+/*** The item's label (disabled) ***/
+.menu-item .label:disabled {
+    -fx-opacity: 1.0;
+}
+
+/*** The item itself (hovered / focused) ***/
+.menu-item:focused, .menu-item:hover {
+    -fx-background-color: -fx-my-menu-color-highlighted;
+}
+
+/*** The item's label (hovered / focused) ***/
+.menu-item:focused .label, .menu-item:hover .label {
+    -fx-text-fill: -fx-my-menu-font-color-highlighted;
+}
+
+/* CONTEXT MENU */
+.context-menu {
+    -fx-skin: "com.sun.javafx.scene.control.skin.ContextMenuSkin";
+    -fx-background-color: rgba(0, 0, 0, 0.25);
+    -fx-background-insets: 0, 1, 2;
+    -fx-background-radius: 0 6 6 6, 0 5 5 5, 0 4 4 4;
+    -fx-padding: 0.666667em 0.666667em 0.666667em 0.666667em; /*8 1 8 1*/
+}
+
+/* ================   ComboBOx    ===========================*/
+* {
+    -fx-my-combox-color: rgba(176, 32, 29, 0.98);
+    -fx-my-combox-color-highlighted: #FFFFFF;
+    -fx-my-combox-font-color: #FFFFFF;
+    -fx-my-combox-font-color-highlighted: rgba(176, 32, 29, 0.98);
+}
+
+
+.combo-box {
+    -fx-border-color:  -fx-my-combox-color;
+    -fx-border-width: 1;
+    -fx-background-radius: 0;
+    -fx-background-color:  -fx-my-combox-color;
+    -fx-font-family: "Arial";
+    -fx-font-size: 12px;
+    -fx-background-insets: 0;
+    -fx-alignment: center;
+    -fx-content-display: center;
+}
+
+.combo-box > .cell {
+    -fx-background-color:-fx-my-combox-color;
+    -fx-text-fill:  -fx-my-combox-color-highlighted;
+}
+
+.combo-box:hover >.cell {
+    -fx-background-color: -fx-my-combox-color-highlighted;
+    -fx-text-fill: -fx-my-combox-font-color-highlighted;
+}
+
+.combo-box-popup .list-view .list-cell {
+    -fx-background-color: -fx-my-combox-color;
+    -fx-text-fill: -fx-my-combox-font-color;
+    -fx-text-alignment: LEFT;
+}
+/* 移除默认选中样式 */
+/*.combo-box-popup .list-view .list-cell:filled:selected,*/
+/*.combo-box-popup .list-view .list-cell:filled:selected:hover {*/
+/*    -fx-background-color:#ffffff;*/
+/*    -fx-text-fill: rgba(0, 0, 0, 0.98);*/
+/*}*/
+
+.combo-box-popup .list-view .list-cell:filled:hover {
+    -fx-background-color:-fx-my-combox-color-highlighted;
+    -fx-text-fill:  -fx-my-combox-font-color-highlighted;
+    -fx-background-radius: 10.0;
+}
+
+/*=========================   Radio   ===================================*/
+.radio-button .radio {
+    -fx-border-width: 1px;
+    -fx-border-color: rgba(176, 32, 29, 0.98);
+    -fx-background-color: white;
+    -fx-border-radius: 15px;
+}
+.radio-button .radio:selected {
+    -fx-background-color: rgba(176, 32, 29, 0.98);
+    -fx-border-color: #FFFFFF;
+}
+
+.radio-button .dot:selected {
+    -fx-background-color: rgba(176, 32, 29, 0.98);
+    -fx-border-color: #FFFFFF;
+}
+
+/* ========================== TableView  ===================================*/
+.table-row-cell:filled {
+    -fx-background-color: lime;
+}
+
+.table-row-cell:filled:selected {
+    -fx-background-color: -fx-selection-bar;
+}
+
+.table-row-cell:filled:removed {
+    -fx-background-color: orange;
+}
+
+.table-row-cell:filled:removed:selected {
+    -fx-background-color: -fx-selection-bar;
+}

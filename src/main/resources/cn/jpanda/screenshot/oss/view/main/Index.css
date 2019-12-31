@@ -1,0 +1,169 @@
+/*全局字体样式*/
+.root {
+    -fx-font-size: 14px;
+}
+
+/*边框圆角按钮*/
+.btn-radius-large {
+    -fx-border-radius: 50px;
+    -fx-background-radius: 50px;
+}
+
+
+.back {
+    -fx-background-color: rgba(235, 235, 235, 0.27);
+}
+
+.top {
+    -fx-background-color: rgba(176, 32, 29, 0.98);
+}
+
+
+/*内容盒子样式，设置一下圆角和内边距*/
+.box {
+    -fx-border-color: rgb(162, 162, 162);
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-padding: 5 5 5 5;
+}
+
+/*输入框样式*/
+.input-group {
+    /*对齐方式*/
+    -fx-text-alignment: left;
+    /*内容显示方式*/
+    -fx-content-display: inline-block;
+    /*合适高度*/
+    -fx-pref-height: 30px;
+    /*边框色*/
+    -fx-border-color: rgb(230, 230, 230);
+    /*提示文字颜色*/
+    -fx-prompt-text-fill: rgb(162, 162, 162);
+    /*输入文字颜色*/
+    -fx-text-fill: rgb(110, 110, 110);
+    /*边框圆角*/
+    -fx-border-radius: 2px;
+    -fx-background-radius: 2px;
+    /*内边距*/
+    -fx-padding: 5 5 5 5;
+    /*鼠标形状*/
+    -fx-cursor: pointer;
+}
+
+
+/*复选框样式*/
+.check-box .box {
+    -fx-background-color: #fff;
+    -fx-border-color: rgb(230, 230, 230);
+    -fx-border-radius: 3px;
+}
+
+/*复选框选中后标记的颜色*/
+.check-box:selected .mark {
+    -fx-background-color: #fff;
+}
+
+/*复选框选中后背景色*/
+.check-box:selected .box {
+    -fx-background-color: rgb(95, 184, 120);
+}
+
+/*单选按钮样式*/
+.radio-button .radio {
+    -fx-background-color: #fff;
+    -fx-border-color: rgb(230, 230, 230);
+    -fx-border-radius: 100;
+}
+
+/*单选按钮中间点的颜色*/
+.radio-button:selected .dot {
+    -fx-background-color: #fff;
+}
+
+/*单选按钮选中后背景色*/
+.radio-button:selected .radio {
+    -fx-background-color: rgb(95, 184, 120);
+}
+
+/*表格内容居中显示*/
+.table-view .table-column {
+    -fx-alignment: center;
+}
+
+/*左侧导航菜单按钮样式*/
+.menu-btn {
+    -fx-pref-width: 300px;
+    -fx-pref-height: 35px;
+    -fx-background-color: rgb(40, 43, 51);
+    -fx-text-fill: rgb(191, 192, 194);
+}
+
+/*左侧导航菜单按钮鼠标悬停效果*/
+.menu-btn:hover {
+    -fx-background-color: rgb(95, 184, 120);
+    -fx-text-fill: #fff;
+}
+
+
+/*关闭图标*/
+.close {
+    -fx-background-color: transparent;
+    -fx-text-fill: #e1e1e1;
+}
+
+.close:hover {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0 0 -1 0, 0, 1, 2;
+    -fx-background-radius: 3px, 3px, 2px, 1px;
+    -fx-padding: 0.333333em 0.666667em 0.333333em 0.666667em; /* 4 8 4 8 */
+    -fx-text-fill: white;
+    -fx-alignment: CENTER;
+    -fx-content-display: LEFT;
+}
+
+/* 截图按钮 */
+.cut-button {
+    -fx-text-fill: white;
+    -fx-background-color: rgba(176, 32, 29, 0.98);
+}
+
+.cut-button:hover {
+    -fx-text-fill: rgba(176, 32, 29, 0.98);
+    -fx-background-color: #e6e6e6;
+}
+
+/*按钮基础样式*/
+.btn-basic {
+    /*文本对齐方式*/
+    -fx-text-alignment: center;
+    /*合适高度*/
+    /*-fx-pref-height: 38px;*/
+    /*内边距*/
+    -fx-padding: 0 18px;
+    /*无边框*/
+    -fx-border-style: none;
+    /*鼠标样式*/
+    -fx-cursor: pointer;
+    -fx-text-fill: white;
+    -fx-background-color: rgba(176, 32, 29, 0.98);
+}
+
+/*鼠标覆盖按钮效果*/
+.btn-basic:hover {
+    /*粗体*/
+    /*-fx-font-weight: bold;*/
+    /*透明度*/
+    -fx-opacity: 0.8;
+    -fx-text-fill: rgba(176, 32, 29, 0.98);
+    -fx-background-color: #e6e6e6;
+}
+
+/*鼠标覆盖按钮效果*/
+.btn-basic:pressed {
+    /*粗体*/
+    /*-fx-font-weight: bold;*/
+    /*透明度*/
+    -fx-opacity: 0.8;
+    -fx-text-fill: rgb(0, 0, 0);
+    -fx-background-color: #e6e6e6;
+}

@@ -56,32 +56,41 @@ public class DefaultViewContext implements ViewContext {
     @Override
     @SneakyThrows
     public Scene getScene(Class<? extends Initializable> clazz, boolean isNew, boolean override) {
+        return getScene(clazz, true, isNew, override);
+    }
 
+    @Override
+    public Scene getScene(Class<? extends Initializable> clazz, boolean useDefaultCss, boolean isNew, boolean override) {
         String key = generatorViewKey(clazz);
 
         if (isNew) {
             if (override) {
-                registry(clazz);
+                registry(clazz, useDefaultCss);
             } else {
 
-                return loadScene(clazz);
+                return loadScene(clazz, useDefaultCss);
             }
 
         }
         if (views.containsKey(key)) {
             return views.get(key);
         } else {
-            registry(clazz);
+            registry(clazz, useDefaultCss);
         }
 
         return views.get(key);
     }
 
+    @Override
+    public Scene getScene(Class<? extends Initializable> clazz, boolean useDefaultCss) {
+        return getScene(clazz, useDefaultCss, false, false);
+    }
+
 
     @Override
     @SneakyThrows
-    public boolean registry(Class<? extends Initializable> clazz) {
-        return null != views.put(generatorViewKey(clazz), loadScene(clazz));
+    public boolean registry(Class<? extends Initializable> clazz, boolean useDefaultCss) {
+        return null != views.put(generatorViewKey(clazz), loadScene(clazz, useDefaultCss));
     }
 
     @Override
@@ -106,7 +115,11 @@ public class DefaultViewContext implements ViewContext {
         return FXMLLoader.load(fxmlSearch.search(clazz), null, null, new InjectControllerCallback(configuration));
     }
 
-    protected Scene loadScene(Class<? extends Initializable> clazz) {
-        return new Scene(load(clazz));
+    protected Scene loadScene(Class<? extends Initializable> clazz, boolean useDefaultCss) {
+        Parent parent = load(clazz);
+        if (useDefaultCss) {
+            parent.getStylesheets().add("/css/default.css");
+        }
+        return new Scene(parent);
     }
 }

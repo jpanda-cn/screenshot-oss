@@ -52,7 +52,7 @@ public class ClassicScreenshot implements Snapshot {
             configuration.getCutting().set(stage);
             stage.initOwner(configuration.getViewContext().getStage());
             stage.initStyle(StageStyle.UNDECORATED);
-            Scene scene = configuration.getViewContext().getScene(SnapshotView.class, true, false);
+            Scene scene = configuration.getViewContext().getScene(SnapshotView.class, false, true, false);
             stage.setScene(scene);
 
             // 添加屏幕跟随，截哪个屏幕就在哪个屏幕上展示

@@ -1,5 +1,6 @@
 package cn.jpanda.screenshot.oss.view.tray;
 
+import cn.jpanda.screenshot.oss.common.utils.MathUtils;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.ScreenshotsProcess;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
@@ -12,21 +13,33 @@ import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallbackRegistryManager
 import cn.jpanda.screenshot.oss.store.clipboard.instances.ImageClipboardCallback;
 import cn.jpanda.screenshot.oss.view.main.SettingsView;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
+import cn.jpanda.screenshot.oss.view.tray.subs.ResizeEventHandler;
 import cn.jpanda.screenshot.oss.view.tray.subs.TrayColorView;
 import cn.jpanda.screenshot.oss.view.tray.subs.TrayFontView;
 import cn.jpanda.screenshot.oss.view.tray.subs.TrayPointView;
 import cn.jpanda.screenshot.oss.view.tray.toolkits.CutInnerType;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Bounds;
+import javafx.scene.Cursor;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.WritableImage;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.SVGPath;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -45,6 +58,8 @@ public class CanvasCutTrayView implements Initializable {
     public Button settings;
     public Button mosaic;
     public Button save;
+    public Button rgb;
+    public Button drawingPin;
     private Configuration configuration;
 
     public CanvasCutTrayView(Configuration configuration) {
@@ -84,6 +99,8 @@ public class CanvasCutTrayView implements Initializable {
         pen.tooltipProperty().setValue(new Tooltip("画笔"));
         text.tooltipProperty().setValue(new Tooltip("文字"));
         mosaic.tooltipProperty().setValue(new Tooltip("马赛克"));
+        rgb.tooltipProperty().setValue(new Tooltip("取色器"));
+        drawingPin.tooltipProperty().setValue(new Tooltip("图钉"));
         settings.tooltipProperty().setValue(new Tooltip("设置"));
         save.tooltipProperty().setValue(new Tooltip("上传至云"));
         cancel.tooltipProperty().setValue(new Tooltip("取消"));
@@ -101,8 +118,8 @@ public class CanvasCutTrayView implements Initializable {
         configuration.getUniqueBean(DestroyGroupBeanHolder.class).destroy();
         canvasProperties.setCutInnerType(CutInnerType.ROUNDNESS);
         ViewContext v = configuration.getViewContext();
-        Pane points = (Pane) v.getScene(TrayPointView.class, true, false).getRoot();
-        Pane colors = (Pane) v.getScene(TrayColorView.class, true, false).getRoot();
+        Pane points = (Pane) v.getScene(TrayPointView.class, false, true, false).getRoot();
+        Pane colors = (Pane) v.getScene(TrayColorView.class, false, true, false).getRoot();
         add2Bar(new HBox(points, colors));
         // 为圆形框内的每个元素添加事件
     }
@@ -115,8 +132,8 @@ public class CanvasCutTrayView implements Initializable {
         canvasProperties.setCutInnerType(CutInnerType.RECTANGLE);
         // 生成左侧大小按钮
         ViewContext v = configuration.getViewContext();
-        Pane points = (Pane) v.getScene(TrayPointView.class, true, false).getRoot();
-        Pane colors = (Pane) v.getScene(TrayColorView.class, true, false).getRoot();
+        Pane points = (Pane) v.getScene(TrayPointView.class, false, true, false).getRoot();
+        Pane colors = (Pane) v.getScene(TrayColorView.class, false, true, false).getRoot();
         add2Bar(new HBox(points, colors));
         // 为圆形框内的每个元素添加事件
     }
@@ -127,8 +144,8 @@ public class CanvasCutTrayView implements Initializable {
         destroyGroupBeanHolder.destroy();
         canvasProperties.setCutInnerType(CutInnerType.ARROW);
         ViewContext v = configuration.getViewContext();
-        Pane points = (Pane) v.getScene(TrayPointView.class, true, false).getRoot();
-        Pane colors = (Pane) v.getScene(TrayColorView.class, true, false).getRoot();
+        Pane points = (Pane) v.getScene(TrayPointView.class, false, true, false).getRoot();
+        Pane colors = (Pane) v.getScene(TrayColorView.class, false, true, false).getRoot();
         add2Bar(new HBox(points, colors));
     }
 
@@ -138,8 +155,8 @@ public class CanvasCutTrayView implements Initializable {
         destroyGroupBeanHolder.destroy();
         canvasProperties.setCutInnerType(CutInnerType.PEN);
         ViewContext v = configuration.getViewContext();
-        Pane points = (Pane) v.getScene(TrayPointView.class, true, false).getRoot();
-        Pane colors = (Pane) v.getScene(TrayColorView.class, true, false).getRoot();
+        Pane points = (Pane) v.getScene(TrayPointView.class, false, true, false).getRoot();
+        Pane colors = (Pane) v.getScene(TrayColorView.class, false, true, false).getRoot();
         add2Bar(new HBox(points, colors));
     }
 
@@ -149,8 +166,8 @@ public class CanvasCutTrayView implements Initializable {
         destroyGroupBeanHolder.destroy();
         canvasProperties.setCutInnerType(CutInnerType.TEXT);
         ViewContext v = configuration.getViewContext();
-        Pane fonts = (Pane) v.getScene(TrayFontView.class, true, false).getRoot();
-        Pane colors = (Pane) v.getScene(TrayColorView.class, true, false).getRoot();
+        Pane fonts = (Pane) v.getScene(TrayFontView.class, false, true, false).getRoot();
+        Pane colors = (Pane) v.getScene(TrayColorView.class, false, true, false).getRoot();
         add2Bar(new HBox(fonts, colors));
     }
 
@@ -168,7 +185,102 @@ public class CanvasCutTrayView implements Initializable {
         DestroyGroupBeanHolder destroyGroupBeanHolder = configuration.getUniqueBean(DestroyGroupBeanHolder.class);
         destroyGroupBeanHolder.destroy();
         canvasProperties.setCutInnerType(CutInnerType.MOSAIC);
-        add2Bar(new HBox((Pane) configuration.getViewContext().getScene(TrayPointView.class, true, false).getRoot()));
+        add2Bar(new HBox((Pane) configuration.getViewContext().getScene(TrayPointView.class, false, true, false).getRoot()));
+    }
+
+    public void doDrawingPin(MouseEvent mouseEvent) {
+        try {
+            DestroyGroupBeanHolder destroyGroupBeanHolder = configuration.getUniqueBean(DestroyGroupBeanHolder.class);
+            destroyGroupBeanHolder.destroy();
+            initRectangle();
+            canvasProperties.setCutInnerType(CutInnerType.DRAWING_PIN);
+            // 获取截图区域图片
+            Scene scene = canvasProperties.getCutPane().getScene();
+            Rectangle rectangle = canvasProperties.getCutRectangle();
+            ScreenshotsProcess screenshotsProcess = configuration.getUniqueBean(ScreenshotsProcess.class);
+            BufferedImage image = screenshotsProcess.snapshot(scene, rectangle);
+            WritableImage showImage = new WritableImage(image.getWidth(), image.getHeight());
+            showImage = SwingFXUtils.toFXImage(image, showImage);
+            Stage stage = configuration.getViewContext().newStage();
+            stage.initStyle(StageStyle.TRANSPARENT);
+            stage.initModality(Modality.NONE);
+            stage.initOwner(configuration.getViewContext().getStage());
+            // 添加边框
+            Rectangle rect = new Rectangle(showImage.getWidth(), showImage.getHeight());
+            ImagePattern imagePattern = new ImagePattern(showImage);
+            rect.setFill(imagePattern);
+            rect.strokeWidthProperty().set(2);
+            rect.strokeProperty().set(Color.RED);
+
+            EventHandler<MouseEvent> resize = new ResizeEventHandler(stage, rect);
+            EventHandler<MouseEvent> drag = addDrag(rect);
+            rect.addEventHandler(MouseEvent.ANY, stageHandler(rect, resize, drag));
+            Button button = drawingPin(Color.RED);
+            VBox box = new VBox();
+            AnchorPane top = new AnchorPane();
+            top.styleProperty().set(" -fx-background-color: transparent;");
+            box.styleProperty().set(" -fx-background-color: transparent;");
+            top.getChildren().addAll(button);
+
+            Group pane = new Group(rect);
+            box.getChildren().addAll(top, pane);
+            Scene sc = new Scene(box);
+            sc.setFill(Color.TRANSPARENT);
+
+            stage.setScene(sc);
+            stage.setAlwaysOnTop(true);
+            stage.show();
+        } finally {
+            doCancel();
+        }
+
+    }
+
+    public EventHandler<MouseEvent> stageHandler(Rectangle rectangle, EventHandler<MouseEvent> resize, EventHandler<MouseEvent> drag) {
+        return new EventHandler<MouseEvent>() {
+
+            private double ox;
+            private double oy;
+            private boolean onEdge = false;
+
+
+            @Override
+            public void handle(MouseEvent event) {
+                if (event.getEventType().equals(MouseEvent.MOUSE_MOVED)) {
+                    // 判断如何展示
+                    double mouseX = event.getSceneX();
+                    double mouseY = event.getSceneY();
+                    ox = rectangle.xProperty().get();
+                    oy = rectangle.yProperty().get();
+
+                    boolean onStartX = MathUtils.offset(mouseX, ox, 3);
+                    boolean onEndX = MathUtils.offset(mouseX, ox + rectangle.getWidth(), 3);
+
+                    boolean onStartY = MathUtils.offset(mouseY, oy, 3);
+                    boolean onEndY = MathUtils.offset(mouseY, oy + rectangle.heightProperty().get(), 3);
+
+                    boolean onX = onStartX || onEndX;
+                    boolean onY = onStartY || onEndY;
+                    onEdge = onX || onY;
+                }
+                // 判断当前是否是在边缘
+                System.out.println(onEdge);
+                if (onEdge) {
+                    resize.handle(event);
+                } else {
+                    drag.handle(event);
+                }
+            }
+        };
+    }
+
+
+    public void doRgb(MouseEvent mouseEvent) {
+        initRectangle();
+        DestroyGroupBeanHolder destroyGroupBeanHolder = configuration.getUniqueBean(DestroyGroupBeanHolder.class);
+        destroyGroupBeanHolder.destroy();
+        canvasProperties.setCutInnerType(CutInnerType.RGB);
+
     }
 
     // 设置
@@ -225,16 +337,16 @@ public class CanvasCutTrayView implements Initializable {
         alert.initStyle(StageStyle.UTILITY);
         alert.initModality(Modality.APPLICATION_MODAL);
         // 调整位置，将其放置在截图框的正中间
-        ScreenCapture screenCapture=configuration.getUniqueBean(ScreenCapture.class);
+        ScreenCapture screenCapture = configuration.getUniqueBean(ScreenCapture.class);
         alert.showingProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
                 //  转换为全局坐标
                 double aw = alert.widthProperty().get();
                 double offsetW = (rectangle.getWidth() - aw) / 2;
-                alert.setX(screenCapture.minx()+rectangle.getX() + offsetW);
+                alert.setX(screenCapture.minx() + rectangle.getX() + offsetW);
                 double ah = alert.heightProperty().get();
                 double offsetH = (rectangle.getHeight() - ah) / 2;
-                alert.setY(screenCapture.miny()+rectangle.getY() + offsetH);
+                alert.setY(screenCapture.miny() + rectangle.getY() + offsetH);
             }
         });
 
@@ -305,4 +417,57 @@ public class CanvasCutTrayView implements Initializable {
         }
 
     }
+
+    public EventHandler<MouseEvent> addDrag(Node node) {
+
+        return new EventHandler<MouseEvent>() {
+            private double xOffset = 0;
+            private double yOffset = 0;
+            Stage stage;
+
+            @Override
+            public void handle(MouseEvent event) {
+                node.setCursor(Cursor.MOVE);
+                if (event.getEventType().equals(MouseEvent.MOUSE_PRESSED)) {
+                    stage = (Stage) node.getScene().getWindow();
+                    xOffset = event.getSceneX();
+                    yOffset = event.getSceneY();
+                } else if (event.getEventType().equals(MouseEvent.MOUSE_DRAGGED)) {
+                    stage.setX(event.getScreenX() - xOffset);
+                    stage.setY(event.getScreenY() - yOffset);
+                }
+            }
+        };
+    }
+
+    public Button drawingPin(Color color) {
+
+        Group svg = new Group(
+                createPath("M864.3584 421.2736a46.08 46.08 0 1 1 41.4208-82.3296c26.5216 13.3632 51.6608 29.5424 75.2128 48.5376a81.92 81.92 0 0 1 6.3488 121.3952l-206.4896 206.4896 9.1648 9.1648c150.272 149.1456 213.7088 212.6336 219.0848 219.4944 1.6384 2.2016 1.6384 2.2016-1.024 57.9584l-61.3376 8.3968c-2.4064-1.6896-2.4064-1.6896-4.096-3.1232l-1.7408-1.536-1.1776-1.1776-3.072-3.072-11.9808-11.8784-48.0768-48.0256a343675.648 343675.648 0 0 1-160.768-160.8704l-205.6192 207.2064c-15.616 15.5648-36.352 24.0128-57.856 24.0128-24.3712 0-47.616-10.8032-63.5904-30.208a421.888 421.888 0 0 1-80.5376-373.0432L159.4368 421.0176a245.6576 245.6576 0 0 1-117.7088-39.168 80.896 80.896 0 0 1-12.8-124.928L257.536 28.7744a80.8448 80.8448 0 0 1 125.0304 13.056c22.8864 35.328 36.096 75.6224 38.8608 117.1456l187.6992 148.8384a423.2192 423.2192 0 0 1 107.1616-13.824 46.08 46.08 0 1 1 0 92.16c-34.816 0-69.4784 5.5296-102.8096 16.384l-23.552 7.68-260.9152-206.8992 0.7168-23.1424c0.8192-26.5216-5.12-52.736-17.3056-75.9296L104.3456 311.808a153.8048 153.8048 0 0 0 75.3664 17.4592l23.7056-1.1776 207.2576 261.376-7.68 23.552a329.8816 329.8816 0 0 0 50.176 301.4656l197.5296-199.0656 32.2048-32.4608 32.3584-32.6656 198.656-198.3488a327.424 327.424 0 0 0-49.5616-30.72z", color)
+        );
+
+        Bounds bounds = svg.getBoundsInParent();
+        double scale = Math.min(20 / bounds.getWidth(), 20 / bounds.getHeight());
+        svg.setScaleX(scale);
+        svg.setScaleY(scale);
+
+        Button btn = new Button();
+        btn.setGraphic(svg);
+        btn.setMaxSize(30, 30);
+        btn.setMinSize(30, 30);
+        btn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        btn.styleProperty().set(" -fx-background-color: transparent;");
+        btn.setLayoutX(0);
+        btn.setLayoutY(0);
+        return btn;
+
+    }
+
+    private static SVGPath createPath(String d, Color color) {
+        SVGPath path = new SVGPath();
+        path.setContent(d);
+        path.setFill(color);
+        return path;
+    }
+
 }

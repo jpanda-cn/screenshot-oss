@@ -1,6 +1,7 @@
 package cn.jpanda.screenshot.oss.common.toolkit;
 
 import javafx.geometry.Bounds;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Window;
@@ -11,9 +12,9 @@ import javafx.stage.Window;
  */
 public class ExternalComponentBinders {
     private Rectangle cutRec;
-    private Parent toolbar;
+    private Node toolbar;
 
-    public ExternalComponentBinders(Rectangle cutRec, Parent toolbar) {
+    public ExternalComponentBinders(Rectangle cutRec, Node toolbar) {
         this.cutRec = cutRec;
         this.toolbar = toolbar;
 

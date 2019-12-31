@@ -7,6 +7,7 @@ import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.mosaic.DotMatrix
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.mosaic.MosaicInnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.pen.PathPenInnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.rectangle.DrawRectangleInnerSnapshotCanvasEventHandler;
+import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.rgb.RgbInnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.roundness.RoundnessInnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.text.TextInnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
@@ -43,6 +44,11 @@ public class RouterInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEv
      */
     private MosaicInnerSnapshotCanvasEventHandler mosaicInnerSnapshotCanvasEventHandler;
 
+    /**
+     * RGB
+     */
+    private RgbInnerSnapshotCanvasEventHandler rgbInnerSnapshotCanvasEventHandler;
+
     public RouterInnerSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler) {
         super(canvasProperties, canvasDrawEventHandler);
         dragSnapshotCanvasEventHandler = new LimitDragInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler);
@@ -52,6 +58,7 @@ public class RouterInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEv
         penInnerSnapshotCanvasEventHandler = new PathPenInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler);
         textInnerSnapshotCanvasEventHandler = new TextInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler);
         mosaicInnerSnapshotCanvasEventHandler = new DotMatrixMosaicInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler);
+        rgbInnerSnapshotCanvasEventHandler = new RgbInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler);
     }
 
     @Override
@@ -83,6 +90,10 @@ public class RouterInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEv
             }
             case MOSAIC: {
                 mosaicInnerSnapshotCanvasEventHandler.handle(event);
+                break;
+            }
+            case RGB: {
+                rgbInnerSnapshotCanvasEventHandler.handle(event);
                 break;
             }
             case RESIZE: {

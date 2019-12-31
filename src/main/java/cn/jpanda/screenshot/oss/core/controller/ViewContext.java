@@ -33,13 +33,19 @@ public interface ViewContext {
      * 新增一个指定的场景
      */
     Scene getScene(Class<? extends Initializable> clazz, boolean isNew, boolean override);
+    Scene getScene(Class<? extends Initializable> clazz,boolean useDefaultCss, boolean isNew, boolean override);
+
+    /**
+     * 获取指定场景是否使用默人CSS
+     */
+    Scene getScene(Class<? extends Initializable> clazz, boolean useDefaultCss);
 
     /**
      * 注册场景
      *
      * @param clazz Scene实现类
      */
-    boolean registry(Class<? extends Initializable> clazz);
+    boolean registry(Class<? extends Initializable> clazz, boolean useDefaultCss);
 
 
     /**

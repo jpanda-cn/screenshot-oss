@@ -21,9 +21,11 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Window;
+import lombok.Getter;
 
 import static cn.jpanda.screenshot.oss.common.utils.MathUtils.*;
 
+@Getter
 public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
     private Configuration configuration;
     private Paint masking;
@@ -55,7 +57,7 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
         this.configuration = configuration;
 
         // 加载工具托盘
-        Scene scene = configuration.getViewContext().getScene(CanvasCutTrayView.class, true, false);
+        Scene scene = configuration.getViewContext().getScene(CanvasCutTrayView.class, false, true, false);
         toolbar = scene.getRoot();
     }
 

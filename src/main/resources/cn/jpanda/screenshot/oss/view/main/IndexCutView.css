@@ -1,0 +1,16 @@
+/*全局字体样式*/
+.root {
+    -fx-font-size: 14px;
+}
+
+/*边框圆角按钮*/
+.btn-radius-large {
+    -fx-border-radius: 50px;
+    -fx-background-radius: 50px;
+}
+
+.top {
+    -fx-background-color: rgba(176, 32, 29, 0.98);
+}
+
+

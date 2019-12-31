@@ -2,98 +2,105 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
-<?import javafx.scene.layout.AnchorPane?>
-<AnchorPane prefWidth="380.0" style="-fx-background-color: rgb(224,224,224);" xmlns="http://javafx.com/javafx/8.0.121"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.jpanda.screenshot.oss.view.tray.CanvasCutTrayView">
-    <Button fx:id="drag" layoutX="10.0" layoutY="15.0" mnemonicParsing="false" onMouseClicked="#doDrag"
-            prefHeight="35.0" prefWidth="35.0">
+<?import javafx.scene.layout.*?>
+
+<FlowPane prefWidth="535.0" style="-fx-background-color: rgb(224,224,224);" stylesheets="tray.css" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.jpanda.screenshot.oss.view.tray.CanvasCutTrayView">
+    <Button fx:id="drag" mnemonicParsing="false" onMouseClicked="#doDrag" styleClass="button">
         <graphic>
             <ImageView fitHeight="25.0" fitWidth="25.0">
-                <Image url="@/images/tray/drag.png"/>
+                <Image url="@/images/tray/drag.png" />
             </ImageView>
         </graphic>
     </Button>
-    <Button fx:id="roundness" layoutX="55.0" layoutY="15.0" mnemonicParsing="false" onMouseClicked="#doRoundness"
-            prefHeight="35.0" prefWidth="35.0">
+    <Button fx:id="roundness" mnemonicParsing="false" onMouseClicked="#doRoundness">
         <graphic>
             <ImageView fitHeight="25.0" fitWidth="25.0">
-                <Image url="@/images/tray/roundness.png"/>
+                <Image url="@/images/tray/roundness.png" />
             </ImageView>
         </graphic>
     </Button>
-    <Button fx:id="rectangle" layoutX="100.0" layoutY="15.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0"
-            onMouseClicked="#doRectangle">
+    <Button fx:id="rectangle" mnemonicParsing="false" onMouseClicked="#doRectangle">
         <graphic>
             <ImageView fitHeight="25.0" fitWidth="25.0">
-                <Image url="@/images/tray/rectangle.png"/>
+                <Image url="@/images/tray/rectangle.png" />
             </ImageView>
         </graphic>
     </Button>
-    <Button fx:id="arrow" layoutX="145.0" layoutY="15.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0"
-            onMouseClicked="#doArrow">
+    <Button fx:id="arrow" mnemonicParsing="false" onMouseClicked="#doArrow">
         <graphic>
             <ImageView fitHeight="25.0" fitWidth="25.0">
-                <Image url="@/images/tray/arrow.png"/>
+                <Image url="@/images/tray/arrow.png" />
             </ImageView>
         </graphic>
     </Button>
-    <Button fx:id="pen" layoutX="190.0" layoutY="15.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0"
-            onMouseClicked="#doPen">
+    <Button fx:id="pen" mnemonicParsing="false" onMouseClicked="#doPen">
         <graphic>
             <ImageView fitHeight="25.0" fitWidth="25.0">
-                <Image url="@/images/tray/pen.png"/>
+                <Image url="@/images/tray/pen.png" />
             </ImageView>
         </graphic>
     </Button>
-    <Button fx:id="text" layoutX="235.0" layoutY="15.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0"
-            onMouseClicked="#doText">
+    <Button fx:id="text" mnemonicParsing="false" onMouseClicked="#doText">
         <graphic>
             <ImageView fitHeight="25.0" fitWidth="25.0">
-                <Image url="@/images/tray/text.png"/>
+                <Image url="@/images/tray/text.png" />
             </ImageView>
         </graphic>
     </Button>
-    <Button fx:id="mosaic" layoutX="280.0" layoutY="15.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0"
-            onMouseClicked="#doMosaic">
+    <Button fx:id="mosaic" mnemonicParsing="false" onMouseClicked="#doMosaic">
         <graphic>
             <ImageView fitHeight="25.0" fitWidth="25.0">
-                <Image url="@/images/tray/mosaic.png"/>
+                <Image url="@/images/tray/mosaic.png" />
             </ImageView>
         </graphic>
     </Button>
-    <Button fx:id="settings" layoutX="325.0" layoutY="15.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0"
-            onMouseClicked="#doSettings">
+
+    <Button fx:id="rgb" mnemonicParsing="false" onMouseClicked="#doRgb">
         <graphic>
             <ImageView fitHeight="25.0" fitWidth="25.0">
-                <Image url="@/images/tray/settings.png"/>
+                <Image url="@/images/tray/rgb.png" />
             </ImageView>
         </graphic>
     </Button>
-    <Button fx:id="save" layoutX="370.0" layoutY="15.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0"
-            onMouseClicked="#doSave">
+
+    <Button fx:id="drawingPin" layoutX="370.0" mnemonicParsing="false" onMouseClicked="#doDrawingPin" prefHeight="35.0" prefWidth="35.0">
         <graphic>
             <ImageView fitHeight="25.0" fitWidth="25.0">
-                <Image url="@/images/tray/save.png"/>
+                <Image url="@/images/tray/drawing-pin.png" />
             </ImageView>
         </graphic>
     </Button>
-    <Button fx:id="cancel" layoutX="415.0" layoutY="15.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0"
-            onMouseClicked="#doCancel">
+
+    <Button fx:id="settings" layoutX="415.0" mnemonicParsing="false" onMouseClicked="#doSettings" prefHeight="35.0" prefWidth="35.0">
         <graphic>
             <ImageView fitHeight="25.0" fitWidth="25.0">
-                <Image url="@/images/tray/cancel.png"/>
+                <Image url="@/images/tray/settings.png" />
             </ImageView>
         </graphic>
     </Button>
-    <Button fx:id="submit" layoutX="460.0" layoutY="15.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0"
-            onMouseClicked="#doDone">
+    <Button fx:id="save" mnemonicParsing="false" onMouseClicked="#doSave">
         <graphic>
             <ImageView fitHeight="25.0" fitWidth="25.0">
-                <Image url="@/images/tray/submit.png"/>
+                <Image url="@/images/tray/save.png" />
             </ImageView>
         </graphic>
     </Button>
-    <AnchorPane fx:id="bar" layoutX="4.0" layoutY="64.0">
+    <Button fx:id="cancel" mnemonicParsing="false" onMouseClicked="#doCancel">
+        <graphic>
+            <ImageView fitHeight="25.0" fitWidth="25.0">
+                <Image url="@/images/tray/cancel.png" />
+            </ImageView>
+        </graphic>
+    </Button>
+    <Button fx:id="submit" mnemonicParsing="false" onMouseClicked="#doDone">
+        <graphic>
+            <ImageView fitHeight="25.0" fitWidth="25.0">
+                <Image url="@/images/tray/submit.png" />
+            </ImageView>
+        </graphic>
+    </Button>
+
+    <AnchorPane fx:id="bar" layoutY="64.0">
     </AnchorPane>
-    <Separator layoutX="14.0" layoutY="58.0" visible="false"/>
-</AnchorPane>
+    <Separator layoutX="14.0" layoutY="58.0" prefHeight="17.0" prefWidth="537.0" visible="false" />
+</FlowPane>

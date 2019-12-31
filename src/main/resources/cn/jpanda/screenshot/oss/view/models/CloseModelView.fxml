@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox prefHeight="190.0" prefWidth="250.0" stylesheets="@CloseModelView.css,@/css/default.css" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.jpanda.screenshot.oss.view.models.CloseModelView">
+    <AnchorPane prefHeight="46.0" prefWidth="200.0">
+        <Label layoutX="14.0" layoutY="20.0" prefHeight="27.0" prefWidth="200.0" text="关闭提示" />
+      <Button layoutX="200.0" layoutY="6.0" mnemonicParsing="false" text="X" >
+      </Button>
+      <effect>
+         <Bloom threshold="1.0" />
+      </effect>
+      <opaqueInsets>
+         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+      </opaqueInsets>
+    </AnchorPane>
+    <AnchorPane prefHeight="95.0" prefWidth="214.0">
+        <RadioButton id="chose" fx:id="min" layoutX="49.0" layoutY="33.0" mnemonicParsing="false" selected="true" text="最小化" />
+        <RadioButton id="chose" fx:id="close" layoutX="49.0" layoutY="59.0" mnemonicParsing="false" text="退出截图" />
+    </AnchorPane>
+    <AnchorPane prefHeight="42.0" prefWidth="249.0">
+        <Button fx:id="submit" layoutX="169.0" layoutY="5.0" mnemonicParsing="false" onAction="#ok" prefHeight="27.0" prefWidth="69.0" styleClass="btn-basic" text="确定" />
+    </AnchorPane>
+</VBox>
