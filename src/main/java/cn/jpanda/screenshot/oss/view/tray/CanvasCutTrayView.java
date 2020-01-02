@@ -18,6 +18,8 @@ import cn.jpanda.screenshot.oss.view.tray.subs.TrayColorView;
 import cn.jpanda.screenshot.oss.view.tray.subs.TrayFontView;
 import cn.jpanda.screenshot.oss.view.tray.subs.TrayPointView;
 import cn.jpanda.screenshot.oss.view.tray.toolkits.CutInnerType;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
@@ -40,12 +42,14 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.SVGPath;
+import javafx.scene.shape.StrokeType;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.awt.image.BufferedImage;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -189,6 +193,7 @@ public class CanvasCutTrayView implements Initializable {
     }
 
     public void doDrawingPin(MouseEvent mouseEvent) {
+        final double stroke = 5;
         try {
             DestroyGroupBeanHolder destroyGroupBeanHolder = configuration.getUniqueBean(DestroyGroupBeanHolder.class);
             destroyGroupBeanHolder.destroy();
@@ -206,27 +211,71 @@ public class CanvasCutTrayView implements Initializable {
             stage.initModality(Modality.NONE);
             stage.initOwner(configuration.getViewContext().getStage());
             // 添加边框
-            Rectangle rect = new Rectangle(showImage.getWidth(), showImage.getHeight());
             ImagePattern imagePattern = new ImagePattern(showImage);
+            Rectangle rect = new Rectangle(showImage.getWidth() + stroke * 2, showImage.getHeight() + stroke * 2);
+            rect.setLayoutX(stroke);
+            rect.setLayoutY(stroke);
             rect.setFill(imagePattern);
-            rect.strokeWidthProperty().set(2);
-            rect.strokeProperty().set(Color.RED);
+            rect.strokeWidthProperty().set(stroke);
+            rect.strokeProperty().set(Color.rgb(0, 0, 0, 0.3));
+            rect.strokeTypeProperty().set(StrokeType.OUTSIDE);
+//            rect.mouseTransparentProperty().setValue(true);
 
-            EventHandler<MouseEvent> resize = new ResizeEventHandler(stage, rect);
-            EventHandler<MouseEvent> drag = addDrag(rect);
-            rect.addEventHandler(MouseEvent.ANY, stageHandler(rect, resize, drag));
             Button button = drawingPin(Color.RED);
-            VBox box = new VBox();
             AnchorPane top = new AnchorPane();
-            top.styleProperty().set(" -fx-background-color: transparent;");
-            box.styleProperty().set(" -fx-background-color: transparent;");
+//            top.mouseTransparentProperty().setValue(true);
+            top.styleProperty().set(" -fx-background-color: rgba(0,0,0,0.5);");
             top.getChildren().addAll(button);
+            top.addEventHandler(MouseEvent.ANY, addDrag(top));
 
-            Group pane = new Group(rect);
-            box.getChildren().addAll(top, pane);
+            AnchorPane body = new AnchorPane(rect) {
+
+            };
+            body.widthProperty().addListener(new ChangeListener<Number>() {
+                @Override
+                public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                    if (oldValue.intValue() == 0) {
+                        return;
+                    }
+
+                    rect.widthProperty().set(rect.widthProperty().add(newValue.doubleValue() - oldValue.doubleValue()).getValue());
+                }
+            });
+
+
+
+
+            body.heightProperty().addListener(new ChangeListener<Number>() {
+                @Override
+                public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                    if (oldValue.intValue()==0){
+                        return;
+                    }
+                    System.out.println("=============");
+                    System.out.println(newValue);
+                    System.out.println(oldValue);
+                    System.out.println("=============");
+                    System.out.println(rect.heightProperty().get());
+                    rect.heightProperty().set(rect.heightProperty().add(newValue.doubleValue() - oldValue.doubleValue()).getValue());
+                }
+            });
+
+            AnchorPane.setTopAnchor(rect, 0D);
+            AnchorPane.setLeftAnchor(rect, 0D);
+            AnchorPane.setBottomAnchor(rect, 0D);
+            AnchorPane.setRightAnchor(rect, 0D);
+            body.styleProperty().set(" -fx-background-color: rgba(0,0,0,0.5);");
+            VBox box = new VBox();
+            box.styleProperty().set(" -fx-background-color: transparent;");
+            box.getChildren().addAll(top, body);
+
+            EventHandler<MouseEvent> resize = new ResizeEventHandler(stage, body, rect, Collections.singletonList(top));
+            EventHandler<MouseEvent> drag = addDrag(body);
+            rect.addEventHandler(MouseEvent.ANY, stageHandler(rect, resize, drag));
+            top.addEventHandler(MouseEvent.ANY, addDrag(top));
+
             Scene sc = new Scene(box);
             sc.setFill(Color.TRANSPARENT);
-
             stage.setScene(sc);
             stage.setAlwaysOnTop(true);
             stage.show();
@@ -238,9 +287,7 @@ public class CanvasCutTrayView implements Initializable {
 
     public EventHandler<MouseEvent> stageHandler(Rectangle rectangle, EventHandler<MouseEvent> resize, EventHandler<MouseEvent> drag) {
         return new EventHandler<MouseEvent>() {
-
-            private double ox;
-            private double oy;
+            private double offset = 10;
             private boolean onEdge = false;
 
 
@@ -248,27 +295,32 @@ public class CanvasCutTrayView implements Initializable {
             public void handle(MouseEvent event) {
                 if (event.getEventType().equals(MouseEvent.MOUSE_MOVED)) {
                     // 判断如何展示
-                    double mouseX = event.getSceneX();
-                    double mouseY = event.getSceneY();
-                    ox = rectangle.xProperty().get();
-                    oy = rectangle.yProperty().get();
+                    double mouseX = event.getX();
+                    double mouseY = event.getY();
+                    double ox = rectangle.xProperty().getValue();
+                    double oy = rectangle.yProperty().getValue();
 
-                    boolean onStartX = MathUtils.offset(mouseX, ox, 3);
-                    boolean onEndX = MathUtils.offset(mouseX, ox + rectangle.getWidth(), 3);
 
-                    boolean onStartY = MathUtils.offset(mouseY, oy, 3);
-                    boolean onEndY = MathUtils.offset(mouseY, oy + rectangle.heightProperty().get(), 3);
+                    boolean onStartX = MathUtils.offset(mouseX, ox, offset);
+                    boolean onEndX = MathUtils.offset(mouseX, ox + rectangle.widthProperty().getValue(), offset);
+
+                    boolean onStartY = MathUtils.offset(mouseY, oy, offset);
+                    boolean onEndY = MathUtils.offset(mouseY, oy + rectangle.heightProperty().getValue(), offset);
 
                     boolean onX = onStartX || onEndX;
                     boolean onY = onStartY || onEndY;
                     onEdge = onX || onY;
                 }
                 // 判断当前是否是在边缘
-                System.out.println(onEdge);
                 if (onEdge) {
-                    resize.handle(event);
+                    if (resize != null) {
+                        resize.handle(event);
+                    }
+
                 } else {
-                    drag.handle(event);
+                    if (drag != null) {
+                        drag.handle(event);
+                    }
                 }
             }
         };
@@ -456,7 +508,7 @@ public class CanvasCutTrayView implements Initializable {
         btn.setMaxSize(30, 30);
         btn.setMinSize(30, 30);
         btn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-        btn.styleProperty().set(" -fx-background-color: transparent;");
+        btn.styleProperty().set(" -fx-background-color: rgba(255,255,255,0.5);");
         btn.setLayoutX(0);
         btn.setLayoutY(0);
         return btn;

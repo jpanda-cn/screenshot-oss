@@ -6,18 +6,26 @@ import javafx.beans.value.ChangeListener;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * 限制变更截图矩形大小
  */
 public class ResizeEventHandler implements EventHandler<MouseEvent> {
+    private double offset = 10;
     /**
      * 所属的父类矩形
      */
     protected Stage stage;
+    protected Pane region;
     protected Rectangle rectangle;
+    private List<Region> nodes;
     /**
      * 首先的子节点
      */
@@ -29,16 +37,21 @@ public class ResizeEventHandler implements EventHandler<MouseEvent> {
     protected double ow;
     protected double oh;
 
-    public ResizeEventHandler(Stage stage, Rectangle rectangle) {
+    public ResizeEventHandler(Stage stage, Pane region, Rectangle rectangle, List<Region> nodes) {
         this.stage = stage;
+        this.region = region;
         this.rectangle = rectangle;
+        this.nodes = nodes == null ? Collections.emptyList() : nodes;
         bind();
     }
 
     public void bind() {
         ChangeListener<Number> up = (observable, oldValue, newValue) -> {
-            rectangle.widthProperty().set(stage.getWidth());
-            rectangle.heightProperty().set(stage.getHeight());
+
+            double otherHeight = nodes.stream().mapToDouble(c -> c.heightProperty().getValue()).count();
+            region.setMinWidth(stage.getWidth());
+            region.setMinHeight(stage.getHeight() - otherHeight);
+
         };
         stage.widthProperty().addListener(up);
         stage.heightProperty().addListener(up);
@@ -56,26 +69,21 @@ public class ResizeEventHandler implements EventHandler<MouseEvent> {
         if (event.getEventType().equals(MouseEvent.MOUSE_MOVED)) {
             Cursor cursor = null;
             // 鼠标位置
-            double mouseX = event.getScreenX();
-            double mouseY = event.getScreenY();
+            double mouseX = event.getX();
+            double mouseY = event.getY();
 
-            double stageWidth = stage.getWidth();
-            double stageHeight = stage.getHeight();
+            double stageWidth = rectangle.widthProperty().getValue();
+            double stageHeight = rectangle.heightProperty().getValue();
 
 
-            ox = stage.getX();
-            oy = stage.getY();
-            System.out.println(ox);
-            System.out.println(oy);
-            System.out.println(stageWidth);
-            System.out.println(stageHeight);
-            System.out.println(mouseX);
-            System.out.println(mouseY);
-            boolean onStartX = MathUtils.offset(mouseX, ox, 3);
-            boolean onEndX = MathUtils.offset(mouseX, ox + stageWidth, 3);
+            ox = rectangle.xProperty().getValue();
+            oy = rectangle.yProperty().getValue();
 
-            boolean onStartY = MathUtils.offset(mouseY, oy, 3);
-            boolean onEndY = MathUtils.offset(mouseY, oy + stageHeight, 3);
+            boolean onStartX = MathUtils.offset(mouseX, ox, offset);
+            boolean onEndX = MathUtils.offset(mouseX, ox + stageWidth, offset);
+
+            boolean onStartY = MathUtils.offset(mouseY, oy, offset);
+            boolean onEndY = MathUtils.offset(mouseY, oy + stageHeight, offset);
 
             boolean onX = onStartX || onEndX;
             boolean onY = onStartY || onEndY;
@@ -108,7 +116,8 @@ public class ResizeEventHandler implements EventHandler<MouseEvent> {
                 resizeType = onStartY ? ResizeType.N_VERTICAL : ResizeType.S_VERTICAL;
             }
             if (cursor != null) {
-                rectangle.setCursor(cursor);
+
+                region.setCursor(cursor);
             }
         } else if (event.getEventType().equals(MouseEvent.MOUSE_PRESSED)) {
             // 鼠标开始节点
@@ -118,8 +127,8 @@ public class ResizeEventHandler implements EventHandler<MouseEvent> {
 
             ox = stage.getX();
             oy = stage.getY();
-            ow = rectangle.widthProperty().get();
-            oh = rectangle.heightProperty().get();
+            ow = region.widthProperty().get();
+            oh = region.heightProperty().get();
         } else if (event.getEventType().equals(MouseEvent.MOUSE_DRAGGED)) {
             // 拖动
             // 获取需要移动的元素变更其展示位置
