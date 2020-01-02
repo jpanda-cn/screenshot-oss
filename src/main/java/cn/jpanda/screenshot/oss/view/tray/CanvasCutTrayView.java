@@ -221,16 +221,17 @@ public class CanvasCutTrayView implements Initializable {
             rect.strokeTypeProperty().set(StrokeType.OUTSIDE);
 //            rect.mouseTransparentProperty().setValue(true);
 
-            Button button = drawingPin(Color.RED);
-            AnchorPane top = new AnchorPane();
-//            top.mouseTransparentProperty().setValue(true);
-            top.styleProperty().set(" -fx-background-color: rgba(0,0,0,0.5);");
-            top.getChildren().addAll(button);
-            top.addEventHandler(MouseEvent.ANY, addDrag(top));
+            AnchorPane top =buildTop();
 
             AnchorPane body = new AnchorPane(rect) {
 
             };
+
+
+            body.styleProperty().set(" -fx-background-color: rgba(0,0,0,0.5);");
+            VBox box = new VBox();
+            box.styleProperty().set(" -fx-background-color: transparent;");
+            box.getChildren().addAll(top, body);
             body.widthProperty().addListener(new ChangeListener<Number>() {
                 @Override
                 public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
@@ -244,30 +245,17 @@ public class CanvasCutTrayView implements Initializable {
 
 
 
-
             body.heightProperty().addListener(new ChangeListener<Number>() {
                 @Override
                 public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                     if (oldValue.intValue()==0){
                         return;
                     }
-                    System.out.println("=============");
-                    System.out.println(newValue);
-                    System.out.println(oldValue);
-                    System.out.println("=============");
-                    System.out.println(rect.heightProperty().get());
-                    rect.heightProperty().set(rect.heightProperty().add(newValue.doubleValue() - oldValue.doubleValue()).getValue());
+                    rect.heightProperty().set(box.heightProperty().subtract(top.heightProperty()).subtract(rect.strokeWidthProperty().multiply(2)).getValue());
+
                 }
             });
 
-            AnchorPane.setTopAnchor(rect, 0D);
-            AnchorPane.setLeftAnchor(rect, 0D);
-            AnchorPane.setBottomAnchor(rect, 0D);
-            AnchorPane.setRightAnchor(rect, 0D);
-            body.styleProperty().set(" -fx-background-color: rgba(0,0,0,0.5);");
-            VBox box = new VBox();
-            box.styleProperty().set(" -fx-background-color: transparent;");
-            box.getChildren().addAll(top, body);
 
             EventHandler<MouseEvent> resize = new ResizeEventHandler(stage, body, rect, Collections.singletonList(top));
             EventHandler<MouseEvent> drag = addDrag(body);
@@ -283,6 +271,20 @@ public class CanvasCutTrayView implements Initializable {
             doCancel();
         }
 
+    }
+
+    public AnchorPane buildTop(){
+        Button button= drawingPin(Color.RED);
+        AnchorPane top= new AnchorPane();
+        top.styleProperty().set(" -fx-background-color: rgba(0,0,0,0.5);");
+
+        top.addEventHandler(MouseEvent.ANY, addDrag(top));
+
+        TextField title=new TextField();
+        title.styleProperty().set(" -fx-background-color: rgba(0,0,0,0.5);");
+
+        top.getChildren().addAll(button,title);
+        return top;
     }
 
     public EventHandler<MouseEvent> stageHandler(Rectangle rectangle, EventHandler<MouseEvent> resize, EventHandler<MouseEvent> drag) {
