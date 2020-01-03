@@ -45,3 +45,22 @@
 .drawing-pin:pressed {
     -fx-background-color: rgba(255, 255, 255, 0.5);
 }
+
+
+/* tooltip */
+.tool-tip-ok {
+    /*文本对齐方式*/
+    -fx-text-alignment: center;
+    /*无边框*/
+    -fx-border-style: none;
+    /*鼠标样式*/
+    -fx-cursor: pointer;
+    -fx-text-fill: white;
+    -fx-background-color: rgba(176, 32, 29, 0.98);
+}
+.tool-tip-ok:hover {
+    /*透明度*/
+    -fx-opacity: 0.8;
+    -fx-text-fill: rgba(176, 32, 29, 0.98);
+    -fx-background-color: #e6e6e6;
+}

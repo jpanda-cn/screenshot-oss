@@ -1,7 +1,6 @@
 package cn.jpanda.screenshot.oss.view.tray;
 
 import cn.jpanda.screenshot.oss.common.utils.MathUtils;
-import cn.jpanda.screenshot.oss.shape.ModelDialog;
 import cn.jpanda.screenshot.oss.view.tray.subs.ResizeEventHandler;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
@@ -16,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -27,6 +27,7 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.shape.StrokeType;
+import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -169,33 +170,41 @@ public class ImageShower extends Stage {
         topTitle.styleProperty().set("-fx-background-color: transparent;-fx-text-fill: BLACK; -fx-font-size: 16px;");
         Button close = drawingClose();
         close.setCursor(Cursor.DEFAULT);
+
+
         close.setOnMouseClicked(event -> {
+            AnchorPane center = new AnchorPane();
+            Label label = new Label("确认删除吗？");
+            label.setFont(Font.font(11));
+            center.getChildren().addAll(label);
+            Tooltip tooltip = new Tooltip();
             VBox box = new VBox();
-            box.getChildren().add(new Label("确认删除吗？"));
+            box.getStylesheets().add(stylesheets.get());
+            box.setSpacing(10);
+            box.getChildren().add(center);
             Button ok = new Button("确认");
+            ok.fontProperty().set(Font.font(11));
+            ok.getStyleClass().addAll("tool-tip-ok");
+
             Button cancel = new Button("取消");
+            cancel.fontProperty().set(Font.font(11));
+            cancel.getStyleClass().addAll("tool-tip-cancel");
+            ok.setOnMouseClicked((e) -> {
+                close();
+            });
+            cancel.setOnMouseClicked((e) -> {
+                tooltip.hide();
+            });
+
+
             HBox h = new HBox();
             h.setAlignment(Pos.CENTER_RIGHT);
             h.getChildren().addAll(ok, cancel);
             box.getChildren().addAll(h);
-            ok.setOnMouseClicked((e) -> {
-                @SuppressWarnings("rawtypes") ModelDialog modelDialog2 = (ModelDialog) box.getProperties().get(ModelDialog.class);
-                //noinspection unchecked
-                modelDialog2.resultProperty().setValue(true);
-            });
 
-            cancel.setOnMouseClicked((e) -> {
-                @SuppressWarnings("rawtypes") ModelDialog modelDialog2 = (ModelDialog) box.getProperties().get(ModelDialog.class);
-                //noinspection unchecked
-                modelDialog2.resultProperty().setValue(false);
-            });
-
-            ModelDialog<Boolean> modelDialog = new ModelDialog<>(this);
-            modelDialog.initModality(Modality.APPLICATION_MODAL);
-            modelDialog.setContent(box);
-            if (modelDialog.showAndWait().orElse(false)) {
-                close();
-            }
+            tooltip.setGraphic(box);
+            this.box.disableProperty().bind(tooltip.showingProperty());
+            tooltip.show(close, this.getX() + this.getWidth(), this.getY());
 
         });
         HBox.setHgrow(topTitle, Priority.ALWAYS);
