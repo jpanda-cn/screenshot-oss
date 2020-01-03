@@ -22,6 +22,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.css.CssMetaData;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -32,12 +33,10 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
@@ -199,6 +198,7 @@ public class CanvasCutTrayView implements Initializable {
             destroyGroupBeanHolder.destroy();
             initRectangle();
             canvasProperties.setCutInnerType(CutInnerType.DRAWING_PIN);
+
             // 获取截图区域图片
             Scene scene = canvasProperties.getCutPane().getScene();
             Rectangle rectangle = canvasProperties.getCutRectangle();
@@ -206,126 +206,11 @@ public class CanvasCutTrayView implements Initializable {
             BufferedImage image = screenshotsProcess.snapshot(scene, rectangle);
             WritableImage showImage = new WritableImage(image.getWidth(), image.getHeight());
             showImage = SwingFXUtils.toFXImage(image, showImage);
-            Stage stage = configuration.getViewContext().newStage();
-            stage.initStyle(StageStyle.TRANSPARENT);
-            stage.initModality(Modality.NONE);
-            stage.initOwner(configuration.getViewContext().getStage());
-            // 添加边框
-            ImagePattern imagePattern = new ImagePattern(showImage);
-            Rectangle rect = new Rectangle(showImage.getWidth() + stroke * 2, showImage.getHeight() + stroke * 2);
-            rect.setLayoutX(stroke);
-            rect.setLayoutY(stroke);
-            rect.setFill(imagePattern);
-            rect.strokeWidthProperty().set(stroke);
-            rect.strokeProperty().set(Color.rgb(0, 0, 0, 0.3));
-            rect.strokeTypeProperty().set(StrokeType.OUTSIDE);
-//            rect.mouseTransparentProperty().setValue(true);
-
-            AnchorPane top =buildTop();
-
-            AnchorPane body = new AnchorPane(rect) {
-
-            };
-
-
-            body.styleProperty().set(" -fx-background-color: rgba(0,0,0,0.5);");
-            VBox box = new VBox();
-            box.styleProperty().set(" -fx-background-color: transparent;");
-            box.getChildren().addAll(top, body);
-            body.widthProperty().addListener(new ChangeListener<Number>() {
-                @Override
-                public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                    if (oldValue.intValue() == 0) {
-                        return;
-                    }
-
-                    rect.widthProperty().set(rect.widthProperty().add(newValue.doubleValue() - oldValue.doubleValue()).getValue());
-                }
-            });
-
-
-
-            body.heightProperty().addListener(new ChangeListener<Number>() {
-                @Override
-                public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                    if (oldValue.intValue()==0){
-                        return;
-                    }
-                    rect.heightProperty().set(box.heightProperty().subtract(top.heightProperty()).subtract(rect.strokeWidthProperty().multiply(2)).getValue());
-
-                }
-            });
-
-
-            EventHandler<MouseEvent> resize = new ResizeEventHandler(stage, body, rect, Collections.singletonList(top));
-            EventHandler<MouseEvent> drag = addDrag(body);
-            rect.addEventHandler(MouseEvent.ANY, stageHandler(rect, resize, drag));
-            top.addEventHandler(MouseEvent.ANY, addDrag(top));
-
-            Scene sc = new Scene(box);
-            sc.setFill(Color.TRANSPARENT);
-            stage.setScene(sc);
-            stage.setAlwaysOnTop(true);
-            stage.show();
+            ImageShower.of(configuration.getViewContext().getStage()).show(showImage);
         } finally {
             doCancel();
         }
 
-    }
-
-    public AnchorPane buildTop(){
-        Button button= drawingPin(Color.RED);
-        AnchorPane top= new AnchorPane();
-        top.styleProperty().set(" -fx-background-color: rgba(0,0,0,0.5);");
-
-        top.addEventHandler(MouseEvent.ANY, addDrag(top));
-
-        TextField title=new TextField();
-        title.styleProperty().set(" -fx-background-color: rgba(0,0,0,0.5);");
-
-        top.getChildren().addAll(button,title);
-        return top;
-    }
-
-    public EventHandler<MouseEvent> stageHandler(Rectangle rectangle, EventHandler<MouseEvent> resize, EventHandler<MouseEvent> drag) {
-        return new EventHandler<MouseEvent>() {
-            private double offset = 10;
-            private boolean onEdge = false;
-
-
-            @Override
-            public void handle(MouseEvent event) {
-                if (event.getEventType().equals(MouseEvent.MOUSE_MOVED)) {
-                    // 判断如何展示
-                    double mouseX = event.getX();
-                    double mouseY = event.getY();
-                    double ox = rectangle.xProperty().getValue();
-                    double oy = rectangle.yProperty().getValue();
-
-
-                    boolean onStartX = MathUtils.offset(mouseX, ox, offset);
-                    boolean onEndX = MathUtils.offset(mouseX, ox + rectangle.widthProperty().getValue(), offset);
-
-                    boolean onStartY = MathUtils.offset(mouseY, oy, offset);
-                    boolean onEndY = MathUtils.offset(mouseY, oy + rectangle.heightProperty().getValue(), offset);
-
-                    boolean onX = onStartX || onEndX;
-                    boolean onY = onStartY || onEndY;
-                    onEdge = onX || onY;
-                }
-                // 判断当前是否是在边缘
-                if (onEdge) {
-                    if (resize != null) {
-                        resize.handle(event);
-                    }
-
-                } else {
-                    if (drag != null) {
-                        drag.handle(event);
-                    }
-                }
-            }
-        };
     }
 
 
@@ -472,56 +357,7 @@ public class CanvasCutTrayView implements Initializable {
 
     }
 
-    public EventHandler<MouseEvent> addDrag(Node node) {
 
-        return new EventHandler<MouseEvent>() {
-            private double xOffset = 0;
-            private double yOffset = 0;
-            Stage stage;
 
-            @Override
-            public void handle(MouseEvent event) {
-                node.setCursor(Cursor.MOVE);
-                if (event.getEventType().equals(MouseEvent.MOUSE_PRESSED)) {
-                    stage = (Stage) node.getScene().getWindow();
-                    xOffset = event.getSceneX();
-                    yOffset = event.getSceneY();
-                } else if (event.getEventType().equals(MouseEvent.MOUSE_DRAGGED)) {
-                    stage.setX(event.getScreenX() - xOffset);
-                    stage.setY(event.getScreenY() - yOffset);
-                }
-            }
-        };
-    }
-
-    public Button drawingPin(Color color) {
-
-        Group svg = new Group(
-                createPath("M864.3584 421.2736a46.08 46.08 0 1 1 41.4208-82.3296c26.5216 13.3632 51.6608 29.5424 75.2128 48.5376a81.92 81.92 0 0 1 6.3488 121.3952l-206.4896 206.4896 9.1648 9.1648c150.272 149.1456 213.7088 212.6336 219.0848 219.4944 1.6384 2.2016 1.6384 2.2016-1.024 57.9584l-61.3376 8.3968c-2.4064-1.6896-2.4064-1.6896-4.096-3.1232l-1.7408-1.536-1.1776-1.1776-3.072-3.072-11.9808-11.8784-48.0768-48.0256a343675.648 343675.648 0 0 1-160.768-160.8704l-205.6192 207.2064c-15.616 15.5648-36.352 24.0128-57.856 24.0128-24.3712 0-47.616-10.8032-63.5904-30.208a421.888 421.888 0 0 1-80.5376-373.0432L159.4368 421.0176a245.6576 245.6576 0 0 1-117.7088-39.168 80.896 80.896 0 0 1-12.8-124.928L257.536 28.7744a80.8448 80.8448 0 0 1 125.0304 13.056c22.8864 35.328 36.096 75.6224 38.8608 117.1456l187.6992 148.8384a423.2192 423.2192 0 0 1 107.1616-13.824 46.08 46.08 0 1 1 0 92.16c-34.816 0-69.4784 5.5296-102.8096 16.384l-23.552 7.68-260.9152-206.8992 0.7168-23.1424c0.8192-26.5216-5.12-52.736-17.3056-75.9296L104.3456 311.808a153.8048 153.8048 0 0 0 75.3664 17.4592l23.7056-1.1776 207.2576 261.376-7.68 23.552a329.8816 329.8816 0 0 0 50.176 301.4656l197.5296-199.0656 32.2048-32.4608 32.3584-32.6656 198.656-198.3488a327.424 327.424 0 0 0-49.5616-30.72z", color)
-        );
-
-        Bounds bounds = svg.getBoundsInParent();
-        double scale = Math.min(20 / bounds.getWidth(), 20 / bounds.getHeight());
-        svg.setScaleX(scale);
-        svg.setScaleY(scale);
-
-        Button btn = new Button();
-        btn.setGraphic(svg);
-        btn.setMaxSize(30, 30);
-        btn.setMinSize(30, 30);
-        btn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-        btn.styleProperty().set(" -fx-background-color: rgba(255,255,255,0.5);");
-        btn.setLayoutX(0);
-        btn.setLayoutY(0);
-        return btn;
-
-    }
-
-    private static SVGPath createPath(String d, Color color) {
-        SVGPath path = new SVGPath();
-        path.setContent(d);
-        path.setFill(color);
-        return path;
-    }
 
 }

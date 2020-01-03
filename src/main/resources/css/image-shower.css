@@ -1,0 +1,47 @@
+/*鼠标覆盖按钮效果*/
+.close-button {
+    -fx-fill: black;
+    -fx-content-display: graphic-only;
+    -fx-background-color: rgba(255, 255, 255, 0.5);
+    -fx-cursor: default;
+}
+
+.close-button:hover .svg {
+    -fx-fill: WHITE;
+}
+.close-button:hover {
+    -fx-background-color: BLACK;
+
+}
+.close-button:pressed .svg {
+    -fx-fill: rgba(176, 32, 29, 0.98);
+
+}
+
+.close-button:pressed {
+    -fx-background-color: rgba(255, 255, 255, 0.5);
+}
+
+
+.drawing-pin {
+    -fx-fill: black;
+    -fx-content-display: graphic-only;
+    -fx-background-color: rgba(255, 255, 255, 0.5);
+    -fx-cursor: default;
+}
+
+.drawing-pin:hover .svg {
+    -fx-fill: WHITE;
+}
+.drawing-pin:hover {
+    -fx-background-color: BLACK;
+
+}
+.drawing-pin:pressed .svg {
+    -fx-fill: rgba(176, 32, 29, 0.98);
+
+}
+
+.drawing-pin:pressed {
+    -fx-background-color: rgba(255, 255, 255, 0.5);
+}
