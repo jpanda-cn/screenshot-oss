@@ -14,6 +14,7 @@ public class TrayConfig {
     private SimpleDoubleProperty stroke = new SimpleDoubleProperty(1);
     private SimpleObjectProperty<Color> strokeColor = new SimpleObjectProperty<>(Color.RED);
     private SimpleObjectProperty<Font> font = new SimpleObjectProperty<>(Font.getDefault());
+    private SimpleObjectProperty<Object> ext = new SimpleObjectProperty<>();
 
     public TrayConfig shallowClone() {
         TrayConfig copy = new TrayConfig();
@@ -21,5 +22,9 @@ public class TrayConfig {
         copy.strokeColor.set(strokeColor.get());
         copy.font.set(font.get());
         return copy;
+    }
+
+    public <T> T loadExt() {
+        return (T) ext.get();
     }
 }

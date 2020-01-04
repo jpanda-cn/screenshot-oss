@@ -25,13 +25,8 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.effect.Blend;
-import javafx.scene.effect.BlendMode;
-import javafx.scene.effect.Lighting;
-import javafx.scene.effect.Shadow;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -496,15 +491,20 @@ public class IndexCutView implements Initializable {
     public void doClose() {
         // 获取关闭视图
         Scene scene = configuration.getViewContext().getScene(CloseModelView.class);
-        ModelDialog<String> modelDialog = new ModelDialog<>(containTop.getScene().getWindow());
-        modelDialog.initModality(Modality.APPLICATION_MODAL);
-        modelDialog.setContent(scene.getRoot());
-        if ("min".equals(modelDialog.showAndWait().orElse("min"))) {
-            ((Stage) containTop.getScene().getWindow()).setIconified(true);
-        } else {
-            Platform.exit();
-        }
+        Tooltip tooltip = new Tooltip();
+        tooltip.setGraphic(scene.getRoot());
+        tooltip.showingProperty().addListener((observable, oldValue, newValue) -> mainContain.getScene().getRoot().disableProperty().setValue(newValue));
+        tooltip.show(containTop.getScene().getWindow());
+
+//        if ("min".equals(modelDialog.showAndWait().orElse("min"))) {
+//            ((Stage) containTop.getScene().getWindow()).setIconified(true);
+//        } else {
+//            Platform.exit();
+//        }
     }
 
 
+    public void toMin(ActionEvent actionEvent) {
+        ((Stage) containTop.getScene().getWindow()).setIconified(true);
+    }
 }

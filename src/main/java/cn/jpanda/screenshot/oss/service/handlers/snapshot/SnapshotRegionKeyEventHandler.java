@@ -13,10 +13,14 @@ import cn.jpanda.screenshot.oss.core.log.Log;
 import cn.jpanda.screenshot.oss.core.mouse.GlobalMousePoint;
 import cn.jpanda.screenshot.oss.core.shotkey.DefaultGroupScreenshotsElements;
 import cn.jpanda.screenshot.oss.core.shotkey.ScreenshotsElementConvertor;
+import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallback;
+import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallbackRegistryManager;
+import cn.jpanda.screenshot.oss.store.clipboard.instances.ImageClipboardCallback;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -29,6 +33,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 public class SnapshotRegionKeyEventHandler implements EventHandler<KeyEvent> {
     private Log log;
@@ -98,13 +103,24 @@ public class SnapshotRegionKeyEventHandler implements EventHandler<KeyEvent> {
         KeyCode code = event.getCode();
         switch (code) {
             case ENTER: {
-                // 完成截图操作
-                ScreenshotsProcess screenshotsProcess = configuration.getUniqueBean(ScreenshotsProcess.class);
-                // 获取截图区域的图片交由图片处理器来完成保存图片的操作
-                Platform.runLater(() -> { // 关闭
-                    ((Stage) canvasProperties.getCutPane().getScene().getWindow()).close();
-                });
-                screenshotsProcess.done(screenshotsProcess.snapshot(canvasProperties.getCutPane().getScene(), canvasProperties.getCutRectangle()));
+                if (canvasProperties == null) {
+                    return;
+                }
+                Scene scene = canvasProperties.getCutPane().getScene();
+                Rectangle rectangle = canvasProperties.getCutRectangle();
+                try {
+                    ScreenshotsProcess screenshotsProcess = configuration.getUniqueBean(ScreenshotsProcess.class);
+                    // 获取截图
+                    BufferedImage bufferedImage = screenshotsProcess.snapshot(scene, rectangle);
+                    // 不执行图片保存操作
+                    // 将图片放置剪切板
+                    ClipboardCallback clipboardCallback = configuration.getUniqueBean(ClipboardCallbackRegistryManager.class).get(ImageClipboardCallback.NAME);
+                    clipboardCallback.callback(bufferedImage, "");
+                } finally {
+                    Stage stage = ((Stage) scene.getWindow());
+                    // 关闭
+                    Platform.runLater(stage::close);
+                }
                 break;
             }
         }

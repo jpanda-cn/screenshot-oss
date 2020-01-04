@@ -9,7 +9,6 @@ import cn.jpanda.screenshot.oss.store.img.instances.git.GitPersistence;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.Stage;
 import lombok.SneakyThrows;
 import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.CloneCommand;
@@ -127,7 +126,7 @@ public class GitFileImageStoreConfig implements Initializable {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setInitialDirectory(Paths.get(oldPath).toFile());
         directoryChooser.setTitle(title);
-        File newDir = directoryChooser.showDialog(configuration.getViewContext().newStage());
+        File newDir = directoryChooser.showDialog(localRepositoryDir.getScene().getWindow());
         if (newDir == null) {
             return oldPath;
         }
@@ -296,7 +295,7 @@ public class GitFileImageStoreConfig implements Initializable {
 
     public void close() {
         // 取消
-        ((Stage) async.getScene().getWindow()).close();
+        async.getScene().getWindow().hide();
     }
 
     private Git cloned(GitPersistence gitPersistence, UsernamePasswordCredentialsProvider usernamePasswordCredentialsProvider) {

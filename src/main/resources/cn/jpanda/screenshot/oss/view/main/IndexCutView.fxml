@@ -1,22 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.Cursor?>
 <?import javafx.scene.effect.*?>
-<?import javafx.scene.image.*?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-
-<AnchorPane prefHeight="517.0" prefWidth="367.0" styleClass="back" stylesheets="@/css/default.css,@IndexCutView.css" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.jpanda.screenshot.oss.view.main.IndexCutView">
+<?import javafx.scene.text.Font?>
+<?import java.lang.String?>
+<?import javafx.scene.image.Image?>
+<AnchorPane prefHeight="517.0" prefWidth="367.0" styleClass="back" stylesheets="@/css/default.css,@IndexCutView.css"
+            xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="cn.jpanda.screenshot.oss.view.main.IndexCutView">
     <AnchorPane fx:id="mainContain" layoutX="8.0" layoutY="-2.0" prefHeight="556.0" prefWidth="357.0">
         <!-- 顶部title区域-->
-        <AnchorPane id="contain-top" fx:id="containTop" layoutX="-8.0" layoutY="2.0" prefHeight="59.0" prefWidth="367.0" styleClass="top">
-            <ImageView fitHeight="49.0" fitWidth="150.0" layoutX="8.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true">
-                <Image url="/images/icon-white.png" />
+        <AnchorPane id="contain-top" fx:id="containTop" layoutX="-8.0" layoutY="2.0" prefHeight="59.0" prefWidth="367.0"
+                    styleClass="top">
+            <ImageView fitHeight="49.0" fitWidth="150.0" layoutX="8.0" layoutY="5.0" pickOnBounds="true"
+                       preserveRatio="true">
+                                <Image url="/images/icon-white.png" />
             </ImageView>
-            <Separator layoutX="214.0" layoutY="3.0" orientation="VERTICAL" prefHeight="49.0" prefWidth="11.0" />
-            <MenuButton fx:id="options" layoutX="234.0" layoutY="15.0" mnemonicParsing="false" prefHeight="29.0" prefWidth="91.0" style="-fx-background-color: rgba(176, 32, 29, 0.98);" styleClass="menu-bar" text="选项" textFill="WHITE">
+            <Separator layoutX="167.0" layoutY="3.0" orientation="VERTICAL" prefHeight="49.0" prefWidth="11.0"/>
+            <MenuButton fx:id="options" layoutX="188.0" layoutY="15.0" mnemonicParsing="false" prefHeight="29.0"
+                        prefWidth="91.0" style="-fx-background-color: rgba(176, 32, 29, 0.98);" styleClass="menu-bar"
+                        text="选项" textFill="WHITE">
                 <effect>
                     <Blend mode="ADD">
                         <topInput>
@@ -24,7 +30,7 @@
                                 <input>
                                     <Lighting bumpInput="$null">
                                         <light>
-                                            <Light.Distant />
+                                            <Light.Distant/>
                                         </light>
                                     </Lighting>
                                 </input>
@@ -33,16 +39,20 @@
                     </Blend>
                 </effect>
                 <cursor>
-                    <Cursor fx:constant="CLOSED_HAND" />
-                </cursor></MenuButton>
-            <Button fx:id="exit" layoutX="337.0" layoutY="22.0" onAction="#doClose" styleClass="exit-btn-svg" text="退出" AnchorPane.rightAnchor="12.0" AnchorPane.topAnchor="22.0">
-            </Button>
+                    <Cursor fx:constant="CLOSED_HAND"/>
+                </cursor>
+            </MenuButton>
+            <Button fx:id="exit" layoutX="341.0" layoutY="22.0" onAction="#doClose" styleClass="exit-btn-svg"
+                    text="退出"/>
+            <Button fx:id="toMin" layoutX="319.0" layoutY="22.0" onAction="#toMin" styleClass="min-btn-svg" text="最小化"/>
+
         </AnchorPane>
 
         <AnchorPane layoutY="68.0" prefHeight="158.0" prefWidth="353.0">
 
-            <ImageView fitHeight="87.0" fitWidth="287.0" layoutX="31.0" layoutY="57.0" pickOnBounds="true" preserveRatio="true">
-                <Image url="/images/logo.png"/>
+            <ImageView fitHeight="87.0" fitWidth="287.0" layoutX="31.0" layoutY="57.0" pickOnBounds="true"
+                       preserveRatio="true">
+                                <Image url="/images/logo.png"/>
             </ImageView>
         </AnchorPane>
         <AnchorPane layoutX="26.0" layoutY="228.0" prefHeight="170.0" prefWidth="231.0">
@@ -63,19 +73,22 @@
 
         <!-- 底部截图区域 -->
         <AnchorPane layoutX="21.0" layoutY="387.0" prefHeight="158.0" prefWidth="314.0">
-            <Button fx:id="cutBtn" layoutX="37.0" layoutY="22.0" mnemonicParsing="false" onKeyPressed="#doKeyCut" onMouseClicked="#doCut" prefHeight="87.0" prefWidth="238.0" text="截图" textFill="#010302">
+            <Button fx:id="cutBtn" layoutX="37.0" layoutY="22.0" mnemonicParsing="false" onKeyPressed="#doKeyCut"
+                    onMouseClicked="#doCut" prefHeight="87.0" prefWidth="238.0" text="截图" textFill="#010302">
                 <font>
-                    <Font name="System Bold" size="38.0" />
+                    <Font name="System Bold" size="38.0"/>
                 </font>
                 <styleClass>
-                    <String fx:value="btn-radius-large" />
-                    <String fx:value="btn-basic" />
+                    <String fx:value="btn-radius-large"/>
+                    <String fx:value="btn-basic"/>
                 </styleClass>
             </Button>
-            <Label layoutX="130.0" layoutY="118.0" text="截图时隐藏该菜单" />
-            <RadioButton fx:id="hidden" layoutX="98.0" layoutY="118.0" mnemonicParsing="false" />
-            <Label fx:id="shotKeyShower" alignment="CENTER" disable="true" layoutX="127.0" layoutY="99.0" opacity="0.0" prefHeight="19.0" prefWidth="183.0" textFill="#1d27cf" />
-            <ProgressBar fx:id="loadStatus" layoutX="21.0" layoutY="144.0" prefHeight="21.0" prefWidth="293.0" progress="0.0" />
+            <Label layoutX="130.0" layoutY="118.0" text="截图时隐藏该菜单"/>
+            <RadioButton fx:id="hidden" layoutX="98.0" layoutY="118.0" mnemonicParsing="false"/>
+            <Label fx:id="shotKeyShower" alignment="CENTER" disable="true" layoutX="127.0" layoutY="99.0" opacity="0.0"
+                   prefHeight="19.0" prefWidth="183.0" textFill="#1d27cf"/>
+            <ProgressBar fx:id="loadStatus" layoutX="21.0" layoutY="144.0" prefHeight="21.0" prefWidth="293.0"
+                         progress="0.0"/>
         </AnchorPane>
     </AnchorPane>
 

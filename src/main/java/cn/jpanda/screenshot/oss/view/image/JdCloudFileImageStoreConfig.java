@@ -6,10 +6,7 @@ import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
 import cn.jpanda.screenshot.oss.store.img.instances.jd.JdOssPersistence;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -64,7 +61,7 @@ public class JdCloudFileImageStoreConfig implements Initializable {
     }
 
     public void close() {
-        ((Stage) endpoint.getScene().getWindow()).close();
+        endpoint.getScene().getWindow().hide();
     }
 
     public void save() {

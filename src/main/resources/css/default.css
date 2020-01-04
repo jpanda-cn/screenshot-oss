@@ -1,6 +1,7 @@
 .root {
     -fx-font-size: 14px;
 }
+
 .label {
     -fx-font-size: 14px;
 }
@@ -10,7 +11,10 @@
     /*文本对齐方式*/
     -fx-text-alignment: center;
     /*合适高度*/
-    /*-fx-pref-height: 38px;*/
+    -fx-min-height: 25px;
+    /*-fx-pref-height: 25px;*/
+    /*粗体*/
+    /*-fx-font-weight: bold;*/
     /*内边距*/
     -fx-padding: 0 18px;
     /*无边框*/
@@ -22,8 +26,7 @@
 }
 
 .button:hover {
-    /*粗体*/
-    /*-fx-font-weight: bold;*/
+
     /*透明度*/
     -fx-opacity: 0.8;
     -fx-text-fill: rgba(176, 32, 29, 0.98);
@@ -43,16 +46,32 @@
 .exit-btn-svg {
     -icon-paint: WHITE;
     -fx-background-color: -icon-paint;
-    -size: 12px;
+    -size: 14px;
     -fx-min-height: -size;
     -fx-min-width: -size;
     -fx-max-height: -size;
     -fx-max-width: -size;
     -fx-content-display: graphic-only;
-    -fx-shape: "M604.16 512l110.08-110.08a64 64 0 0 0-90.24-90.88L512 421.76 403.2 311.04a64 64 0 0 0-90.24 90.88L423.04 512 312.96 622.08a64 64 0 1 0 90.24 90.88L512 602.24l110.08 110.08a64 64 0 0 0 90.24-90.24z";
+    -fx-shape: "M7.67 512.003C7.67 794.773 234.866 1024 515.126 1024c280.27 0 507.457-229.227 507.457-511.997S795.396 0 515.127 0C234.867 0 7.669 229.233 7.669 512.003z    M793.678 233.134c15.083 14.883 15.083 40.913 0 55.802L284.084 791c-15.109 14.853-41.532 14.853-56.636 0-15.083-14.878-15.083-40.919 0-55.802l509.59-502.063c15.108-14.858 41.537-14.858 56.64 0z    M236.585 240.824c14.659-14.409 40.295-14.409 54.954 0L785.994 727.66c14.628 14.434 14.628 39.682 0 54.11-14.66 14.403-40.295 14.403-54.96 0L236.586 294.934c-14.633-14.44-14.633-39.682 0-54.11z";
 }
 
 .exit-btn-svg:hover {
+    -icon-paint: rgba(255, 99, 99, 0.36);
+}
+
+.min-btn-svg {
+    -icon-paint: WHITE;
+    -fx-background-color: -icon-paint;
+    -size: 14px;
+    -fx-min-height: -size;
+    -fx-min-width: -size;
+    -fx-max-height: -size;
+    -fx-max-width: -size;
+    -fx-content-display: graphic-only;
+    -fx-shape: "M512 51.2c-254.464 0-460.8 206.336-460.8 460.8s206.336 460.8 460.8 460.8 460.8-206.336 460.8-460.8-206.336-460.8-460.8-460.8z m282.112 516.608H229.888V456.192h564.224v111.616z";
+}
+
+.min-btn-svg:hover {
     -icon-paint: rgba(255, 99, 99, 0.36);
 }
 
@@ -147,10 +166,10 @@
 
 
 .combo-box {
-    -fx-border-color:  -fx-my-combox-color;
+    -fx-border-color: -fx-my-combox-color;
     -fx-border-width: 1;
     -fx-background-radius: 0;
-    -fx-background-color:  -fx-my-combox-color;
+    -fx-background-color: -fx-my-combox-color;
     -fx-font-family: "Arial";
     -fx-font-size: 12px;
     -fx-background-insets: 0;
@@ -159,11 +178,11 @@
 }
 
 .combo-box > .cell {
-    -fx-background-color:-fx-my-combox-color;
-    -fx-text-fill:  -fx-my-combox-color-highlighted;
+    -fx-background-color: -fx-my-combox-color;
+    -fx-text-fill: -fx-my-combox-color-highlighted;
 }
 
-.combo-box:hover >.cell {
+.combo-box:hover > .cell {
     -fx-background-color: -fx-my-combox-color-highlighted;
     -fx-text-fill: -fx-my-combox-font-color-highlighted;
 }
@@ -173,6 +192,7 @@
     -fx-text-fill: -fx-my-combox-font-color;
     -fx-text-alignment: LEFT;
 }
+
 /* 移除默认选中样式 */
 /*.combo-box-popup .list-view .list-cell:filled:selected,*/
 /*.combo-box-popup .list-view .list-cell:filled:selected:hover {*/
@@ -181,8 +201,8 @@
 /*}*/
 
 .combo-box-popup .list-view .list-cell:filled:hover {
-    -fx-background-color:-fx-my-combox-color-highlighted;
-    -fx-text-fill:  -fx-my-combox-font-color-highlighted;
+    -fx-background-color: -fx-my-combox-color-highlighted;
+    -fx-text-fill: -fx-my-combox-font-color-highlighted;
     -fx-background-radius: 10.0;
 }
 
@@ -193,6 +213,7 @@
     -fx-background-color: white;
     -fx-border-radius: 15px;
 }
+
 .radio-button .radio:selected {
     -fx-background-color: rgba(176, 32, 29, 0.98);
     -fx-border-color: #FFFFFF;
@@ -203,19 +224,19 @@
     -fx-border-color: #FFFFFF;
 }
 
-/* ========================== TableView  ===================================*/
-.table-row-cell:filled {
-    -fx-background-color: lime;
-}
+/*!* ========================== TableView  ===================================*!*/
+/*.table-row-cell:filled {*/
+/*    -fx-background-color: lime;*/
+/*}*/
 
-.table-row-cell:filled:selected {
-    -fx-background-color: -fx-selection-bar;
-}
+/*.table-row-cell:filled:selected {*/
+/*    -fx-background-color: -fx-selection-bar;*/
+/*}*/
 
-.table-row-cell:filled:removed {
-    -fx-background-color: orange;
-}
+/*.table-row-cell:filled:removed {*/
+/*    -fx-background-color: orange;*/
+/*}*/
 
-.table-row-cell:filled:removed:selected {
-    -fx-background-color: -fx-selection-bar;
-}
+/*.table-row-cell:filled:removed:selected {*/
+/*    -fx-background-color: -fx-selection-bar;*/
+/*}*/

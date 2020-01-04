@@ -8,7 +8,7 @@
 <VBox prefHeight="190.0" prefWidth="250.0" stylesheets="@CloseModelView.css,@/css/default.css" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.jpanda.screenshot.oss.view.models.CloseModelView">
     <AnchorPane prefHeight="46.0" prefWidth="200.0">
         <Label layoutX="14.0" layoutY="20.0" prefHeight="27.0" prefWidth="200.0" text="关闭提示" />
-      <Button layoutX="200.0" layoutY="6.0" mnemonicParsing="false" text="X" >
+      <Button layoutX="222.0" layoutY="7.0" maxHeight="21.0" maxWidth="22.0" mnemonicParsing="false" onAction="#cancel" prefHeight="21.0" prefWidth="22.0" style="-fx-background-color: rgba(176, 32, 29, 0.98);-fx-min-height: 20px;-fx-min-width: 20px;" styleClass="exit-btn-svg" text="关闭">
       </Button>
       <effect>
          <Bloom threshold="1.0" />

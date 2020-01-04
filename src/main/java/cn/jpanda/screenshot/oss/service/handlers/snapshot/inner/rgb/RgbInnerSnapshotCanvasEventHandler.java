@@ -109,8 +109,6 @@ public class RgbInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEvent
                 Platform.runLater(tooltip::hide);
             }
         }, 500L);
-
-
     }
 
     protected void enter() {

@@ -1,10 +1,13 @@
 package cn.jpanda.screenshot.oss.view.tray;
 
 import cn.jpanda.screenshot.oss.common.utils.MathUtils;
+import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.view.tray.subs.ResizeEventHandler;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
@@ -12,12 +15,9 @@ import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -28,13 +28,17 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Font;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import lombok.Getter;
+import lombok.SneakyThrows;
 
-import java.util.Arrays;
-import java.util.Collections;
+import javax.imageio.ImageIO;
+import java.io.File;
+import java.nio.file.Paths;
+import java.util.*;
 
 
 /**
@@ -53,7 +57,8 @@ public class ImageShower extends Stage {
     private HBox top;
     private AnchorPane body;
     private Rectangle rect;
-    TextField topTitle;
+    private Image image;
+    private TextField topTitle;
 
     {
         stylesheets.addListener(new ChangeListener<String>() {
@@ -65,6 +70,13 @@ public class ImageShower extends Stage {
                 });
             }
         });
+    }
+
+    public ImageShower setTopTitle(String message) {
+        if (StringUtils.isNotEmpty(message)){
+            topTitle.textProperty().set(message);
+        }
+        return this;
     }
 
     public ImageShower stylesheets(String stylesheets) {
@@ -116,6 +128,7 @@ public class ImageShower extends Stage {
     }
 
     public void init(Image image) {
+        this.image = image;
         loadImage(image);
         body.getChildren().add(rect);
 
@@ -138,10 +151,108 @@ public class ImageShower extends Stage {
         EventHandler<MouseEvent> drag = addDrag(body);
         rect.addEventHandler(MouseEvent.ANY, stageHandler(rect, resize, drag));
 
+        ContextMenu contextMenu = new ContextMenu();
+        MenuItem saveOther = new MenuItem("图像另存为");
+        MenuItem sceneSaveOther = new MenuItem("窗口图像另存为");
+
+        MenuItem copyItem = new MenuItem("复制图像到剪切板(Ctrl+C)");
+        MenuItem copyFullItem = new MenuItem("复制当前窗口到剪切板(Ctrl+Alt+C)");
+        saveOther.setOnAction((e) -> {
+            saveAndChooseFile(image);
+        });
+        sceneSaveOther.setOnAction((e) -> {
+            saveAndChooseFile(this.getScene().snapshot(null));
+        });
+        copyItem.setOnAction((e) -> {
+            saveAndShowTips(image, "图片已复制", rect);
+        });
+        copyFullItem.setOnAction((e) -> {
+            saveAndShowTips(this.getScene().snapshot(null), "窗口已复制", rect);
+        });
+        contextMenu.getItems().addAll(saveOther, sceneSaveOther, copyItem, copyFullItem);
+
+        body.addEventHandler(MouseEvent.MOUSE_CLICKED, (e) -> {
+            if (e.getButton().equals(MouseButton.SECONDARY)) {
+                contextMenu.show(body, e.getScreenX(), e.getScreenY() + 10);
+            }
+        });
+        body.addEventHandler(MouseEvent.MOUSE_PRESSED, (e) -> {
+            if (contextMenu.showingProperty().getValue()) {
+                contextMenu.hide();
+            }
+        });
+        box.addEventHandler(KeyEvent.KEY_PRESSED, (e) -> {
+            if (e.isControlDown() && e.getCode().equals(KeyCode.C)) {
+                if (e.isShiftDown() || e.isMetaDown()) {
+                    return;
+                }
+                if (e.isAltDown()) {
+                    saveAndShowTips(this.getScene().snapshot(null), "窗口已复制", rect);
+                } else {
+                    saveAndShowTips(image, "图片已复制", rect);
+                }
+            }
+        });
+
         Scene sc = new Scene(box);
         sc.setFill(Color.TRANSPARENT);
+
         setScene(sc);
+
         setAlwaysOnTop(true);
+
+    }
+
+    @SneakyThrows
+    private void saveAndChooseFile(Image image) {
+        // 获取当前地址
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("请选择图片保存地址");
+        File file = directoryChooser.showDialog(this);
+        if (file == null) {
+            return;
+        }
+        String newPath = file.getAbsolutePath();
+        if (StringUtils.isEmpty(newPath)) {
+            return;
+        }
+        // 获取标题
+        String title = topTitle.textProperty().getValue();
+        if (StringUtils.isEmpty(title)) {
+            title = UUID.randomUUID().toString();
+        }
+        String fileName = title.concat(".png");
+        File pngFile = Paths.get(newPath, fileName).toFile();
+        while (pngFile.exists()) {
+            fileName = UUID.randomUUID().toString().concat(fileName);
+            pngFile = Paths.get(newPath, fileName).toFile();
+        }
+        ImageIO.write(SwingFXUtils.fromFXImage(image, null), "PNG", pngFile);
+        tips("保存成功", body);
+    }
+
+    private void saveAndShowTips(Image image, String tips, Rectangle node) {
+        setClipboard(image);
+        tips(tips, node);
+    }
+
+    private void setClipboard(Image image) {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent clipboardContent = new ClipboardContent();
+        clipboardContent.putImage(image);
+        clipboard.setContent(clipboardContent);
+    }
+
+    private void tips(String tips, Node node) {
+        // 获取关闭视图
+        Tooltip tooltip = new Tooltip(tips);
+        tooltip.show(this);
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Platform.runLater(tooltip::hide);
+            }
+        }, 500L);
     }
 
     protected void loadImage(Image image) {

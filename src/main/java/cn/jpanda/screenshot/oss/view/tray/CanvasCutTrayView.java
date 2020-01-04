@@ -1,6 +1,5 @@
 package cn.jpanda.screenshot.oss.view.tray;
 
-import cn.jpanda.screenshot.oss.common.utils.MathUtils;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.ScreenshotsProcess;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
@@ -13,42 +12,35 @@ import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallbackRegistryManager
 import cn.jpanda.screenshot.oss.store.clipboard.instances.ImageClipboardCallback;
 import cn.jpanda.screenshot.oss.view.main.SettingsView;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
-import cn.jpanda.screenshot.oss.view.tray.subs.ResizeEventHandler;
 import cn.jpanda.screenshot.oss.view.tray.subs.TrayColorView;
 import cn.jpanda.screenshot.oss.view.tray.subs.TrayFontView;
 import cn.jpanda.screenshot.oss.view.tray.subs.TrayPointView;
 import cn.jpanda.screenshot.oss.view.tray.toolkits.CutInnerType;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.css.CssMetaData;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Bounds;
-import javafx.scene.Cursor;
-import javafx.scene.Group;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.ImagePattern;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.SVGPath;
-import javafx.scene.shape.StrokeType;
+import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.awt.image.BufferedImage;
 import java.net.URL;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -108,6 +100,17 @@ public class CanvasCutTrayView implements Initializable {
         save.tooltipProperty().setValue(new Tooltip("上传至云"));
         cancel.tooltipProperty().setValue(new Tooltip("取消"));
         submit.tooltipProperty().setValue(new Tooltip("保存"));
+
+        drawingPin.setOnKeyPressed(e->{
+            if (e.isControlDown() || e.isShiftDown() || e.isAltDown()) {
+                return;
+            }
+            if (e.getCode().equals(KeyCode.ENTER)) {
+                // 获取截图区域图片
+                showImage("");
+                e.consume();
+            }
+        });
     }
 
     private void initRectangle() {
@@ -188,38 +191,59 @@ public class CanvasCutTrayView implements Initializable {
         DestroyGroupBeanHolder destroyGroupBeanHolder = configuration.getUniqueBean(DestroyGroupBeanHolder.class);
         destroyGroupBeanHolder.destroy();
         canvasProperties.setCutInnerType(CutInnerType.MOSAIC);
-        add2Bar(new HBox((Pane) configuration.getViewContext().getScene(TrayPointView.class, false, true, false).getRoot()));
+        add2Bar(new HBox(configuration.getViewContext().getScene(TrayPointView.class, false, true, false).getRoot()));
     }
 
     public void doDrawingPin(MouseEvent mouseEvent) {
-        final double stroke = 5;
-        try {
-            DestroyGroupBeanHolder destroyGroupBeanHolder = configuration.getUniqueBean(DestroyGroupBeanHolder.class);
-            destroyGroupBeanHolder.destroy();
-            initRectangle();
-            canvasProperties.setCutInnerType(CutInnerType.DRAWING_PIN);
+        DestroyGroupBeanHolder destroyGroupBeanHolder = configuration.getUniqueBean(DestroyGroupBeanHolder.class);
+        destroyGroupBeanHolder.destroy();
+        initRectangle();
+        canvasProperties.setCutInnerType(CutInnerType.DRAWING_PIN);
+        HBox hBox = new HBox();
+        hBox.setPadding(new Insets(5, 20, 5, 20));
+        hBox.setSpacing(10);
+        hBox.setAlignment(Pos.CENTER_LEFT);
+        Text text = new Text("标题:");
+        TextField textField = new TextField();
+        Button ok = new Button("固定到桌面");
+        hBox.getChildren().addAll(text, textField, ok);
+        textField.setOnKeyPressed(e->{
+            if (e.isControlDown() || e.isShiftDown() || e.isAltDown()) {
+                return;
+            }
+            if (e.getCode().equals(KeyCode.ENTER)) {
+                // 获取截图区域图片
+                showImage(textField.getText());
+                e.consume();
+            }
+        });
 
+        add2Bar(hBox);
+
+        ok.setOnAction(e -> {
             // 获取截图区域图片
-            Scene scene = canvasProperties.getCutPane().getScene();
-            Rectangle rectangle = canvasProperties.getCutRectangle();
-            ScreenshotsProcess screenshotsProcess = configuration.getUniqueBean(ScreenshotsProcess.class);
-            BufferedImage image = screenshotsProcess.snapshot(scene, rectangle);
-            WritableImage showImage = new WritableImage(image.getWidth(), image.getHeight());
-            showImage = SwingFXUtils.toFXImage(image, showImage);
-            ImageShower.of(configuration.getViewContext().getStage()).show(showImage);
-        } finally {
-            doCancel();
-        }
+            showImage(textField.getText());
+        });
 
     }
 
+    private void  showImage(String text){
+        Scene scene = canvasProperties.getCutPane().getScene();
+        Rectangle rectangle = canvasProperties.getCutRectangle();
+        ScreenshotsProcess screenshotsProcess = configuration.getUniqueBean(ScreenshotsProcess.class);
+        BufferedImage image = screenshotsProcess.snapshot(scene, rectangle);
+        WritableImage showImage = new WritableImage(image.getWidth(), image.getHeight());
+        showImage = SwingFXUtils.toFXImage(image, showImage);
+        ImageShower.of(configuration.getViewContext().getStage()).setTopTitle(text).show(showImage);
+        doCancel();
+    }
 
     public void doRgb(MouseEvent mouseEvent) {
         initRectangle();
         DestroyGroupBeanHolder destroyGroupBeanHolder = configuration.getUniqueBean(DestroyGroupBeanHolder.class);
         destroyGroupBeanHolder.destroy();
         canvasProperties.setCutInnerType(CutInnerType.RGB);
-
+        add2Bar(new HBox());
     }
 
     // 设置
@@ -356,8 +380,6 @@ public class CanvasCutTrayView implements Initializable {
         }
 
     }
-
-
 
 
 }
