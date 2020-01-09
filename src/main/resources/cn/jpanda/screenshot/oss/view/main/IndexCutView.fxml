@@ -87,8 +87,6 @@
             <RadioButton fx:id="hidden" layoutX="98.0" layoutY="118.0" mnemonicParsing="false"/>
             <Label fx:id="shotKeyShower" alignment="CENTER" disable="true" layoutX="127.0" layoutY="99.0" opacity="0.0"
                    prefHeight="19.0" prefWidth="183.0" textFill="#1d27cf"/>
-            <ProgressBar fx:id="loadStatus" layoutX="21.0" layoutY="144.0" prefHeight="21.0" prefWidth="293.0"
-                         progress="0.0"/>
         </AnchorPane>
     </AnchorPane>
 

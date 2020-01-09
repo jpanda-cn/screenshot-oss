@@ -1,4 +1,4 @@
-package cn.jpanda.screenshot.oss.view.tray;
+package cn.jpanda.screenshot.oss.common.toolkit;
 
 import cn.jpanda.screenshot.oss.common.utils.MathUtils;
 import cn.jpanda.screenshot.oss.common.utils.StringUtils;

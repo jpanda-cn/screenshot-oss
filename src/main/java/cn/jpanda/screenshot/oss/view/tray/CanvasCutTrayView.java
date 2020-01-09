@@ -1,5 +1,7 @@
 package cn.jpanda.screenshot.oss.view.tray;
 
+import cn.jpanda.screenshot.oss.common.toolkit.EventHelper;
+import cn.jpanda.screenshot.oss.common.toolkit.ImageShower;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.ScreenshotsProcess;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
@@ -28,13 +30,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -101,7 +101,7 @@ public class CanvasCutTrayView implements Initializable {
         cancel.tooltipProperty().setValue(new Tooltip("取消"));
         submit.tooltipProperty().setValue(new Tooltip("保存"));
 
-        drawingPin.setOnKeyPressed(e->{
+        drawingPin.setOnKeyPressed(e -> {
             if (e.isControlDown() || e.isShiftDown() || e.isAltDown()) {
                 return;
             }
@@ -199,35 +199,58 @@ public class CanvasCutTrayView implements Initializable {
         destroyGroupBeanHolder.destroy();
         initRectangle();
         canvasProperties.setCutInnerType(CutInnerType.DRAWING_PIN);
+
+        TextInputDialog inputDialog = new TextInputDialog();
+        inputDialog.initOwner(canvasProperties.getCutPane().getScene().getWindow());
+        inputDialog.initStyle(StageStyle.UNDECORATED);
         HBox hBox = new HBox();
-        hBox.setPadding(new Insets(5, 20, 5, 20));
-        hBox.setSpacing(10);
-        hBox.setAlignment(Pos.CENTER_LEFT);
-        Text text = new Text("标题:");
-        TextField textField = new TextField();
-        Button ok = new Button("固定到桌面");
-        hBox.getChildren().addAll(text, textField, ok);
-        textField.setOnKeyPressed(e->{
+        hBox.setPadding(new Insets(10, 0, 10, 0));
+        Label text = new Label("请输入便签描述（可为空）");
+        text.minHeight(50);
+        hBox.setAlignment(Pos.CENTER);
+        hBox.getChildren().addAll(text);
+
+        TextArea body = new TextArea();
+
+        DialogPane dialogPane = inputDialog.getDialogPane();
+        hBox.setStyle("-fx-background-color: #e6e6e6;");
+
+        EventHelper.addDrag(hBox);
+        dialogPane.setHeader(hBox);
+        dialogPane.setContent(body);
+        inputDialog.showAndWait();
+
+
+
+//        HBox hBox = new HBox();
+//        hBox.setPadding(new Insets(5, 20, 5, 20));
+//        hBox.setSpacing(10);
+//        hBox.setAlignment(Pos.CENTER_LEFT);
+//        Text text = new Text("标题:");
+//        TextField textField = new TextField();
+//        Button ok = new Button("固定到桌面");
+//        hBox.getChildren().addAll(text, textField, ok);
+        body.setOnKeyPressed(e -> {
             if (e.isControlDown() || e.isShiftDown() || e.isAltDown()) {
                 return;
             }
             if (e.getCode().equals(KeyCode.ENTER)) {
                 // 获取截图区域图片
-                showImage(textField.getText());
+                showImage(body.getText());
                 e.consume();
             }
         });
 
-        add2Bar(hBox);
+//        add2Bar(hBox);
 
-        ok.setOnAction(e -> {
-            // 获取截图区域图片
-            showImage(textField.getText());
-        });
+//        ok.setOnAction(e -> {
+//            // 获取截图区域图片
+//            showImage(body.getText());
+//        });
 
     }
 
-    private void  showImage(String text){
+    private void showImage(String text) {
         Scene scene = canvasProperties.getCutPane().getScene();
         Rectangle rectangle = canvasProperties.getCutRectangle();
         ScreenshotsProcess screenshotsProcess = configuration.getUniqueBean(ScreenshotsProcess.class);

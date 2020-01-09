@@ -64,11 +64,6 @@ public class IndexCutView implements Initializable {
      */
     public AnchorPane mainContain;
 
-    /**
-     * 右侧容器
-     */
-    public AnchorPane rightContain;
-    public ProgressBar loadStatus;
     @FXML
     public AnchorPane containTop;
     public Button exit;
@@ -123,7 +118,6 @@ public class IndexCutView implements Initializable {
         loadImageSave();
         loadClipboard();
         loadHotKey();
-        loadStatus.progressProperty().setValue(0.5);
 
         addDrag();
 

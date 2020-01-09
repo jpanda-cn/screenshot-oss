@@ -70,7 +70,7 @@ public class LocalFileImageStoreConfig implements Initializable {
 
     public void cancel() {
         // 取消
-        show.getScene().getWindow().hide();
+        ((Stage) show.getScene().getWindow()).close();
     }
 
     public void save() {

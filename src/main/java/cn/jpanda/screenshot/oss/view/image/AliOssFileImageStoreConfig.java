@@ -57,7 +57,7 @@ public class AliOssFileImageStoreConfig implements Initializable {
     }
 
     public void close() {
-        endpoint.getScene().getWindow().hide();
+        ((Stage) endpoint.getScene().getWindow()).close();
     }
 
     public void save() {

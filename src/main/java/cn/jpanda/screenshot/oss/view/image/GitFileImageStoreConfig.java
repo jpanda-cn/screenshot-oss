@@ -294,6 +294,7 @@ public class GitFileImageStoreConfig implements Initializable {
     }
 
     public void close() {
+        System.out.println("123");
         // 取消
         async.getScene().getWindow().hide();
     }
