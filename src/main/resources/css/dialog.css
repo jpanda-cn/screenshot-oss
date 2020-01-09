@@ -1,0 +1,67 @@
+.dialog-pane{
+  -fx-border-color:black;
+  -fx-border-width:3.0px;
+ }
+.dialog-pane:header {
+ -fx-background-color: #e6e6e6;
+}
+.dialog-pane:header .header-panel {
+ -fx-background-color: rgba(255,255,255,0);
+}
+
+.dialog-pane > .content.label {
+   -fx-padding: 0.5em 0.5em 0.5em 0.5em;
+   -fx-background-color: white;
+   -fx-text-fill:black;
+   -fx-font-size:15.0px;
+}
+
+
+.dialog-pane:header .header-panel .label{
+  -fx-background-color: rgba(255,255,255,0);
+  -fx-background-radius:10px;
+  -fx-text-fill:black;
+  -fx-font-size:15.0px;
+  -fx-font-weight: bold;
+}
+
+
+.dialog-pane > .button-bar > .container {
+  -fx-background-color:rgba(255,255,255,0.2);
+}
+
+.dialog-pane .button{
+    /*文本对齐方式*/
+    -fx-text-alignment: center;
+    /*合适高度*/
+    -fx-min-height: 25px;
+    /*粗体*/
+    -fx-font-weight: bold;
+    /*内边距*/
+    -fx-padding: 0 18px;
+    /*无边框*/
+    -fx-border-style: none;
+    /*鼠标样式*/
+    -fx-cursor: pointer;
+    -fx-text-fill: white;
+    -fx-background-color: rgba(176, 32, 29, 0.98);
+    -fx-text-fill:white;
+    -fx-wrap-text: true;
+    /*-fx-effect: dropshadow( three-pass-box, rgba(176, 32, 29, 0.98), 10.0, 0.0, 0.0, 0.0);*/
+ }
+
+.dialog-pane .button:hover{
+    /*透明度*/
+     -fx-opacity: 0.8;
+     -fx-text-fill: rgba(176, 32, 29, 0.98);
+     -fx-background-color: #FFFFFF;
+ }
+
+.dialog-pane .button:pressed {
+     /*粗体*/
+     /*-fx-font-weight: bold;*/
+     /*透明度*/
+     -fx-opacity: 0.8;
+     -fx-text-fill: rgb(0, 0, 0);
+     -fx-background-color: #FFFFFF;
+ }
