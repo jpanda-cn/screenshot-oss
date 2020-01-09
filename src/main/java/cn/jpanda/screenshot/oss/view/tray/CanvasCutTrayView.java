@@ -23,6 +23,7 @@ import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -208,7 +209,25 @@ public class CanvasCutTrayView implements Initializable {
         inputDialog.initOwner(canvasProperties.getCutPane().getScene().getWindow());
         inputDialog.initStyle(StageStyle.UNDECORATED);
         // 处理展示位置
-
+        Rectangle rectangle = canvasProperties.getCutRectangle();
+        Bounds bounds = rectangle.getScene().getRoot().getLayoutBounds();
+        inputDialog.setX(rectangle.xProperty().add(rectangle.widthProperty().subtract(inputDialog.widthProperty()).divide(2)).get());
+        inputDialog.widthProperty().addListener((observable, oldValue, newValue) -> {
+            // 计算基准位置
+            double x = rectangle.xProperty().add(rectangle.widthProperty().subtract(inputDialog.widthProperty()).divide(2)).get();
+            // 重置展示位置
+            x = Math.max(x, bounds.getMinX());
+            x = Math.min(x, bounds.getMaxX());
+            inputDialog.setX(x);
+        });
+        inputDialog.heightProperty().addListener((observable, oldValue, newValue) -> {
+            double y = rectangle.yProperty().add(rectangle.heightProperty().subtract(inputDialog.heightProperty()).divide(2)).get();
+            // 计算基准位置
+            y = Math.max(y, bounds.getMinY());
+            // 重置展示位置
+            y = Math.min(y, bounds.getMaxY());
+            inputDialog.setY(y);
+        });
 
         HBox hBox = new HBox();
         hBox.setPadding(new Insets(10, 0, 10, 0));
@@ -224,7 +243,7 @@ public class CanvasCutTrayView implements Initializable {
         EventHelper.addDrag(hBox);
         dialogPane.setHeader(hBox);
         dialogPane.setContent(body);
-        ButtonType toDesktop=new ButtonType("固定到桌面", ButtonBar.ButtonData.OK_DONE);
+        ButtonType toDesktop = new ButtonType("固定到桌面", ButtonBar.ButtonData.OK_DONE);
         dialogPane.getButtonTypes().addAll(ButtonType.CANCEL, toDesktop);
         if (inputDialog.showAndWait().orElse(ButtonType.CANCEL).equals(toDesktop)) {
             showImage(body.getText());
