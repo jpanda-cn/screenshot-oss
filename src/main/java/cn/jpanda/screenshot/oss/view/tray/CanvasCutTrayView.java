@@ -200,9 +200,16 @@ public class CanvasCutTrayView implements Initializable {
         initRectangle();
         canvasProperties.setCutInnerType(CutInnerType.DRAWING_PIN);
 
-        TextInputDialog inputDialog = new TextInputDialog();
+        Dialog<ButtonType> inputDialog = new Dialog<ButtonType>() {
+            {
+                setResultConverter((b) -> b);
+            }
+        };
         inputDialog.initOwner(canvasProperties.getCutPane().getScene().getWindow());
         inputDialog.initStyle(StageStyle.UNDECORATED);
+        // 处理展示位置
+
+
         HBox hBox = new HBox();
         hBox.setPadding(new Insets(10, 0, 10, 0));
         Label text = new Label("请输入便签描述（可为空）");
@@ -214,40 +221,14 @@ public class CanvasCutTrayView implements Initializable {
 
         DialogPane dialogPane = inputDialog.getDialogPane();
         hBox.setStyle("-fx-background-color: #e6e6e6;");
-
         EventHelper.addDrag(hBox);
         dialogPane.setHeader(hBox);
         dialogPane.setContent(body);
-        inputDialog.showAndWait();
-
-
-
-//        HBox hBox = new HBox();
-//        hBox.setPadding(new Insets(5, 20, 5, 20));
-//        hBox.setSpacing(10);
-//        hBox.setAlignment(Pos.CENTER_LEFT);
-//        Text text = new Text("标题:");
-//        TextField textField = new TextField();
-//        Button ok = new Button("固定到桌面");
-//        hBox.getChildren().addAll(text, textField, ok);
-        body.setOnKeyPressed(e -> {
-            if (e.isControlDown() || e.isShiftDown() || e.isAltDown()) {
-                return;
-            }
-            if (e.getCode().equals(KeyCode.ENTER)) {
-                // 获取截图区域图片
-                showImage(body.getText());
-                e.consume();
-            }
-        });
-
-//        add2Bar(hBox);
-
-//        ok.setOnAction(e -> {
-//            // 获取截图区域图片
-//            showImage(body.getText());
-//        });
-
+        ButtonType toDesktop=new ButtonType("固定到桌面", ButtonBar.ButtonData.OK_DONE);
+        dialogPane.getButtonTypes().addAll(ButtonType.CANCEL, toDesktop);
+        if (inputDialog.showAndWait().orElse(ButtonType.CANCEL).equals(toDesktop)) {
+            showImage(body.getText());
+        }
     }
 
     private void showImage(String text) {
