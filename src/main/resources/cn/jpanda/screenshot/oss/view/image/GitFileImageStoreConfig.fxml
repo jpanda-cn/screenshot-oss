@@ -1,28 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-
-<AnchorPane prefHeight="405.0" prefWidth="398.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.jpanda.screenshot.oss.view.image.GitFileImageStoreConfig">
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane prefHeight="405.0" prefWidth="398.0" xmlns="http://javafx.com/javafx/10.0.2-internal"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="cn.jpanda.screenshot.oss.view.image.GitFileImageStoreConfig">
     <ImageView fitHeight="87.0" fitWidth="308.0" layoutX="14.0" layoutY="23.0" pickOnBounds="true" preserveRatio="true">
-        <Image url="/images/logo.png"/>
+<!--        <Image url="/images/logo.png"/>-->
     </ImageView>
-    <Label layoutX="19.0" layoutY="130.0" text="本地仓库地址" />
-    <Label layoutX="19.0" layoutY="160.0" text="图片子目录地址" />
-    <Label layoutX="19.0" layoutY="191.0" text="远程仓库地址" />
-    <Label layoutX="20.0" layoutY="221.0" text="分支名称" />
-    <Label layoutX="19.0" layoutY="250.0" text="用户名" />
-    <Label layoutX="19.0" layoutY="280.0" text="密码" />
-    <Label layoutX="18.0" layoutY="312.0" text="异步上传" />
-    <TextField fx:id="localRepositoryDir" layoutX="109.0" layoutY="127.0" />
-    <TextField fx:id="subDir" layoutX="109.0" layoutY="157.0" />
-    <TextField fx:id="remoteRepositoryUrl" layoutX="109.0" layoutY="188.0" />
-    <TextField fx:id="branch" layoutX="109.0" layoutY="218.0" />
-    <TextField fx:id="username" layoutX="109.0" layoutY="246.0" />
-    <PasswordField fx:id="password" layoutX="109.0" layoutY="275.0" />
-    <CheckBox fx:id="async" layoutX="109.0" layoutY="312.0" mnemonicParsing="false" />
-    <Button fx:id="cancel" layoutX="91.0" layoutY="347.0" mnemonicParsing="false" onMouseClicked="#cancel" text="取消" />
-    <Button fx:id="save" layoutX="227.0" layoutY="347.0" mnemonicParsing="false" onMouseClicked="#save" text="保存" />
-    <Button fx:id="choseLocalRepositoryDir" layoutX="325.0" layoutY="128.0" mnemonicParsing="false" onMouseClicked="#choseLocalRepositoryDir" prefHeight="23.0" prefWidth="36.0" text="..." />
+    <AnchorPane layoutX="19.0">
+        <Label  layoutY="130.0" text="本地仓库地址"/>
+        <Label  layoutY="160.0" text="图片子目录地址"/>
+        <Label  layoutY="191.0" text="远程仓库地址"/>
+        <Label  layoutY="221.0" text="分支名称"/>
+        <Label  layoutY="250.0" text="用户名"/>
+        <Label  layoutY="280.0" text="密码"/>
+        <Label  layoutY="312.0" text="异步上传"/>
+    </AnchorPane>
+   <AnchorPane layoutX="109.0">
+       <TextField fx:id="localRepositoryDir" layoutY="127.0"/>
+       <TextField fx:id="subDir"  layoutY="157.0"/>
+       <TextField fx:id="remoteRepositoryUrl"  layoutY="188.0"/>
+       <TextField fx:id="branch"  layoutY="218.0"/>
+       <TextField fx:id="username"  layoutY="246.0"/>
+       <PasswordField fx:id="password"  layoutY="275.0"/>
+       <CheckBox fx:id="async"  layoutY="312.0" mnemonicParsing="false"/>
+   </AnchorPane>
+   <AnchorPane>
+       <Button fx:id="choseLocalRepositoryDir" layoutX="325.0" layoutY="128.0" mnemonicParsing="false"
+               onMouseClicked="#choseLocalRepositoryDir" prefHeight="23.0" prefWidth="36.0" text="..."/>
+   </AnchorPane>
 </AnchorPane>

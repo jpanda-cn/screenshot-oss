@@ -83,6 +83,9 @@ public class GitFileImageStoreConfig implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
+
+
         boolean update = false;
         GitPersistence gitPersistence = configuration.getPersistence(GitPersistence.class);
         if (StringUtils.isEmpty(gitPersistence.getLocalRepositoryDir())) {
