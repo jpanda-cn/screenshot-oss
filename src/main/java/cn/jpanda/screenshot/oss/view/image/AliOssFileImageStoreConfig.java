@@ -1,15 +1,14 @@
 package cn.jpanda.screenshot.oss.view.image;
 
+import cn.jpanda.screenshot.oss.common.toolkit.Callable;
 import cn.jpanda.screenshot.oss.common.utils.AlertUtils;
 import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
+import cn.jpanda.screenshot.oss.store.img.instances.alioss.AliOssImageStore;
 import cn.jpanda.screenshot.oss.store.img.instances.alioss.AliOssPersistence;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -54,15 +53,22 @@ public class AliOssFileImageStoreConfig implements Initializable {
         }
 
         async.selectedProperty().set(aliOssPersistence.isAsync());
+
+        configuration.registryUniquePropertiesHolder(Callable.class.getCanonicalName() + "-" + AliOssImageStore.NAME, (Callable<Boolean, ButtonType>) a -> {
+            if (a.equals(ButtonType.APPLY)) {
+                return save();
+            }
+            return true;
+        });
     }
 
     public void close() {
         ((Stage) endpoint.getScene().getWindow()).close();
     }
 
-    public void save() {
+    public boolean save() {
         if (!check()) {
-            return;
+            return false;
         }
         AliOssPersistence aliOssPersistence = configuration.getPersistence(AliOssPersistence.class);
         aliOssPersistence.setEndpoint(endpoint.textProperty().get());
@@ -72,7 +78,8 @@ public class AliOssFileImageStoreConfig implements Initializable {
         aliOssPersistence.setAccessUrl(accessUrl.textProperty().get());
         aliOssPersistence.setAsync(async.isSelected());
         configuration.storePersistence(aliOssPersistence);
-        close();
+//        close();
+        return true;
     }
 
     private boolean check() {

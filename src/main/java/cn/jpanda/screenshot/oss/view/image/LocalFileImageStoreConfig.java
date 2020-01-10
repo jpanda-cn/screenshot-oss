@@ -1,11 +1,15 @@
 package cn.jpanda.screenshot.oss.view.image;
 
+import cn.jpanda.screenshot.oss.common.toolkit.Callable;
+import cn.jpanda.screenshot.oss.common.toolkit.PopDialogShower;
 import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
 import cn.jpanda.screenshot.oss.persistences.LocalImageStorePersistence;
+import cn.jpanda.screenshot.oss.store.img.instances.LocalImageStore;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.stage.DirectoryChooser;
@@ -46,14 +50,26 @@ public class LocalFileImageStoreConfig implements Initializable {
         Tooltip tooltip = new Tooltip();
         tooltip.textProperty().bind(show.textProperty());
         show.tooltipProperty().setValue(tooltip);
+        configuration.registryUniquePropertiesHolder(Callable.class.getCanonicalName() + "-" + LocalImageStore.NAME, (Callable<Boolean, ButtonType>) a -> {
+            System.out.println(a);
+            if (a.equals(ButtonType.APPLY)) {
+                return save();
+            }
+            return true;
+        });
     }
 
     public void chose() {
         // 获取当前地址
         String path = show.textProperty().get();
+        File dir = Paths.get(path).toFile();
+
         DirectoryChooser directoryChooser = new DirectoryChooser();
-        directoryChooser.setInitialDirectory(Paths.get(path).toFile());
+        if (dir.exists() && dir.isDirectory()) {
+            directoryChooser.setInitialDirectory(dir);
+        }
         directoryChooser.setTitle("请选择本地图片保存地址");
+
         File file = directoryChooser.showDialog(configuration.getViewContext().newStage());
         if (file == null) {
             return;
@@ -73,18 +89,19 @@ public class LocalFileImageStoreConfig implements Initializable {
         ((Stage) show.getScene().getWindow()).close();
     }
 
-    public void save() {
+    public boolean save() {
         String path = config.getPath();
         String newPath = show.textProperty().get();
         if (StringUtils.isEmpty(newPath)) {
-            return;
+            PopDialogShower.message("未选择路径");
         }
         if (newPath.equals(path)) {
-            return;
+            PopDialogShower.message("当前目录未发生变化");
+            return false;
         }
         config.setPath(newPath);
         configuration.storePersistence(config);
         // 取消
-        ((Stage) show.getScene().getWindow()).close();
+        return true;
     }
 }

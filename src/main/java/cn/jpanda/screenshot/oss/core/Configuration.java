@@ -99,6 +99,20 @@ public class Configuration {
      */
     private Map<Class, Object> specialAndUniqueBeanRegistryTable = new ConcurrentHashMap<>();
 
+    private Map<Object, Object> uniquePropertiesHolder = new ConcurrentHashMap<>();
+
+    @SuppressWarnings("unchecked")
+    public <T> T getUniquePropertiesHolder(Object key) {
+        return (T) uniquePropertiesHolder.get(key);
+    }
+
+    /**
+     * 注册一个特殊且唯一的实体类
+     */
+    public <T> void registryUniquePropertiesHolder(Object key, Object value) {
+        uniquePropertiesHolder.put(key, value);
+    }
+
 
     /**
      * 获取一个特殊且唯一的实体类
@@ -169,7 +183,7 @@ public class Configuration {
      * @param value 拦截器对象
      */
     public void registryAfterBootstrapLoaderProcesses(AfterBootstrapLoaderProcess value) {
-        log.info("registry new after bootstrap loader processes :{0}",value.getClass().getCanonicalName());
+        log.info("registry new after bootstrap loader processes :{0}", value.getClass().getCanonicalName());
         afterBootstrapLoaderProcesses.add(value);
         afterBootstrapLoaderProcesses = afterBootstrapLoaderProcesses.stream().sorted((pre, nex) -> new OrderComparator().compare(pre.getClass(), nex.getClass())).collect(Collectors.toList());
     }

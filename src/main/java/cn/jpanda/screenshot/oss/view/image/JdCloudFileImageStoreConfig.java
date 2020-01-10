@@ -1,15 +1,15 @@
 package cn.jpanda.screenshot.oss.view.image;
 
+import cn.jpanda.screenshot.oss.common.toolkit.Callable;
 import cn.jpanda.screenshot.oss.common.utils.AlertUtils;
 import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
+import cn.jpanda.screenshot.oss.store.img.instances.git.GitImageStore;
+import cn.jpanda.screenshot.oss.store.img.instances.jd.JdOssCloudStore;
 import cn.jpanda.screenshot.oss.store.img.instances.jd.JdOssPersistence;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -61,29 +61,36 @@ public class JdCloudFileImageStoreConfig implements Initializable {
         }
 
         async.selectedProperty().set(JdOssPersistence.isAsync());
+
+        configuration.registryUniquePropertiesHolder(Callable.class.getCanonicalName() + "-" + JdOssCloudStore.NAME, (Callable<Boolean, ButtonType>) a -> {
+            if (a.equals(ButtonType.APPLY)) {
+                return save();
+            }
+            return true;
+        });
     }
 
     public void close() {
         ((Stage) endpoint.getScene().getWindow()).close();
     }
 
-    public void save() {
+    public boolean save() {
         if (!check()) {
-            return;
+            return false;
         }
         JdOssPersistence JdOssPersistence = configuration.getPersistence(JdOssPersistence.class);
         JdOssPersistence.setEndpoint(endpoint.textProperty().get());
         JdOssPersistence.setBucket(bucket.textProperty().get());
         JdOssPersistence.setAccessKeyId(accessKeyId.textProperty().get());
         JdOssPersistence.setAccessKeySecret(accessKeySecret.textProperty().get());
-        String access=accessUrl.textProperty().get();
-        if (access.endsWith("\\")){
-            access=access.substring(0,access.length()-1);
+        String access = accessUrl.textProperty().get();
+        if (access.endsWith("\\")) {
+            access = access.substring(0, access.length() - 1);
         }
         JdOssPersistence.setAccessUrl(access);
         JdOssPersistence.setAsync(async.isSelected());
         configuration.storePersistence(JdOssPersistence);
-        close();
+        return true;
     }
 
     private boolean check() {

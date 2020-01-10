@@ -257,7 +257,10 @@ public class CanvasCutTrayView implements Initializable {
         BufferedImage image = screenshotsProcess.snapshot(scene, rectangle);
         WritableImage showImage = new WritableImage(image.getWidth(), image.getHeight());
         showImage = SwingFXUtils.toFXImage(image, showImage);
-        ImageShower.of(configuration.getViewContext().getStage()).setTopTitle(text).show(showImage);
+        ImageShower imageShower=ImageShower.of(configuration.getViewContext().getStage()).setTopTitle(text);
+        imageShower.setX(rectangle.getX());
+        imageShower.setY(rectangle.getY());
+        imageShower.show(showImage);
         doCancel();
     }
 

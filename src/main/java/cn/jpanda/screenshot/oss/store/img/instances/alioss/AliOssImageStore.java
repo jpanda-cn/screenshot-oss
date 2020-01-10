@@ -32,7 +32,7 @@ public class AliOssImageStore extends AbstractConfigImageStore {
 
     @Override
     public String getName() {
-        return "阿里OSS";
+        return NAME;
     }
 
     @Override

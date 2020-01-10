@@ -1,22 +1,21 @@
 package cn.jpanda.screenshot.oss.store.img;
 
+import cn.jpanda.screenshot.oss.common.toolkit.Callable;
+import cn.jpanda.screenshot.oss.common.toolkit.PopDialog;
 import cn.jpanda.screenshot.oss.core.Configuration;
-import cn.jpanda.screenshot.oss.shape.ModelDialog;
 import cn.jpanda.screenshot.oss.store.ExceptionType;
 import cn.jpanda.screenshot.oss.store.ExceptionWrapper;
 import cn.jpanda.screenshot.oss.store.ImageStoreResult;
 import cn.jpanda.screenshot.oss.store.ImageStoreResultHandler;
-import cn.jpanda.screenshot.oss.view.models.CloseModelView;
+import cn.jpanda.screenshot.oss.store.img.instances.git.GitImageStore;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
+import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 
 import java.awt.image.BufferedImage;
 import java.util.Optional;
@@ -38,30 +37,41 @@ public abstract class AbstractConfigImageStore implements ImageStore {
             return;
         }
         Scene scene = configuration.getViewContext().getScene(config);
-        Stage stage = configuration.getViewContext().getStage();
-        ModelDialog<String> modelDialog = new ModelDialog<>(stage);
-//        modelDialog.initModality(Modality.APPLICATION_MODAL);
-        modelDialog.setContent(scene.getRoot());
-//        stage.initModality(Modality.APPLICATION_MODAL);
-        modelDialog.showAndWait();
-//        stage.getIcons().addAll(configuration.getViewContext().getStage().getIcons());
-//        stage.setTitle(getName());
-//        stage.setScene(scene);
-//        stage.showAndWait();
+
+        HBox header = new HBox();
+        Label main = new Label(getName());
+        main.setStyle(" -fx-underline: true;-fx-font-weight: bold;");
+        header.getChildren().addAll(main);
+        Callable<Boolean, ButtonType> callable = configuration.getUniquePropertiesHolder(Callable.class.getCanonicalName() + "-" + getName());
+        PopDialog.create()
+                .setHeader(header)
+                .setContent(scene.getRoot())
+                .bindParent(configuration.getViewContext().getStage())
+                .buttonTypes(ButtonType.CANCEL, ButtonType.APPLY)
+                .callback(callable).showAndWait();
+
     }
 
     public abstract String getName();
 
     protected boolean pre() {
         // 展示一条提示
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle("警告");
-        alert.setHeaderText(String.format("【%s】存储方式需要配置【%s】相关参数才可使用", getName(), getName()));
-        alert.getButtonTypes().clear();
-        alert.getButtonTypes().addAll(new ButtonType("取消", ButtonBar.ButtonData.BACK_PREVIOUS), new ButtonType("配置", ButtonBar.ButtonData.OK_DONE));
-        Optional<ButtonType> result = alert.showAndWait();
+//        Alert alert = new Alert(Alert.AlertType.WARNING);
+//        alert.setTitle("警告");
+//        alert.setHeaderText(String.format("【%s】存储方式需要配置【%s】相关参数才可使用", getName(), getName()));
+//        alert.getButtonTypes().clear();
+//        alert.getButtonTypes().addAll(new ButtonType("取消", ButtonBar.ButtonData.BACK_PREVIOUS), new ButtonType("配置", ButtonBar.ButtonData.OK_DONE));
+//        Optional<ButtonType> result = alert.showAndWait();
+
+        HBox content = new HBox();
+        Label main = new Label(getName());
+        main.setStyle(" -fx-underline: true;-fx-font-weight: bold;");
+        Label description = new Label("需要进行相关参数配置才可使用");
+        content.getChildren().addAll(main, description);
+        Optional<ButtonType> result = PopDialog.create().setHeader("提示").setContent(content).showAndWait();
+
         if (result.isPresent()) {
-            if (result.get().getButtonData() == ButtonBar.ButtonData.OK_DONE) {
+            if (result.get().equals(PopDialog.CONFIG)) {
                 config();
                 return canUse();
             } else {

@@ -1,10 +1,13 @@
 package cn.jpanda.screenshot.oss.view.image;
 
+import cn.jpanda.screenshot.oss.common.toolkit.Callable;
+import cn.jpanda.screenshot.oss.common.toolkit.PopDialogShower;
 import cn.jpanda.screenshot.oss.common.utils.AlertUtils;
 import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
 import cn.jpanda.screenshot.oss.store.ExceptionWrapper;
+import cn.jpanda.screenshot.oss.store.img.instances.git.GitImageStore;
 import cn.jpanda.screenshot.oss.store.img.instances.git.GitPersistence;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -115,6 +118,12 @@ public class GitFileImageStoreConfig implements Initializable {
         async.selectedProperty().setValue(gitPersistence.isAsync());
         async.tooltipProperty().setValue(new Tooltip("是否异步上传"));
 
+        configuration.registryUniquePropertiesHolder(Callable.class.getCanonicalName() + "-" + GitImageStore.NAME, (Callable<Boolean, ButtonType>) a -> {
+            if (a.equals(ButtonType.APPLY)) {
+                return save();
+            }
+            return true;
+        });
     }
 
     public void choseLocalRepositoryDir() {
@@ -140,7 +149,7 @@ public class GitFileImageStoreConfig implements Initializable {
         return newPath;
     }
 
-    public void save() {
+    public boolean save() {
         GitPersistence old = configuration.getPersistence(GitPersistence.class);
         GitPersistence gitPersistence = new GitPersistence();
         String localRep = localRepositoryDir.textProperty().get();
@@ -153,12 +162,12 @@ public class GitFileImageStoreConfig implements Initializable {
         // 数据校验
         File localRepFile = Paths.get(localRep).toFile();
         if (!localRepFile.exists()) {
-            AlertUtils.alert(Alert.AlertType.ERROR, "本地仓库目录不存在");
-            return;
+            message("本地仓库目录不存在");
+            return false;
         }
         if (StringUtils.isEmpty(remote) || !Pattern.matches("^(https?)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]", remote)) {
-            AlertUtils.alert(Alert.AlertType.ERROR, "远程仓库地址格式错误");
-            return;
+            message("远程仓库地址格式错误");
+            return false;
         }
         gitPersistence.setLocalRepositoryDir(localRepFile.getAbsolutePath());
         if (StringUtils.isEmpty(subDirName)) {
@@ -281,12 +290,14 @@ public class GitFileImageStoreConfig implements Initializable {
         } catch (Exception e) {
             // 不能完成配置，执行弹窗提示
             e.printStackTrace();
+
             AlertUtils.exception(new ExceptionWrapper(e)).showAndWait();
             configuration.storePersistence(old);
-            return;
+            return false;
         }
         configuration.storePersistence(gitPersistence);
-        close();
+//        close();
+        return true;
     }
 
     public void cancel() {
@@ -294,7 +305,6 @@ public class GitFileImageStoreConfig implements Initializable {
     }
 
     public void close() {
-        System.out.println("123");
         // 取消
         async.getScene().getWindow().hide();
     }
@@ -319,5 +329,9 @@ public class GitFileImageStoreConfig implements Initializable {
     private boolean isCloned(GitPersistence gitPersistence) {
         File file = Paths.get(gitPersistence.getLocalRepositoryDir(), ".git").toFile();
         return file.exists() && file.isDirectory();
+    }
+
+    protected void message(String message) {
+        PopDialogShower.message(message);
     }
 }

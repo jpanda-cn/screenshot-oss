@@ -41,7 +41,7 @@ import java.util.UUID;
 @ImgStore(name = JdOssCloudStore.NAME, config = JdCloudFileImageStoreConfig.class)
 public class JdOssCloudStore extends AbstractConfigImageStore {
 
-    final static String NAME = "京东云存储";
+    public final static String NAME = "京东云存储";
 
     public JdOssCloudStore(Configuration configuration) {
         super(configuration);
