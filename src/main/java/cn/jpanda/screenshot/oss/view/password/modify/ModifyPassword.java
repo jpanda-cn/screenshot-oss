@@ -1,18 +1,16 @@
 package cn.jpanda.screenshot.oss.view.password.modify;
 
-import cn.jpanda.screenshot.oss.common.utils.AlertUtils;
+import cn.jpanda.screenshot.oss.common.toolkit.Callable;
+import cn.jpanda.screenshot.oss.common.toolkit.PopDialogShower;
 import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
 import cn.jpanda.screenshot.oss.core.persistence.BootstrapPersistence;
 import cn.jpanda.screenshot.oss.core.persistence.Persistence;
 import cn.jpanda.screenshot.oss.core.persistence.PersistenceBeanCatalogManagement;
-import cn.jpanda.screenshot.oss.shape.ModelDialog;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.PasswordField;
 
 import java.net.URL;
@@ -39,15 +37,16 @@ public class ModifyPassword implements Initializable {
     private PasswordField pwd;
     @FXML
     public PasswordField cpwd;
-    @FXML
-    public Button cancel;
-
-    @FXML
-    public Button submit;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        configuration.registryUniquePropertiesHolder(Callable.class.getCanonicalName() + "-" + ModifyPassword.class.getCanonicalName(), (Callable<Boolean, ButtonType>) a -> {
+            System.out.println(a);
+            if (a.equals(ButtonType.APPLY)) {
+                return done();
+            }
+            return true;
+        });
     }
 
     /**
@@ -56,21 +55,22 @@ public class ModifyPassword implements Initializable {
      * 设置密码属性
      * 重新存储
      */
-    public void done() {
+    public boolean done() {
         // 校验两次密码是否一致
         String password = pwd.textProperty().get();
         if (StringUtils.isEmpty(password)) {
-            AlertUtils.alert(Alert.AlertType.ERROR, "密码不得为空");
-            return;
+            PopDialogShower.message("密码不得为空", pwd.getScene().getWindow());
+
+            return false;
         }
         String checkPassword = cpwd.textProperty().get();
         if (StringUtils.isEmpty(checkPassword)) {
-            AlertUtils.alert(Alert.AlertType.ERROR, "密码不得为空");
-            return;
+            PopDialogShower.message("密码不得为空", pwd.getScene().getWindow());
+            return false;
         }
         if (!password.equals(checkPassword)) {
-            AlertUtils.alert(Alert.AlertType.ERROR, "两次密码不一致");
-            return;
+            PopDialogShower.message("两次密码不一致", pwd.getScene().getWindow());
+            return false;
         }
         // 加载所有配置
         PersistenceBeanCatalogManagement persistenceBeanCatalogManagement = configuration.getUniqueBean(PersistenceBeanCatalogManagement.class);
@@ -87,14 +87,7 @@ public class ModifyPassword implements Initializable {
             configuration.storePersistence(p);
         });
         // 完成
-        close();
+        return true;
     }
 
-    public void close() {
-        Parent root = pwd.getParent();
-        @SuppressWarnings("rawtypes") ModelDialog modelDialog = (ModelDialog) root.getProperties().get(ModelDialog.class);
-        //noinspection unchecked
-        modelDialog.resultProperty().setValue("cancel");
-        modelDialog.close();
-    }
 }

@@ -2,6 +2,8 @@ package cn.jpanda.screenshot.oss.view.main;
 
 import cn.jpanda.screenshot.oss.common.enums.ClipboardType;
 import cn.jpanda.screenshot.oss.common.enums.ImageType;
+import cn.jpanda.screenshot.oss.common.toolkit.Callable;
+import cn.jpanda.screenshot.oss.common.toolkit.PopDialog;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.Snapshot;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
@@ -11,7 +13,6 @@ import cn.jpanda.screenshot.oss.core.persistence.PersistenceBeanCatalogManagemen
 import cn.jpanda.screenshot.oss.core.shotkey.HotKey2CutPersistence;
 import cn.jpanda.screenshot.oss.core.shotkey.SettingsHotKeyPropertyHolder;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
-import cn.jpanda.screenshot.oss.shape.ModelDialog;
 import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallbackRegistryManager;
 import cn.jpanda.screenshot.oss.store.img.ImageStore;
 import cn.jpanda.screenshot.oss.store.img.ImageStoreRegisterManager;
@@ -31,6 +32,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -194,7 +196,6 @@ public class IndexCutView implements Initializable {
         MenuItem usePwd = new MenuItem("启用密码");
         MenuItem cpwd = new MenuItem("修改密码");
 
-//        addShadow(pwd,stopUsePwd,usePwd,cpwd);
         stopUsePwd.setOnAction(event -> {
             BootstrapPersistence bootstrapPersistence = configuration.getPersistence(BootstrapPersistence.class);
             // 取消密码，重新存储一下数据
@@ -215,19 +216,29 @@ public class IndexCutView implements Initializable {
             pwd.getItems().remove(cpwd);
             pwd.getItems().add(0, usePwd);
         });
+        EventHandler<ActionEvent> usePwdAction = event -> {
 
-        EventHandler<ActionEvent> usePwdAction = (event) -> {
             PersistenceBeanCatalogManagement persistenceBeanCatalogManagement = configuration.getUniqueBean(PersistenceBeanCatalogManagement.class);
             // 将所有数据重新加载
             List<Persistence> list =
                     persistenceBeanCatalogManagement.list().stream().filter((p) -> !BootstrapPersistence.class.isAssignableFrom(p)).map((p) -> configuration.getPersistence(p)).collect(Collectors.toList());
             // 跳转到初始化密码页面
             // 将密码页面放置到舞台中央
-            Scene scene = configuration.getViewContext().getScene(ModifyPassword.class);
-            ModelDialog<Void> modelDialog = new ModelDialog<>(containTop.getScene().getWindow());
-            modelDialog.initModality(Modality.APPLICATION_MODAL);
-            modelDialog.setContent(scene.getRoot());
-            modelDialog.showAndWait();
+            Scene scene = configuration.getViewContext().getScene(ModifyPassword.class,true,false);
+
+            HBox header = new HBox();
+            Label main = new Label("密码管理");
+            main.setStyle(" -fx-underline: true;-fx-font-weight: bold;");
+            header.getChildren().addAll(main);
+            Callable<Boolean, ButtonType> callable = configuration.getUniquePropertiesHolder(Callable.class.getCanonicalName() + "-" + ModifyPassword.class.getCanonicalName());
+            PopDialog.create()
+                    .setHeader(header)
+                    .setContent(scene.getRoot())
+                    .bindParent(imageSave.getScene().getWindow())
+                    .buttonTypes(ButtonType.CANCEL, ButtonType.APPLY)
+                    .callback(callable).showAndWait();
+
+
             if (configuration.getPersistence(BootstrapPersistence.class).isUsePassword()) {
                 // 将所有配置重新保存一下
                 list.forEach((p) -> {
@@ -239,6 +250,7 @@ public class IndexCutView implements Initializable {
                 pwd.getItems().add(1, cpwd);
             }
         };
+
 
         usePwd.setOnAction(usePwdAction);
         cpwd.setOnAction(usePwdAction);
@@ -319,7 +331,8 @@ public class IndexCutView implements Initializable {
                 if (!imageStore.check()) {
                     // 会出现异常，但是不影响正常业务
                     // 2019年6月22日21:48:55 修复角标越界异常
-                    Platform.runLater(new Thread(() -> imageSave.getSelectionModel().selectNext()));
+                    // 2020年1月11日17:07:24 调整 若选择的图片存储方式不可使用，恢复到上一次选择的方式
+                    Platform.runLater(new Thread(() -> imageSave.getSelectionModel().select(oldValue)));
                     return;
                 }
                 // 判断是否有对应的配置界面，决定是否展示配置按钮

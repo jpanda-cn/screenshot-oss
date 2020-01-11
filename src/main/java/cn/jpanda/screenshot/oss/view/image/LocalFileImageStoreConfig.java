@@ -28,8 +28,6 @@ public class LocalFileImageStoreConfig implements Initializable {
     private Configuration configuration;
     public TextField show;
     public Button chose;
-    public Button cancel;
-    public Button save;
     private LocalImageStorePersistence config;
 
     public LocalFileImageStoreConfig(Configuration configuration) {

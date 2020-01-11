@@ -7,7 +7,6 @@ import cn.jpanda.screenshot.oss.store.ExceptionType;
 import cn.jpanda.screenshot.oss.store.ExceptionWrapper;
 import cn.jpanda.screenshot.oss.store.ImageStoreResult;
 import cn.jpanda.screenshot.oss.store.ImageStoreResultHandler;
-import cn.jpanda.screenshot.oss.store.img.instances.git.GitImageStore;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -55,14 +54,6 @@ public abstract class AbstractConfigImageStore implements ImageStore {
     public abstract String getName();
 
     protected boolean pre() {
-        // 展示一条提示
-//        Alert alert = new Alert(Alert.AlertType.WARNING);
-//        alert.setTitle("警告");
-//        alert.setHeaderText(String.format("【%s】存储方式需要配置【%s】相关参数才可使用", getName(), getName()));
-//        alert.getButtonTypes().clear();
-//        alert.getButtonTypes().addAll(new ButtonType("取消", ButtonBar.ButtonData.BACK_PREVIOUS), new ButtonType("配置", ButtonBar.ButtonData.OK_DONE));
-//        Optional<ButtonType> result = alert.showAndWait();
-
         HBox content = new HBox();
         Label main = new Label(getName());
         main.setStyle(" -fx-underline: true;-fx-font-weight: bold;");
