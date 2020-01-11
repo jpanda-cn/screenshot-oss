@@ -18,7 +18,6 @@ import cn.jpanda.screenshot.oss.store.img.ImageStore;
 import cn.jpanda.screenshot.oss.store.img.ImageStoreRegisterManager;
 import cn.jpanda.screenshot.oss.store.img.NoImageStoreConfig;
 import cn.jpanda.screenshot.oss.view.fail.FailListView;
-import cn.jpanda.screenshot.oss.view.models.CloseModelView;
 import cn.jpanda.screenshot.oss.view.password.modify.ModifyPassword;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -33,9 +32,9 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
 import java.net.URL;
 import java.util.List;
@@ -497,17 +496,36 @@ public class IndexCutView implements Initializable {
 
     public void doClose() {
         // 获取关闭视图
-        Scene scene = configuration.getViewContext().getScene(CloseModelView.class);
-        Tooltip tooltip = new Tooltip();
-        tooltip.setGraphic(scene.getRoot());
-        tooltip.showingProperty().addListener((observable, oldValue, newValue) -> mainContain.getScene().getRoot().disableProperty().setValue(newValue));
-        tooltip.show(containTop.getScene().getWindow());
 
-//        if ("min".equals(modelDialog.showAndWait().orElse("min"))) {
-//            ((Stage) containTop.getScene().getWindow()).setIconified(true);
-//        } else {
-//            Platform.exit();
-//        }
+        VBox b=new VBox();
+        b.setSpacing(10);
+        RadioButton min=new RadioButton("最小化");
+        RadioButton close=new RadioButton("关闭");
+        b.getChildren().addAll(min,close);
+        b.setStyle(" -fx-alignment: left;");
+        min.setUserData("min");
+        close.setUserData("close");
+
+        ToggleGroup group = new ToggleGroup();
+        group.getToggles().addAll(min,close);
+        group.selectToggle(min);
+
+        ButtonType back=new ButtonType("再想想");
+        ButtonType ok=new ButtonType("我意已决");
+    Stage window=configuration.getViewContext().getStage();
+        if (ok.equals(PopDialog.create()
+                .setHeader("确认关闭吗？")
+                .setContent(b)
+                .bindParent(window)
+                .buttonTypes(back, ok)
+                .showAndWait().orElse(back))){
+            if (group.getSelectedToggle().getUserData().equals("close")){
+                Platform.exit();
+            }else {
+                window.setIconified(true);
+            }
+        }
+
     }
 
 

@@ -59,7 +59,7 @@ public abstract class AbstractConfigImageStore implements ImageStore {
         main.setStyle(" -fx-underline: true;-fx-font-weight: bold;");
         Label description = new Label("需要进行相关参数配置才可使用");
         content.getChildren().addAll(main, description);
-        Optional<ButtonType> result = PopDialog.create().setHeader("提示").setContent(content).showAndWait();
+        Optional<ButtonType> result = PopDialog.create().setHeader("提示").setContent(content).bindParent(configuration.getViewContext().getStage()).showAndWait();
 
         if (result.isPresent()) {
             if (result.get().equals(PopDialog.CONFIG)) {
