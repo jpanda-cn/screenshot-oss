@@ -14,7 +14,7 @@
 
 }
 .close-button:pressed .svg {
-    -fx-fill: rgba(176, 32, 29, 0.98);
+    -fx-fill: rgba(198,47,47,1);
 
 }
 
@@ -38,7 +38,7 @@
 
 }
 .drawing-pin:pressed .svg {
-    -fx-fill: rgba(176, 32, 29, 0.98);
+    -fx-fill: rgba(198,47,47,1);
 
 }
 
@@ -56,11 +56,11 @@
     /*鼠标样式*/
     -fx-cursor: pointer;
     -fx-text-fill: white;
-    -fx-background-color: rgba(176, 32, 29, 0.98);
+    -fx-background-color: rgba(198,47,47,1);
 }
 .tool-tip-ok:hover {
     /*透明度*/
     -fx-opacity: 0.8;
-    -fx-text-fill: rgba(176, 32, 29, 0.98);
+    -fx-text-fill: rgba(198,47,47,1);
     -fx-background-color: #e6e6e6;
 }

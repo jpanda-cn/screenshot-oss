@@ -22,14 +22,14 @@
     /*鼠标样式*/
     -fx-cursor: pointer;
     -fx-text-fill: white;
-    -fx-background-color: rgba(176, 32, 29, 0.98);
+    -fx-background-color: rgba(198,47,47,1);
 }
 
 .button:hover {
 
     /*透明度*/
     -fx-opacity: 0.8;
-    -fx-text-fill: rgba(176, 32, 29, 0.98);
+    -fx-text-fill: rgba(198,47,47,1);
     -fx-background-color: #e6e6e6;
 }
 
@@ -78,10 +78,10 @@
 /* see https://stackoverflow.com/questions/12299162/how-to-style-menu-button-and-menu-items*/
 /* VARIABLE DEFINITIONS: Only these 4 variables have to be adjusted, the rest is copy-paste */
 * {
-    -fx-my-menu-color: rgba(176, 32, 29, 0.98); /* Change according to your needs */
+    -fx-my-menu-color: rgba(198,47,47,1); /* Change according to your needs */
     -fx-my-menu-color-highlighted: #FFFFFF; /* Change according to your needs */
     -fx-my-menu-font-color: #FFFFFF; /* Change according to your needs */
-    -fx-my-menu-font-color-highlighted: rgba(176, 32, 29, 0.98); /* Change according to your needs */
+    -fx-my-menu-font-color-highlighted: rgba(198,47,47,1); /* Change according to your needs */
 }
 
 /* MENU BAR + Top-level MENU BUTTONS */
@@ -158,10 +158,10 @@
 
 /* ================   ComboBOx    ===========================*/
 * {
-    -fx-my-combox-color: rgba(176, 32, 29, 0.98);
+    -fx-my-combox-color: rgba(198,47,47,1);
     -fx-my-combox-color-highlighted: #FFFFFF;
     -fx-my-combox-font-color: #FFFFFF;
-    -fx-my-combox-font-color-highlighted: rgba(176, 32, 29, 0.98);
+    -fx-my-combox-font-color-highlighted: rgba(198,47,47,1);
 }
 
 
@@ -209,18 +209,18 @@
 /*=========================   Radio   ===================================*/
 .radio-button .radio {
     -fx-border-width: 1px;
-    -fx-border-color: rgba(176, 32, 29, 0.98);
+    -fx-border-color: rgba(198,47,47,1);
     -fx-background-color: white;
     -fx-border-radius: 15px;
 }
 
 .radio-button .radio:selected {
-    -fx-background-color: rgba(176, 32, 29, 0.98);
+    -fx-background-color: rgba(198,47,47,1);
     -fx-border-color: #FFFFFF;
 }
 
 .radio-button .dot:selected {
-    -fx-background-color: rgba(176, 32, 29, 0.98);
+    -fx-background-color: rgba(198,47,47,1);
     -fx-border-color: #FFFFFF;
 }
 

@@ -47,7 +47,6 @@ public class RgbInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEvent
     Text hex;
     final int imageSize = 130;
     final int cursorSize = 40;
-
     private StringProperty posStr = new SimpleStringProperty();
     private StringProperty rgbaStr = new SimpleStringProperty();
     private StringProperty hexStr = new SimpleStringProperty();
@@ -85,6 +84,10 @@ public class RgbInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEvent
             }
 
         });
+        // 补偿： 移除图片预览图
+        canvasProperties.getCutRectangle().addEventHandler(MouseEvent.MOUSE_EXITED, event -> {
+            exit();
+        });
     }
 
     public void setValue(String text, String tips) {
@@ -112,6 +115,7 @@ public class RgbInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEvent
     }
 
     protected void enter() {
+
         rectangle.cursorProperty().set(Cursor.DEFAULT);
         if (imageCache == null) {
             imageCache = SwingFXUtils.fromFXImage(canvasProperties.getComputerImage(), null);
@@ -121,7 +125,6 @@ public class RgbInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEvent
             imageView.fitWidthProperty().setValue(imageSize);
             imageView.fitHeightProperty().setValue(imageSize);
             // 添加十字准星
-
         }
         if (group == null) {
             group = new Group();
@@ -141,11 +144,13 @@ public class RgbInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEvent
             canvasProperties.getCutPane().getChildren().addAll(group, cursorRectangle);
 
         }
+
     }
 
     protected void exit() {
-
+        if (group!=null){
         canvasProperties.getCutPane().getChildren().remove(group);
+        }
         imageView = null;
         group = null;
     }

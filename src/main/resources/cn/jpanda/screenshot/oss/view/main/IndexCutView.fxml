@@ -21,7 +21,7 @@
             </ImageView>
             <Separator layoutX="167.0" layoutY="3.0" orientation="VERTICAL" prefHeight="49.0" prefWidth="11.0"/>
             <MenuButton fx:id="options" layoutX="188.0" layoutY="15.0" mnemonicParsing="false" prefHeight="29.0"
-                        prefWidth="91.0" style="-fx-background-color: rgba(176, 32, 29, 0.98);" styleClass="menu-bar"
+                        prefWidth="91.0" style="-fx-background-color: rgba(198,47,47,1);" styleClass="menu-bar"
                         text="选项" textFill="WHITE">
                 <effect>
                     <Blend mode="ADD">
