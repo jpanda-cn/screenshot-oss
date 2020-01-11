@@ -19,6 +19,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -103,10 +104,14 @@ public class FailListView implements Initializable {
             show.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
                 Platform.runLater(() -> {
                     Alert info = new Alert(Alert.AlertType.INFORMATION);
+                    info.  getDialogPane().getStylesheets().add(
+                            getClass().getResource("/css/dialog.css").toExternalForm());
+                    info.initStyle(StageStyle.UNDECORATED);
                     info.setTitle("异常信息");
                     info.setHeaderText(c.getValue().getException().get().getMessage());
                     DialogPane pane = info.getDialogPane();
                     TextArea textArea = new TextArea();
+                    textArea.editableProperty().set(false);
                     pane.contentProperty().setValue(textArea);
                     textArea.textProperty().setValue(c.getValue().getException().get().getDetails());
                     textArea.wrapTextProperty().set(true);

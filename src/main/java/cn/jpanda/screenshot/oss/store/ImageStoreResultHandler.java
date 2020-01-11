@@ -14,7 +14,6 @@ import javafx.stage.StageStyle;
 import lombok.Getter;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
 import net.sf.json.JsonConfig;
 
 import javax.imageio.ImageIO;
@@ -45,7 +44,7 @@ public class ImageStoreResultHandler {
             JSONArray jsonArray = JSONArray.fromObject(json);
             for (int i = 0; i < jsonArray.size(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                JsonConfig jsonConfig=new JsonConfig();
+                JsonConfig jsonConfig = new JsonConfig();
                 ImageStoreResultWrapper imageStoreResultWrapper = (ImageStoreResultWrapper) JSONObject.toBean(jsonObject, ImageStoreResultWrapper.class);
                 imageStoreResults.add(imageStoreResultWrapper.toImageStoreResult());
             }
@@ -72,7 +71,7 @@ public class ImageStoreResultHandler {
                 File file = Paths.get(path).toFile();
                 if (!file.exists()) {
                     File parent = file.getParentFile();
-                    if (parent.exists()) {
+                    if (parent != null && !parent.exists()) {
                         parent.mkdirs();
                     }
                 }
@@ -104,7 +103,18 @@ public class ImageStoreResultHandler {
 
     public void showAlert(ImageStoreResult imageStoreResult) {
         Platform.runLater(() -> {
+//
+//            PopDialog.create()
+//                    .setHeader("图片保存失败")
+//                    .setContent(configuration.getViewContext().getScene(FailListView.class, true, false).getRoot())
+//                    .bindParent(imageSave.getScene().getWindow())
+//                    .buttonTypes(ButtonType.CLOSE)
+//                    .showAndWait();
+
             Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.getDialogPane().getStylesheets().add(
+                    getClass().getResource("/css/dialog.css").toExternalForm());
+
             alert.setTitle("图片保存失败");
             alert.setHeaderText(String.format("在使用【%s】方式保存图片时发生异常", imageStoreResult.getImageStore().get()));
             alert.setContentText(String.format("异常信息的简要内容为:%s", imageStoreResult.getException().get().getMessage()));

@@ -76,7 +76,7 @@ public class AliOssImageStore extends AbstractConfigImageStore {
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             ImageIO.write(image, "png", os);
             PutObjectResult result = ossClient.putObject(aliOssPersistence.getBucket(), name, new ByteArrayInputStream(os.toByteArray()));
-        } catch (IOException e) {
+        } catch (Exception e) {
             configuration.getUniqueBean(ImageStoreResultHandler.class).add(ImageStoreResult
                     .builder()
                     .image(new SimpleObjectProperty<>(image))

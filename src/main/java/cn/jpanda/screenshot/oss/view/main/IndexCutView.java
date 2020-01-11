@@ -270,13 +270,13 @@ public class IndexCutView implements Initializable {
 
     public void toFailList() {
         // 使用动画，加载至右侧
-        Stage stage = configuration.getViewContext().newStage();
-        stage.setTitle("失败任务列表");
-        stage.initOwner(configuration.getViewContext().getStage());
-        stage.initStyle(StageStyle.UTILITY);
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setScene(configuration.getViewContext().getScene(FailListView.class, true, false));
-        stage.showAndWait();
+        PopDialog.create()
+                .setHeader("失败任务列表")
+                .setContent(configuration.getViewContext().getScene(FailListView.class, true, false).getRoot())
+                .bindParent(imageSave.getScene().getWindow())
+                .buttonTypes(ButtonType.CLOSE)
+                .showAndWait();
+
     }
 
     public void doCut() {
