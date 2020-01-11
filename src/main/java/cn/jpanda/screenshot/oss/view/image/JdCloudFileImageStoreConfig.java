@@ -1,6 +1,7 @@
 package cn.jpanda.screenshot.oss.view.image;
 
 import cn.jpanda.screenshot.oss.common.toolkit.Callable;
+import cn.jpanda.screenshot.oss.common.toolkit.PopDialogShower;
 import cn.jpanda.screenshot.oss.common.utils.AlertUtils;
 import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.Configuration;
@@ -95,26 +96,26 @@ public class JdCloudFileImageStoreConfig implements Initializable {
 
     private boolean check() {
         if (StringUtils.isEmpty(endpoint.textProperty().get())) {
-            alert("endpoint");
+            alert("endpoint为必填项");
             return false;
         }
         if (StringUtils.isEmpty(bucket.textProperty().get())) {
-            alert("bucket");
+            alert("bucket为必填项");
             return false;
         }
         if (StringUtils.isEmpty(accessKeyId.textProperty().get())) {
-            alert("accessKeyId");
+            alert("accessKeyId为必填项");
             return false;
         }
         if (StringUtils.isEmpty(accessKeySecret.textProperty().get())) {
-            alert("accessKeySecret");
+            alert("accessKeySecret为必填项");
             return false;
         }
 
         return true;
     }
 
-    public void alert(String name) {
-        AlertUtils.alert(Alert.AlertType.ERROR, String.format("%s不得为空", name));
+    public void alert(String message) {
+        PopDialogShower.message(message,endpoint.getScene().getWindow());
     }
 }

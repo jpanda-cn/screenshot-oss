@@ -165,6 +165,7 @@ public class GitFileImageStoreConfig implements Initializable {
         // 数据校验
         File localRepFile = Paths.get(localRep).toFile();
         if (!localRepFile.exists()) {
+
             message("本地仓库目录不存在");
             return false;
         }
@@ -335,6 +336,6 @@ public class GitFileImageStoreConfig implements Initializable {
     }
 
     protected void message(String message) {
-        PopDialogShower.message(message);
+        PopDialogShower.message(message,username.getScene().getWindow());
     }
 }

@@ -6,27 +6,48 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
 
-<?import javafx.scene.layout.HBox?>
-<AnchorPane prefHeight="431.0" prefWidth="442.0" stylesheets="@/css/default.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.jpanda.screenshot.oss.view.image.AliOssFileImageStoreConfig">
-    <ImageView fitHeight="87.0" fitWidth="308.0" layoutX="65.0" layoutY="28.0" pickOnBounds="true" preserveRatio="true">
-<!--        <Image url="/images/logo.png"/>-->
+<?import javafx.scene.image.Image?>
+<AnchorPane prefHeight="310.0" prefWidth="322.0" stylesheets="@/css/default.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.jpanda.screenshot.oss.view.image.AliOssFileImageStoreConfig">
+    <ImageView fitHeight="81.0" fitWidth="239.0" layoutX="45.0" layoutY="38.0" pickOnBounds="true" preserveRatio="true">
+        <Image url="/images/logo.png"/>
     </ImageView>
-    <HBox  layoutX="42.0" layoutY="149.0">
-        <Label layoutX="42.0" layoutY="149.0" text="endpoint" />
-        <TextField fx:id="endpoint" layoutX="216.0" layoutY="149.0" />
-    </HBox>
+    <GridPane layoutX="3.0" layoutY="141.0" prefHeight="132.0" prefWidth="308.0">
+        <Label text="endpoint" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="0" />
+        <TextField fx:id="endpoint" prefHeight="23.0" prefWidth="196.0" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
-    <Label layoutX="42.0" layoutY="200.0" text="bucket" />
-    <TextField fx:id="bucket" layoutX="216.0" layoutY="200.0" />
-    <Label layoutX="42.0" layoutY="247.0" text="accessKeyId" />
-    <TextField fx:id="accessKeyId" layoutX="216.0" layoutY="247.0" />
-    <HBox  layoutX="42.0" layoutY="295.0">
-    <Label layoutX="42.0" layoutY="295.0" text="accessKeySecret" />
-    <PasswordField fx:id="accessKeySecret" layoutX="216.0" layoutY="295.0" />
-    </HBox>
-    <Label layoutX="42.0" layoutY="342.0" text="accessUrl" />
-    <TextField fx:id="accessUrl" layoutX="216.0" layoutY="342.0" />
-    <Label layoutX="42.0" layoutY="400.0" text="async" />
-    <CheckBox fx:id="async" layoutX="216.0" layoutY="400.0"  />
+
+        <Label text="bucket" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
+        <TextField fx:id="bucket" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+
+        <Label text="accessKeyId" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
+        <TextField fx:id="accessKeyId" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+
+        <Label text="accessKeySecret" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
+        <PasswordField fx:id="accessKeySecret" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+        <Label text="accessUrl" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
+        <TextField fx:id="accessUrl" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+        <Label text="async" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
+        <CheckBox fx:id="async" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+        <columnConstraints>
+            <ColumnConstraints maxWidth="168.0" minWidth="81.0" prefWidth="156.0" />
+            <ColumnConstraints maxWidth="320.0" minWidth="140.0" prefWidth="152.0" />
+            <ColumnConstraints maxWidth="208.0" minWidth="0.0" prefWidth="0.0" />
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+        </rowConstraints>
+    </GridPane>
 </AnchorPane>
