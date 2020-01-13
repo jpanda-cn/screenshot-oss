@@ -1,0 +1,45 @@
+.table-view .column-header-background .label {
+    -fx-text-fill: #000000;
+}
+
+.table-view .table-cell {
+    /*-fx-border-color:black;*/
+    /*-fx-border-insets: 2;*/
+    /*-fx-border-width: 2;*/
+    -fx-alignment: center;
+}
+.table-view {
+    -fx-border-color:black;
+    -fx-border-width: 2;
+}
+
+.table-row-cell {
+    -fx-background-insets: 3, 3, 3, 3;
+    -fx-padding: 0.0em;
+    -fx-border-color: #e6e6e6;
+}
+
+.table-row-cell:odd {
+    -fx-background-insets: 3, 3, 3, 3;
+    -fx-padding: 0.0em;
+    -fx-border-color: white;
+}
+
+
+
+.button-image {
+    -fx-cursor: HAND;
+    -fx-stroke: #e6e6e6;
+    -fx-stroke-width: 2;
+}
+
+.button-image:hover {
+    -fx-stroke: BLACK;
+    -fx-stroke-width: 5;
+}
+
+/*鼠标覆盖按钮效果*/
+.button-image:pressed {
+    -fx-stroke: #e6e6e6;
+    -fx-stroke-width: 5;
+}

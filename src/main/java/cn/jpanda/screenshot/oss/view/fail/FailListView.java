@@ -1,5 +1,8 @@
 package cn.jpanda.screenshot.oss.view.fail;
 
+import cn.jpanda.screenshot.oss.common.toolkit.ImageShower;
+import cn.jpanda.screenshot.oss.common.toolkit.PopDialog;
+import cn.jpanda.screenshot.oss.common.toolkit.PopDialogShower;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
 import cn.jpanda.screenshot.oss.store.ImageStoreResult;
@@ -9,14 +12,17 @@ import cn.jpanda.screenshot.oss.store.img.ImageStore;
 import cn.jpanda.screenshot.oss.store.img.ImageStoreRegisterManager;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.concurrent.Task;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.StrokeType;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -26,10 +32,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutionException;
 
 @Controller
 public class FailListView implements Initializable {
 
+    public static final String IS_SHOWING = FailListView.class.getCanonicalName() + "-IS_SHOWING";
 
     private Configuration configuration;
 
@@ -46,6 +54,8 @@ public class FailListView implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        table.setFixedCellSize(130.0);
+
         table.editableProperty().set(false);
         image.setResizable(false);
         store.setResizable(false);
@@ -63,17 +73,13 @@ public class FailListView implements Initializable {
             try {
 
                 Image image = new Image(new FileInputStream(new File(cell.getValue().getPath().get())));
-                ImageView imageView = new ImageView(image);
-                imageView.setFitWidth(80);
-                imageView.setFitHeight(80);
-                Button button = new Button("", imageView);
+                Button button = loadImage(image);
+                button.setMinWidth(100);
+                button.setMinHeight(100);
+                button.getStyleClass().clear();
                 button.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-                    Stage stage = configuration.getViewContext().newStage();
-                    stage.initOwner(table.getScene().getWindow());
-                    stage.initModality(Modality.APPLICATION_MODAL);
-                    ImageView imageView1 = new ImageView(image);
-                    stage.setScene(new Scene(new AnchorPane(imageView1)));
-                    stage.showAndWait();
+                    ImageShower imageShower = ImageShower.of((Stage) table.getScene().getWindow()).setTopTitle(cell.getValue().getPath().get());
+                    imageShower.show(image);
                 });
                 return new SimpleObjectProperty<>(button);
             } catch (FileNotFoundException f) {
@@ -97,30 +103,46 @@ public class FailListView implements Initializable {
         // 添加查看异常和删除的操作
         operation.setCellValueFactory((c) -> {
             VBox box = new VBox();
-            Button show = new Button("查看详情");
+            box.setSpacing(10);
+            Button show = new Button("异常信息");
             Button delete = new Button("忽略并删除");
             Button retry = new Button("重试");
             box.getChildren().addAll(show, delete, retry);
             show.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
                 Platform.runLater(() -> {
-                    Alert info = new Alert(Alert.AlertType.INFORMATION);
-                    info.  getDialogPane().getStylesheets().add(
-                            getClass().getResource("/css/dialog.css").toExternalForm());
-                    info.initStyle(StageStyle.UNDECORATED);
-                    info.setTitle("异常信息");
-                    info.setHeaderText(c.getValue().getException().get().getMessage());
-                    DialogPane pane = info.getDialogPane();
+
                     TextArea textArea = new TextArea();
                     textArea.editableProperty().set(false);
-                    pane.contentProperty().setValue(textArea);
                     textArea.textProperty().setValue(c.getValue().getException().get().getDetails());
                     textArea.wrapTextProperty().set(true);
-                    info.initModality(Modality.APPLICATION_MODAL);
-                    info.showAndWait();
+
+                    PopDialogShower.exception(c.getValue().getException().get().getMessage(), c.getValue().getException().get().getDetails())
+                            .bindParent(table.getScene().getWindow())
+                            .showAndWait();
+
                 });
             });
+            // 移除，添加提示，二次确认
             delete.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> configuration.getUniqueBean(ImageStoreResultHandler.class).remove(c.getValue().getPath().get()));
             retry.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+
+                Dialog dialogStage = new Dialog();
+                ProgressIndicator progressIndicator = new ProgressIndicator();
+                // 窗口父子关系
+                dialogStage.initStyle(StageStyle.TRANSPARENT);
+                dialogStage.initModality(Modality.APPLICATION_MODAL);
+                // progress bar
+                Label label = new Label("数据加载中, 请稍后...");
+                label.setTextFill(Color.BLUE);
+                progressIndicator.setProgress(-1F);
+                VBox vBox = new VBox();
+                vBox.setSpacing(10);
+                vBox.setBackground(Background.EMPTY);
+                vBox.getChildren().addAll(progressIndicator, label);
+                dialogStage.getDialogPane().setContent(vBox);
+                dialogStage.show();
+
+
                 ImageStoreResultWrapper wrapper = new ImageStoreResultWrapper(c.getValue());
                 String is = wrapper.getImageStore();
                 ImageStoreRegisterManager imageStoreRegisterManager = configuration.getUniqueBean(ImageStoreRegisterManager.class);
@@ -132,29 +154,69 @@ public class FailListView implements Initializable {
                 // 移除
                 ImageStoreResultHandler imageStoreResultHandler = configuration.getUniqueBean(ImageStoreResultHandler.class);
                 imageStoreResultHandler.remove(c.getValue().getPath().get());
-                if (!imageStore.retry(wrapper)) {
-                    Platform.runLater(() -> {
-                        Alert info = new Alert(Alert.AlertType.INFORMATION);
-                        info.setTitle("失败");
-                        info.setHeaderText("重试失败，新的异常信息已添加到失败任务列表中");
-                        info.initModality(Modality.APPLICATION_MODAL);
-                        info.showAndWait();
-                    });
-                } else {
-                    Platform.runLater(() -> {
-                        Alert info = new Alert(Alert.AlertType.INFORMATION);
-                        info.setTitle("成功");
-                        info.setHeaderText("重试成功");
-                        info.initModality(Modality.APPLICATION_MODAL);
-                        info.showAndWait();
-                    });
-                }
-
-
+                Task<Boolean> task = new Task<Boolean>() {
+                    @Override
+                    protected Boolean call() throws Exception {
+                        try {
+                            return imageStore.retry(wrapper);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            return false;
+                        }
+                    }
+                };
+                task.setOnRunning(e -> {
+                    dialogStage.show();
+                });
+                task.setOnSucceeded(e -> {
+                    try {
+                        if (task.get()) {
+                            Platform.runLater(() -> {
+                                dialogStage.close();
+                                PopDialog.create().setHeader("提示").setContent("重试成功").buttonTypes(new ButtonType("知道了")).showAndWait();
+                            });
+                        }
+                    } catch (InterruptedException | ExecutionException ex) {
+                        ex.printStackTrace();
+                    } finally {
+                        System.out.println("succ");
+                        dialogStage.close();
+                    }
+                });
+                new Thread(task).start();
             });
             return new SimpleObjectProperty<>(box);
         });
 
+        table.setRowFactory(tv -> new TableRow<ImageStoreResult>() {
+            @Override
+            public void updateIndex(int i) {
+                super.updateIndex(i);
+                if (i % 2 == 0) {
+                    setStyle("-fx-background-color: white");
+                } else {
+                    setStyle("-fx-background-color: #e6e6e6");
+                }
+            }
+        });
+
         table.setItems(configuration.getUniqueBean(ImageStoreResultHandler.class).getImageStoreResults());
+    }
+
+    protected Button loadImage(Image image) {
+        double stroke = 2;
+        Rectangle rect = new Rectangle();
+        rect.getStyleClass().add("button-image");
+        ImagePattern imagePattern = new ImagePattern(image);
+        rect.widthProperty().set(100 + stroke * 2);
+        rect.heightProperty().set(100 + stroke * 2);
+        rect.setLayoutX(stroke);
+        rect.setLayoutY(stroke);
+        rect.setFill(imagePattern);
+        rect.strokeWidthProperty().set(stroke);
+        rect.strokeTypeProperty().set(StrokeType.OUTSIDE);
+        Button button = new Button();
+        button.setGraphic(rect);
+        return button;
     }
 }

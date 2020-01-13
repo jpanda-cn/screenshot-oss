@@ -1,16 +1,17 @@
 package cn.jpanda.screenshot.oss.store;
 
+import cn.jpanda.screenshot.oss.common.toolkit.PopDialog;
 import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.log.Log;
+import cn.jpanda.screenshot.oss.view.fail.FailListView;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
-import javafx.stage.Modality;
-import javafx.stage.StageStyle;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.VBox;
 import lombok.Getter;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -103,41 +104,65 @@ public class ImageStoreResultHandler {
 
     public void showAlert(ImageStoreResult imageStoreResult) {
         Platform.runLater(() -> {
-//
-//            PopDialog.create()
-//                    .setHeader("图片保存失败")
-//                    .setContent(configuration.getViewContext().getScene(FailListView.class, true, false).getRoot())
-//                    .bindParent(imageSave.getScene().getWindow())
-//                    .buttonTypes(ButtonType.CLOSE)
-//                    .showAndWait();
-
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.getDialogPane().getStylesheets().add(
-                    getClass().getResource("/css/dialog.css").toExternalForm());
-
-            alert.setTitle("图片保存失败");
-            alert.setHeaderText(String.format("在使用【%s】方式保存图片时发生异常", imageStoreResult.getImageStore().get()));
-            alert.setContentText(String.format("异常信息的简要内容为:%s", imageStoreResult.getException().get().getMessage()));
-            alert.getButtonTypes().removeAll(ButtonType.OK);
-            alert.getButtonTypes().addAll(new ButtonType("忽略", ButtonBar.ButtonData.BACK_PREVIOUS), new ButtonType("查看详细日志", ButtonBar.ButtonData.OK_DONE));
-            alert.initStyle(StageStyle.UNDECORATED);
-            alert.initModality(Modality.APPLICATION_MODAL);
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.isPresent()) {
-                if (result.get().getButtonData() == ButtonBar.ButtonData.OK_DONE) {
-                    // 获取异常对象
-                    Platform.runLater(() -> {
-                        Alert info = new Alert(Alert.AlertType.INFORMATION);
-                        alert.setTitle("异常信息");
-                        info.setHeaderText(imageStoreResult.getException().get().getMessage());
-                        info.setContentText(imageStoreResult.getException().get().getDetails());
-                        info.initModality(Modality.APPLICATION_MODAL);
-                        info.setOnCloseRequest(event -> info.close());
-                        info.showAndWait();
-                    });
-
-                }
+            if (configuration.getCutting().get() != null) {
+                // 当前处于截图状态中
+                // 当截图窗口关闭后，展示弹窗
+                configuration.getCutting().addListener((observable, oldValue, newValue) -> {
+                    if (newValue == null) {
+                        showExceptionTips(imageStoreResult);
+                    }
+                });
+            } else {
+                showExceptionTips(imageStoreResult);
             }
         });
+    }
+
+    public void showExceptionTips(ImageStoreResult result) {
+
+
+        ButtonType ignore = new ButtonType("忽略");
+        ButtonType toHandler = new ButtonType("去处理");
+
+        VBox body = new VBox();
+        body.setSpacing(5);
+        Label type = new Label(String.format("存储方式:【%s】", result.getImageStore().get()));
+        Label reason = new Label(String.format("失败原因:【%s】", result.getException().get().getMessage()));
+        Label description = new Label(String.format("失败描述:【%s】", result.getExceptionType().getDescription()));
+        Label path = new Label(String.format("图片保存路径:【%s】", result.getPath().get()));
+
+        TextArea textArea = new TextArea();
+        textArea.editableProperty().set(false);
+        textArea.textProperty().setValue(result.getException().get().getDetails());
+        textArea.wrapTextProperty().set(true);
+        body.getChildren().addAll(type, description, reason, path, textArea);
+        PopDialog popDialog = PopDialog.create().setHeader("图片处理失败")
+                .setContent(body)
+                .bindParent(configuration.getViewContext().getStage())
+                .callback(buttonType -> {
+                    if (toHandler.equals(buttonType)) {
+                        // 跳转到失败任务列表
+                        configuration.registryUniquePropertiesHolder(FailListView.IS_SHOWING, true);
+                        PopDialog.create()
+                                .setHeader("失败任务列表")
+                                .setContent(configuration.getViewContext().getScene(FailListView.class, true, false).getRoot())
+                                .bindParent(configuration.getViewContext().getStage())
+                                .buttonTypes(ButtonType.CLOSE)
+                                .callback(buttonType1 -> {
+                                    configuration.registryUniquePropertiesHolder(FailListView.IS_SHOWING, false);
+                                    return true;
+                                })
+                                .show();
+                    }
+                    return true;
+                });
+        if (configuration.getUniquePropertiesHolder(FailListView.IS_SHOWING, false)) {
+            popDialog.buttonTypes(ignore);
+        } else {
+            popDialog.buttonTypes(ignore, toHandler);
+        }
+        popDialog.getDialogPane().getContent().setStyle("-fx-alignment: left;");
+        popDialog.show();
+
     }
 }

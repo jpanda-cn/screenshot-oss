@@ -102,6 +102,10 @@ public class Configuration {
     private Map<Object, Object> uniquePropertiesHolder = new ConcurrentHashMap<>();
 
     @SuppressWarnings("unchecked")
+    public <T> T getUniquePropertiesHolder(Object key, T defaultValue) {
+        return (T) uniquePropertiesHolder.getOrDefault(key, defaultValue);
+    }
+
     public <T> T getUniquePropertiesHolder(Object key) {
         return (T) uniquePropertiesHolder.get(key);
     }

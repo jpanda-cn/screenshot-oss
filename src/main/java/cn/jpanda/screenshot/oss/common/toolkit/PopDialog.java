@@ -2,12 +2,9 @@ package cn.jpanda.screenshot.oss.common.toolkit;
 
 import javafx.animation.*;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
@@ -30,6 +27,8 @@ public class PopDialog extends Dialog<ButtonType> {
      * 保存
      */
     public static ButtonType SAVE = new ButtonType("保存", ButtonBar.ButtonData.OK_DONE);
+
+    public static ButtonType PLACE_HOLDER = new ButtonType("占位");
 
     private SimpleObjectProperty<Parent> header = new SimpleObjectProperty<>(new HBox());
 
@@ -62,19 +61,9 @@ public class PopDialog extends Dialog<ButtonType> {
         loadStylesheets();
         initButtonTypes();
         initAnimation();
-        getDialogPane().parentProperty().addListener(new ChangeListener<Parent>() {
-            @Override
-            public void changed(ObservableValue<? extends Parent> observable, Parent oldValue, Parent newValue) {
-                System.out.println(321);
-            }
-        });
-        getDialogPane().sceneProperty().addListener(new ChangeListener<Scene>() {
-            @Override
-            public void changed(ObservableValue<? extends Scene> observable, Scene oldValue, Scene newValue) {
-                System.out.println("123");
-                if (Optional.ofNullable(newValue).isPresent()) {
-                    newValue.setFill(Color.TRANSPARENT);
-                }
+        getDialogPane().sceneProperty().addListener((observable, oldValue, newValue) -> {
+            if (Optional.ofNullable(newValue).isPresent()) {
+                newValue.setFill(Color.TRANSPARENT);
             }
         });
     }
@@ -125,11 +114,13 @@ public class PopDialog extends Dialog<ButtonType> {
                             animation.get().setRate(-1);
                             animation.get().play();
                             animation.get().setOnFinished(e -> {
+                                setResult(PLACE_HOLDER);
                                 close();
                             });
+                        } else {
+                            setResult(PLACE_HOLDER);
+                            close();
                         }
-                    } else {
-                        close();
                     }
                 });
                 return button;
@@ -180,10 +171,11 @@ public class PopDialog extends Dialog<ButtonType> {
 
     public PopDialog bindParent(Window parent, boolean disableParent) {
         initOwner(parent);
-
         // 显示在中间
         if (disableParent && parent != null) {
-            showingProperty().addListener((observable, oldValue, newValue) -> parent.getScene().getRoot().disableProperty().set(newValue));
+            showingProperty().addListener((observable, oldValue, newValue) -> {
+                parent.getScene().getRoot().disableProperty().set(newValue);
+            });
         }
         return this;
     }

@@ -20,9 +20,7 @@ public class ExceptionWrapper {
         while (e != null && e.getCause() != null) {
             e = e.getCause();
         }
-        this.message = Objects.requireNonNull(e).getClass().getSimpleName() + ":\r\n\r\n\t" + throwable.getMessage();
-
-        message += "\r\n";
+        this.message = throwable.getMessage();
         // 获取异常对象
         // 展示五十行日志
         StackTraceElement[] traceElements = throwable.getStackTrace();

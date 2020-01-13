@@ -223,7 +223,7 @@ public class IndexCutView implements Initializable {
                     persistenceBeanCatalogManagement.list().stream().filter((p) -> !BootstrapPersistence.class.isAssignableFrom(p)).map((p) -> configuration.getPersistence(p)).collect(Collectors.toList());
             // 跳转到初始化密码页面
             // 将密码页面放置到舞台中央
-            Scene scene = configuration.getViewContext().getScene(ModifyPassword.class,true,false);
+            Scene scene = configuration.getViewContext().getScene(ModifyPassword.class, true, false);
 
             HBox header = new HBox();
             Label main = new Label("密码管理");
@@ -269,10 +269,16 @@ public class IndexCutView implements Initializable {
 
     public void toFailList() {
         // 使用动画，加载至右侧
+        configuration.registryUniquePropertiesHolder(FailListView.IS_SHOWING, true);
+
         PopDialog.create()
                 .setHeader("失败任务列表")
                 .setContent(configuration.getViewContext().getScene(FailListView.class, true, false).getRoot())
                 .bindParent(imageSave.getScene().getWindow())
+                .callback(buttonType -> {
+                    configuration.registryUniquePropertiesHolder(FailListView.IS_SHOWING, false);
+                    return true;
+                })
                 .buttonTypes(ButtonType.CLOSE)
                 .showAndWait();
 
@@ -497,31 +503,31 @@ public class IndexCutView implements Initializable {
     public void doClose() {
         // 获取关闭视图
 
-        VBox b=new VBox();
+        VBox b = new VBox();
         b.setSpacing(10);
-        RadioButton min=new RadioButton("最小化");
-        RadioButton close=new RadioButton("关闭");
-        b.getChildren().addAll(min,close);
+        RadioButton min = new RadioButton("最小化");
+        RadioButton close = new RadioButton("关闭");
+        b.getChildren().addAll(min, close);
         b.setStyle(" -fx-alignment: left;");
         min.setUserData("min");
         close.setUserData("close");
 
         ToggleGroup group = new ToggleGroup();
-        group.getToggles().addAll(min,close);
+        group.getToggles().addAll(min, close);
         group.selectToggle(min);
 
-        ButtonType back=new ButtonType("再想想");
-        ButtonType ok=new ButtonType("我意已决");
-    Stage window=configuration.getViewContext().getStage();
+        ButtonType back = new ButtonType("再想想");
+        ButtonType ok = new ButtonType("我意已决");
+        Stage window = configuration.getViewContext().getStage();
         if (ok.equals(PopDialog.create()
                 .setHeader("确认关闭吗？")
                 .setContent(b)
                 .bindParent(window)
                 .buttonTypes(back, ok)
-                .showAndWait().orElse(back))){
-            if (group.getSelectedToggle().getUserData().equals("close")){
+                .showAndWait().orElse(back))) {
+            if (group.getSelectedToggle().getUserData().equals("close")) {
                 Platform.exit();
-            }else {
+            } else {
                 window.setIconified(true);
             }
         }
