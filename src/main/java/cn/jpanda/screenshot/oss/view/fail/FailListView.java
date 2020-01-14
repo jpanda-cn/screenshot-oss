@@ -14,9 +14,11 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -26,6 +28,7 @@ import javafx.scene.shape.StrokeType;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.Window;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -126,21 +129,7 @@ public class FailListView implements Initializable {
             delete.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> configuration.getUniqueBean(ImageStoreResultHandler.class).remove(c.getValue().getPath().get()));
             retry.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
 
-                Dialog dialogStage = new Dialog();
-                ProgressIndicator progressIndicator = new ProgressIndicator();
-                // 窗口父子关系
-                dialogStage.initStyle(StageStyle.TRANSPARENT);
-                dialogStage.initModality(Modality.APPLICATION_MODAL);
-                // progress bar
-                Label label = new Label("数据加载中, 请稍后...");
-                label.setTextFill(Color.BLUE);
-                progressIndicator.setProgress(-1F);
-                VBox vBox = new VBox();
-                vBox.setSpacing(10);
-                vBox.setBackground(Background.EMPTY);
-                vBox.getChildren().addAll(progressIndicator, label);
-                dialogStage.getDialogPane().setContent(vBox);
-                dialogStage.show();
+                Stage loading = createLoading(table.getScene().getWindow());
 
 
                 ImageStoreResultWrapper wrapper = new ImageStoreResultWrapper(c.getValue());
@@ -148,7 +137,7 @@ public class FailListView implements Initializable {
                 ImageStoreRegisterManager imageStoreRegisterManager = configuration.getUniqueBean(ImageStoreRegisterManager.class);
                 ImageStore imageStore = imageStoreRegisterManager.getImageStore(is);
                 if (imageStore == null) {
-                    // TODO
+                    // nothing...
                     return;
                 }
                 // 移除
@@ -156,7 +145,7 @@ public class FailListView implements Initializable {
                 imageStoreResultHandler.remove(c.getValue().getPath().get());
                 Task<Boolean> task = new Task<Boolean>() {
                     @Override
-                    protected Boolean call() throws Exception {
+                    protected Boolean call() {
                         try {
                             return imageStore.retry(wrapper);
                         } catch (Exception e) {
@@ -165,22 +154,21 @@ public class FailListView implements Initializable {
                         }
                     }
                 };
+
                 task.setOnRunning(e -> {
-                    dialogStage.show();
+                    loading.show();
                 });
                 task.setOnSucceeded(e -> {
                     try {
                         if (task.get()) {
                             Platform.runLater(() -> {
-                                dialogStage.close();
                                 PopDialog.create().setHeader("提示").setContent("重试成功").buttonTypes(new ButtonType("知道了")).showAndWait();
                             });
                         }
                     } catch (InterruptedException | ExecutionException ex) {
                         ex.printStackTrace();
                     } finally {
-                        System.out.println("succ");
-                        dialogStage.close();
+                        loading.close();
                     }
                 });
                 new Thread(task).start();
@@ -218,5 +206,57 @@ public class FailListView implements Initializable {
         Button button = new Button();
         button.setGraphic(rect);
         return button;
+    }
+
+    protected Stage createLoading(Window parent) {
+
+        Stage loadingStage = new Stage();
+
+        loadingStage.initOwner(table.getScene().getWindow());
+        loadingStage.initStyle(StageStyle.TRANSPARENT);
+        loadingStage.initModality(Modality.APPLICATION_MODAL);
+
+
+        ProgressIndicator progressIndicator = new ProgressIndicator();
+        progressIndicator.setStyle("  -fx-progress-color: RED ;");
+        progressIndicator.setProgress(-1F);
+
+        Label label = new Label("处理中, 请稍后...");
+        label.setTextFill(Color.RED);
+        label.setBackground(Background.EMPTY);
+
+
+        VBox vBox = new VBox(progressIndicator, label);
+        vBox.setSpacing(10);
+        vBox.setStyle("-fx-background-color: transparent");
+        AnchorPane pane = new AnchorPane(vBox);
+        pane.setStyle("-fx-background-color:  rgba(0,0,0,0.3)");
+
+        Scene scene = new Scene(pane);
+        scene.setFill(Color.TRANSPARENT);
+        loadingStage.setScene(scene);
+
+        loadingStage.setX(parent.getX());
+        loadingStage.setY(parent.getY());
+
+        pane.layoutXProperty().set(0);
+        pane.layoutYProperty().set(0);
+
+        pane.prefWidthProperty().bind(parent.getScene().widthProperty());
+        pane.prefHeightProperty().bind(pane.getScene().heightProperty());
+        loadingStage.setWidth(parent.getWidth());
+        loadingStage.setHeight(parent.getHeight());
+
+        vBox.translateXProperty()
+                .bind(pane.widthProperty().subtract(vBox.widthProperty())
+                        .divide(2));
+
+        vBox.translateYProperty()
+                .bind(pane.heightProperty().subtract(vBox.heightProperty())
+                        .divide(2));
+
+        return loadingStage;
+
+
     }
 }

@@ -4,7 +4,10 @@ import cn.jpanda.screenshot.oss.common.utils.MathUtils;
 import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.ImgStore;
-import cn.jpanda.screenshot.oss.store.*;
+import cn.jpanda.screenshot.oss.store.ExceptionWrapper;
+import cn.jpanda.screenshot.oss.store.ImageStoreResult;
+import cn.jpanda.screenshot.oss.store.ImageStoreResultHandler;
+import cn.jpanda.screenshot.oss.store.ImageStoreResultWrapper;
 import cn.jpanda.screenshot.oss.store.img.AbstractConfigImageStore;
 import cn.jpanda.screenshot.oss.view.image.AliOssFileImageStoreConfig;
 import com.aliyun.oss.OSSClient;
@@ -63,9 +66,7 @@ public class AliOssImageStore extends AbstractConfigImageStore {
             return false;
         }
         String path = imageStoreResultWrapper.getPath();
-        String suffix = path.substring(path.lastIndexOf(".") + 1);
         String name = path.substring((int) MathUtils.max(path.lastIndexOf("/"), path.lastIndexOf("\\")) + 1);
-        name = name.substring(0, name.length() - suffix.length() - 1);
         return upload(bufferedImage, configuration.getPersistence(AliOssPersistence.class), name);
     }
 
