@@ -112,7 +112,16 @@ public class FailListView implements Initializable {
                 });
             });
             // 移除，添加提示，二次确认
-            delete.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> configuration.getUniqueBean(ImageStoreResultHandler.class).remove(c.getValue().getPath().get()));
+            delete.addEventHandler(MouseEvent.MOUSE_CLICKED, (event) -> {
+                PopDialog.create().setHeader("确认删除").setContent("数据一旦删除，无法恢复！").callback(b -> {
+                    if (b.equals(PopDialog.CONFIG)) {
+                        configuration.getUniqueBean(ImageStoreResultHandler.class).remove(c.getValue().getPath().get());
+                        return true;
+                    }
+                    return false;
+                }).showAndWait();
+            });
+
             retry.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
                 Stage loading = createLoading(table.getScene().getWindow());
                 ImageStoreResultWrapper wrapper = new ImageStoreResultWrapper(c.getValue());
