@@ -1,9 +1,9 @@
 package cn.jpanda.screenshot.oss.view.fail;
 
 import cn.jpanda.screenshot.oss.common.toolkit.ImageShower;
+import cn.jpanda.screenshot.oss.common.toolkit.ImageStoreResultExceptionShower;
 import cn.jpanda.screenshot.oss.common.toolkit.LoadingShower;
 import cn.jpanda.screenshot.oss.common.toolkit.PopDialog;
-import cn.jpanda.screenshot.oss.common.toolkit.PopDialogShower;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
 import cn.jpanda.screenshot.oss.store.ImageStoreResult;
@@ -108,25 +108,13 @@ public class FailListView implements Initializable {
             box.getChildren().addAll(show, delete, retry);
             show.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
                 Platform.runLater(() -> {
-
-                    TextArea textArea = new TextArea();
-                    textArea.editableProperty().set(false);
-                    textArea.textProperty().setValue(c.getValue().getException().get().getDetails());
-                    textArea.wrapTextProperty().set(true);
-
-                    PopDialogShower.exception(c.getValue().getException().get().getMessage(), c.getValue().getException().get().getDetails())
-                            .bindParent(table.getScene().getWindow())
-                            .showAndWait();
-
+                    ImageStoreResultExceptionShower.showExceptionTips(c.getValue(), configuration);
                 });
             });
             // 移除，添加提示，二次确认
             delete.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> configuration.getUniqueBean(ImageStoreResultHandler.class).remove(c.getValue().getPath().get()));
             retry.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-
                 Stage loading = createLoading(table.getScene().getWindow());
-
-
                 ImageStoreResultWrapper wrapper = new ImageStoreResultWrapper(c.getValue());
                 String is = wrapper.getImageStore();
                 ImageStoreRegisterManager imageStoreRegisterManager = configuration.getUniqueBean(ImageStoreRegisterManager.class);

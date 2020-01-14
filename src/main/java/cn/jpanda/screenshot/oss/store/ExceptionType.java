@@ -19,4 +19,12 @@ public class ExceptionType {
     public Integer getLevel() {
         return level;
     }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setLevel(Integer level) {
+        this.level = level;
+    }
 }
