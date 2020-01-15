@@ -11,6 +11,7 @@
     -fx-alignment: center;
     -fx-background-color: rgba(255, 255, 255, 0);
 }
+
 .dialog-pane:header .header-panel .label {
     -fx-background-color: rgba(255, 255, 255, 0);
     -fx-background-radius: 10px;
@@ -33,8 +34,6 @@
 }
 
 
-
-
 .dialog-pane > .button-bar > .container {
     -fx-background-color: rgba(255, 255, 255, 0.2);
 }
@@ -53,7 +52,7 @@
     /*鼠标样式*/
     -fx-cursor: pointer;
     -fx-text-fill: white;
-    -fx-background-color: rgba(198,47,47,1);
+    -fx-background-color: rgba(198, 47, 47, 1);
     -fx-wrap-text: true;
     /*-fx-effect: dropshadow( three-pass-box, rgba(198,47,47,1), 10.0, 0.0, 0.0, 0.0);*/
 }
@@ -61,7 +60,7 @@
 .dialog-pane .button:hover {
     /*透明度*/
     -fx-opacity: 0.8;
-    -fx-text-fill: rgba(198,47,47,1);
+    -fx-text-fill: rgba(198, 47, 47, 1);
     -fx-background-color: #FFFFFF;
 }
 
@@ -72,4 +71,108 @@
     -fx-opacity: 0.8;
     -fx-text-fill: rgb(0, 0, 0);
     -fx-background-color: #FFFFFF;
+}
+
+.dialog-pane .button-cancel {
+    /*文本对齐方式*/
+    -fx-text-alignment: center;
+    /*合适高度*/
+    -fx-min-height: 25px;
+    /*粗体*/
+    -fx-font-weight: bold;
+    /*内边距*/
+    -fx-padding: 0 18px;
+    /*无边框*/
+    -fx-border-style: none;
+    /*鼠标样式*/
+    -fx-cursor: pointer;
+    -fx-text-fill: white;
+    -fx-background-color: rgba(52, 58, 64, 1);
+    -fx-wrap-text: true;
+    /*-fx-effect: dropshadow( three-pass-box, rgba(198,47,47,1), 10.0, 0.0, 0.0, 0.0);*/
+}
+
+.dialog-pane .button-cancel:hover {
+    /*透明度*/
+    -fx-opacity: 0.8;
+    -fx-text-fill: rgba(52, 58, 64, 1);
+    -fx-background-color: white;
+}
+
+.dialog-pane .button-cancel:pressed {
+    /*粗体*/
+    /*-fx-font-weight: bold;*/
+    /*透明度*/
+    -fx-opacity: 0.8;
+    -fx-text-fill: rgb(205, 66, 49);
+    -fx-background-color: #FFFFFF;
+}
+
+
+.dialog-pane .button-next {
+    /*文本对齐方式*/
+    -fx-text-alignment: center;
+    /*合适高度*/
+    -fx-min-height: 25px;
+    /*粗体*/
+    -fx-font-weight: bold;
+    /*内边距*/
+    -fx-padding: 0 18px;
+    /*无边框*/
+    -fx-border-style: none;
+    /*鼠标样式*/
+    -fx-cursor: pointer;
+    -fx-text-fill: white;
+    -fx-background-color: rgba(0,123,255,1);
+    -fx-wrap-text: true;
+    /*-fx-effect: dropshadow( three-pass-box, rgba(198,47,47,1), 10.0, 0.0, 0.0, 0.0);*/
+}
+
+.dialog-pane .button-next:hover {
+    /*透明度*/
+    -fx-opacity: 0.8;
+    -fx-text-fill: rgba(0,123,255,1);
+    -fx-background-color: white;
+}
+
+.dialog-pane .button-next:pressed {
+    /*粗体*/
+    /*-fx-font-weight: bold;*/
+    /*透明度*/
+    -fx-opacity: 0.8;
+    -fx-text-fill: rgba(52, 58, 64, 1);
+}
+
+.dialog-pane .button-light {
+    /*文本对齐方式*/
+    -fx-text-alignment: center;
+    /*合适高度*/
+    -fx-min-height: 25px;
+    /*粗体*/
+    -fx-font-weight: bold;
+    /*内边距*/
+    -fx-padding: 0 18px;
+    /*无边框*/
+    -fx-border-style: none;
+    /*鼠标样式*/
+    -fx-cursor: pointer;
+    -fx-text-fill: black;
+    -fx-background-color: rgba(248,249,250,1);
+    -fx-wrap-text: true;
+    /*-fx-effect: dropshadow( three-pass-box, rgba(198,47,47,1), 10.0, 0.0, 0.0, 0.0);*/
+}
+
+.dialog-pane .button-light:hover {
+    /*透明度*/
+    -fx-opacity: 0.8;
+    -fx-text-fill: rgba(248,249,250,1);
+    -fx-background-color: black;
+}
+
+.dialog-pane .button-light:pressed {
+    /*粗体*/
+    /*-fx-font-weight: bold;*/
+    /*透明度*/
+    -fx-opacity: 0.8;
+    -fx-text-fill: rgba(248,249,250,1);
 }

@@ -35,9 +35,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
@@ -333,7 +335,11 @@ public class IndexCutView implements Initializable {
 
                 // 联动，剪切板的内容同步发生变化
                 ImageStore imageStore = imageStoreRegisterManager.getImageStore((String) newValue);
-                if (!imageStore.check()) {
+                Window stage = configuration.getViewContext().getStage();
+                if (Optional.ofNullable(storeEdit.getScene()).isPresent()) {
+                    stage = storeEdit.getScene().getWindow();
+                }
+                if (!imageStore.check(stage)) {
                     // 会出现异常，但是不影响正常业务
                     // 2019年6月22日21:48:55 修复角标越界异常
                     // 2020年1月11日17:07:24 调整 若选择的图片存储方式不可使用，恢复到上一次选择的方式
@@ -430,7 +436,7 @@ public class IndexCutView implements Initializable {
         // 获取当前选择的图片存储方式
         String name = (String) imageSave.getValue();
         ImageStore imageStore = imageStoreRegisterManager.getImageStore(name);
-        imageStore.config();
+        imageStore.config(storeEdit.getScene().getWindow());
     }
 
 

@@ -4,8 +4,6 @@ import cn.jpanda.screenshot.oss.common.enums.ClipboardType;
 import cn.jpanda.screenshot.oss.common.enums.ImageType;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
-import cn.jpanda.screenshot.oss.core.shotkey.HotKey2CutPersistence;
-import cn.jpanda.screenshot.oss.core.shotkey.SettingsHotKeyPropertyHolder;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
 import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallbackRegistryManager;
 import cn.jpanda.screenshot.oss.store.img.ImageStore;
@@ -14,13 +12,14 @@ import cn.jpanda.screenshot.oss.store.img.NoImageStoreConfig;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.stage.Stage;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
+import javafx.stage.Window;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 @Controller
@@ -36,12 +35,6 @@ public class SettingsView implements Initializable {
     public ComboBox imageSave;
     @FXML
     public ComboBox clipboard;
-    public Label shotKey;
-    /**
-     * 截图预览
-     */
-    @FXML
-    public CheckBox preview;
 
     private ImageStoreRegisterManager imageStoreRegisterManager;
     private ClipboardCallbackRegistryManager clipboardCallbackRegistryManager;
@@ -55,30 +48,7 @@ public class SettingsView implements Initializable {
         globalConfigPersistence = configuration.getPersistence(GlobalConfigPersistence.class);
         loadImageSave();
         loadClipboard();
-        loadHotKey();
 
-    }
-
-    private void loadHotKey() {
-        SettingsHotKeyPropertyHolder settingsHotKeyPropertyHolder = configuration.getUniqueBean(SettingsHotKeyPropertyHolder.class);
-        settingsHotKeyPropertyHolder.isSettings.unbind();
-        settingsHotKeyPropertyHolder.isSettings.bind(hotKey.focusedProperty());
-
-        hotKey.editableProperty().setValue(false);
-        HotKey2CutPersistence hotKey2CutPersistence = configuration.getPersistence(HotKey2CutPersistence.class);
-
-        StringBuilder stringBuilder = new StringBuilder();
-        if (hotKey2CutPersistence.isCtrl()) {
-            stringBuilder.append(KeyCode.CONTROL.getName()).append(" + ");
-        }
-        if (hotKey2CutPersistence.isShift()) {
-            stringBuilder.append(KeyCode.SHIFT.getName()).append(" + ");
-        }
-        if (hotKey2CutPersistence.isAlt()) {
-            stringBuilder.append(KeyCode.ALT.getName()).append(" + ");
-        }
-        stringBuilder.append(hotKey2CutPersistence.getCode());
-        hotKey.textProperty().setValue(stringBuilder.toString());
     }
 
     @SuppressWarnings("unchecked")
@@ -90,10 +60,15 @@ public class SettingsView implements Initializable {
 
                 // 联动，剪切板的内容同步发生变化
                 ImageStore imageStore = imageStoreRegisterManager.getImageStore((String) newValue);
-                if (!imageStore.check()) {
+                Window stage = configuration.getViewContext().getStage();
+                if (Optional.ofNullable(edit.getScene()).isPresent()) {
+                    stage = edit.getScene().getWindow();
+                }
+                if (!imageStore.check(stage)) {
                     // 会出现异常，但是不影响正常业务
                     // 2019年6月22日21:48:55 修复角标越界异常
-                    Platform.runLater(new Thread(() -> imageSave.getSelectionModel().selectNext()));
+                    // 2020年1月11日17:07:24 调整 若选择的图片存储方式不可使用，恢复到上一次选择的方式
+                    Platform.runLater(new Thread(() -> imageSave.getSelectionModel().select(oldValue)));
                     return;
                 }
                 // 判断是否有对应的配置界面，决定是否展示配置按钮
@@ -186,49 +161,6 @@ public class SettingsView implements Initializable {
         // 获取当前选择的图片存储方式
         String name = (String) imageSave.getValue();
         ImageStore imageStore = imageStoreRegisterManager.getImageStore(name);
-        imageStore.config();
-    }
-
-
-    public void back() {
-        // 取消
-        ((Stage) edit.getScene().getWindow()).close();
-    }
-
-    public void keyBack(KeyEvent e) {
-        if (e.getCode().equals(KeyCode.ENTER) || e.getCode().equals(KeyCode.SPACE)) {
-            // 执行保存操作
-            back();
-        }
-    }
-
-    public void changeHotKey(KeyEvent event) {
-
-        HotKey2CutPersistence hotKey2CutPersistence = configuration.getPersistence(HotKey2CutPersistence.class);
-        StringBuilder stringBuilder = new StringBuilder();
-        hotKey2CutPersistence.setShift(event.isShiftDown());
-        hotKey2CutPersistence.setAlt(event.isAltDown());
-        hotKey2CutPersistence.setCtrl(event.isControlDown());
-        if (hotKey2CutPersistence.isCtrl()) {
-            stringBuilder.append(KeyCode.CONTROL.getName()).append(" + ");
-        }
-        if (hotKey2CutPersistence.isShift()) {
-            stringBuilder.append(KeyCode.SHIFT.getName()).append(" + ");
-        }
-        if (hotKey2CutPersistence.isAlt()) {
-            stringBuilder.append(KeyCode.ALT.getName()).append(" + ");
-        }
-
-        hotKey.textProperty().setValue(stringBuilder.toString());
-        if (event.getCode().equals(KeyCode.SHIFT)
-                || event.getCode().equals(KeyCode.ALT)
-                || event.getCode().equals(KeyCode.CONTROL)) {
-            return;
-        }
-        String name = event.getCode().getName();
-        stringBuilder.append(name).append(" ");
-        hotKey2CutPersistence.setCode(name);
-        hotKey.textProperty().setValue(stringBuilder.toString());
-        configuration.storePersistence(hotKey2CutPersistence);
+        imageStore.config(edit.getScene().getWindow());
     }
 }

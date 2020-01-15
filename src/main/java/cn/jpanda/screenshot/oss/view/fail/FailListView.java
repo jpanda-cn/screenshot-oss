@@ -102,10 +102,16 @@ public class FailListView implements Initializable {
         operation.setCellValueFactory((c) -> {
             VBox box = new VBox();
             box.setSpacing(10);
+
             Button show = new Button("异常信息");
+            show.getStyleClass().add("button-info");
             Button delete = new Button("忽略并删除");
+            delete.getStyleClass().add("button-danger");
             Button retry = new Button("重试");
+            retry.getStyleClass().add("button-primary");
             box.getChildren().addAll(show, delete, retry);
+
+
             show.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
                 Platform.runLater(() -> {
                     ImageStoreResultExceptionShower.showExceptionTips(c.getValue(), configuration);
@@ -113,12 +119,11 @@ public class FailListView implements Initializable {
             });
             // 移除，添加提示，二次确认
             delete.addEventHandler(MouseEvent.MOUSE_CLICKED, (event) -> {
-                PopDialog.create().setHeader("确认删除").setContent("数据一旦删除，无法恢复！").callback(b -> {
-                    if (b.equals(PopDialog.CONFIG)) {
+                PopDialog.create().setHeader("确认删除").setContent("数据一旦删除，无法恢复！").buttonTypes(ButtonType.CANCEL, ButtonType.OK).callback(b -> {
+                    if (b.equals(ButtonType.OK)) {
                         configuration.getUniqueBean(ImageStoreResultHandler.class).remove(c.getValue().getPath().get());
-                        return true;
                     }
-                    return false;
+                    return true;
                 }).showAndWait();
             });
 

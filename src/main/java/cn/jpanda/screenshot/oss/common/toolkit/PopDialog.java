@@ -1,8 +1,12 @@
 package cn.jpanda.screenshot.oss.common.toolkit;
 
 import javafx.animation.*;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
+import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
@@ -13,6 +17,8 @@ import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import javafx.util.Duration;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -28,6 +34,7 @@ public class PopDialog extends Dialog<ButtonType> {
      */
     public static ButtonType SAVE = new ButtonType("保存", ButtonBar.ButtonData.OK_DONE);
 
+
     public static ButtonType PLACE_HOLDER = new ButtonType("占位");
 
     private SimpleObjectProperty<Parent> header = new SimpleObjectProperty<>(new HBox());
@@ -36,7 +43,29 @@ public class PopDialog extends Dialog<ButtonType> {
 
     private SimpleObjectProperty<Animation> animation = new SimpleObjectProperty<>();
 
-    private SimpleObjectProperty<Callable<Boolean, ButtonType>> callableSimpleObjectProperty = new SimpleObjectProperty<>(null);
+    private SimpleObjectProperty<Callable<Boolean, ButtonType>> callableSimpleObjectProperty = new SimpleObjectProperty<>(buttonType -> true);
+
+    /**
+     * 按钮样式
+     */
+    private ObjectProperty<Map<ButtonType, String>> buttonStyleClassProperty = new SimpleObjectProperty<>(new HashMap<>());
+
+    {
+        buttonStyleClassProperty.get().put(ButtonType.APPLY, "button-apply");
+        buttonStyleClassProperty.get().put(ButtonType.CANCEL, "button-cancel");
+        buttonStyleClassProperty.get().put(ButtonType.CLOSE, "button-close");
+        buttonStyleClassProperty.get().put(ButtonType.OK, "button-ok");
+        buttonStyleClassProperty.get().put(ButtonType.FINISH, "button-finish");
+        buttonStyleClassProperty.get().put(ButtonType.NEXT, "button-next");
+        buttonStyleClassProperty.get().put(ButtonType.NO, "button-no");
+        buttonStyleClassProperty.get().put(ButtonType.PREVIOUS, "button-previous");
+        buttonStyleClassProperty.get().put(ButtonType.YES, "button-yes");
+    }
+
+    public PopDialog addButtonClass(ButtonType buttonType, String styleClass) {
+        buttonStyleClassProperty.get().put(buttonType, styleClass);
+        return this;
+    }
 
     public static PopDialog create() {
         return new PopDialog();
@@ -57,6 +86,7 @@ public class PopDialog extends Dialog<ButtonType> {
             getDialogPane().setContent(newValue);
         });
         callableSimpleObjectProperty.addListener((observable, oldValue, newValue) -> buttonTypes(getDialogPane().getButtonTypes().toArray(new ButtonType[0])));
+        buttonStyleClassProperty.addListener((observable, oldValue, newValue) -> buttonTypes(getDialogPane().getButtonTypes().toArray(new ButtonType[0])));
         initStyle(StageStyle.TRANSPARENT);
         loadStylesheets();
         initButtonTypes();
@@ -103,6 +133,7 @@ public class PopDialog extends Dialog<ButtonType> {
                 }
 
                 final Button button = new Button(buttonType.getText());
+                button.getStyleClass().add(buttonStyleClassProperty.get().getOrDefault(buttonType, "button"));
                 final ButtonBar.ButtonData buttonData = buttonType.getButtonData();
                 ButtonBar.setButtonData(button, buttonData);
                 button.setDefaultButton(buttonData.isDefaultButton());
@@ -114,11 +145,11 @@ public class PopDialog extends Dialog<ButtonType> {
                             animation.get().setRate(-1);
                             animation.get().play();
                             animation.get().setOnFinished(e -> {
-                                setResult(PLACE_HOLDER);
+                                setResult(null==buttonType?PLACE_HOLDER:buttonType);
                                 close();
                             });
                         } else {
-                            setResult(PLACE_HOLDER);
+                            setResult(null==buttonType?PLACE_HOLDER:buttonType);
                             close();
                         }
                     }
@@ -169,6 +200,7 @@ public class PopDialog extends Dialog<ButtonType> {
         return bindParent(parent, true);
     }
 
+
     public PopDialog bindParent(Window parent, boolean disableParent) {
         initOwner(parent);
         // 显示在中间
@@ -180,12 +212,27 @@ public class PopDialog extends Dialog<ButtonType> {
         return this;
     }
 
+    public PopDialog centerOnNode(Node node) {
+
+        node.boundsInLocalProperty().addListener(new ChangeListener<Bounds>() {
+            @Override
+            public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
+                setX(newValue.getMinX() + ((newValue.getWidth() - getWidth()) / 2));
+                setY(newValue.getMinY() + ((newValue.getHeight() - getHeight()) / 2));
+            }
+        });
+
+        showingProperty().addListener((observable, oldValue, newValue) -> {
+            Bounds bounds = node.getBoundsInLocal();
+            setX(bounds.getMinX() + ((bounds.getWidth() - getWidth()) / 2));
+            setY(bounds.getMinY() + ((bounds.getHeight() - getHeight()) / 2));
+        });
+        return this;
+    }
+
     public PopDialog callback(Callable<Boolean, ButtonType> callable) {
         callableSimpleObjectProperty.set(callable);
         return this;
     }
 
-    public PopDialog getPopDiag() {
-        return this;
-    }
 }

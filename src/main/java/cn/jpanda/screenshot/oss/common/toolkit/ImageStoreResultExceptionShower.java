@@ -35,6 +35,7 @@ public class ImageStoreResultExceptionShower {
         body.getChildren().addAll(type, description, reason, path, textArea);
         PopDialog popDialog = PopDialog.create().setHeader("图片处理失败")
                 .setContent(body)
+                .addButtonClass(ignore,"button-light")
                 .bindParent(configuration.getViewContext().getStage())
                 .callback(buttonType -> {
                     if (toHandler.equals(buttonType)) {

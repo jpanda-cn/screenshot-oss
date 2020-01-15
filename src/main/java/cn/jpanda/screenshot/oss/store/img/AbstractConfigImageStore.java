@@ -15,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import javafx.stage.Window;
 
 import java.awt.image.BufferedImage;
 import java.util.Optional;
@@ -29,7 +30,10 @@ public abstract class AbstractConfigImageStore implements ImageStore {
     }
 
     @Override
-    public void config() {
+    public void config(Window stage) {
+        if (stage == null) {
+            stage = configuration.getViewContext().getStage();
+        }
         // 获取当前选择的图片存储方式
         Class<? extends Initializable> config = imageStoreRegisterManager.getConfig(getName());
         if (config == null) {
@@ -45,7 +49,7 @@ public abstract class AbstractConfigImageStore implements ImageStore {
         PopDialog.create()
                 .setHeader(header)
                 .setContent(scene.getRoot())
-                .bindParent(configuration.getViewContext().getStage())
+                .bindParent(stage)
                 .buttonTypes(ButtonType.CANCEL, ButtonType.APPLY)
                 .callback(callable).showAndWait();
 
@@ -53,17 +57,17 @@ public abstract class AbstractConfigImageStore implements ImageStore {
 
     public abstract String getName();
 
-    protected boolean pre() {
+    protected boolean pre(Window stage) {
         HBox content = new HBox();
         Label main = new Label(getName());
         main.setStyle(" -fx-underline: true;-fx-font-weight: bold;");
         Label description = new Label("需要进行相关参数配置才可使用");
         content.getChildren().addAll(main, description);
-        Optional<ButtonType> result = PopDialog.create().setHeader("提示").setContent(content).bindParent(configuration.getViewContext().getStage()).showAndWait();
+        Optional<ButtonType> result = PopDialog.create().setHeader("提示").setContent(content).bindParent(stage).showAndWait();
 
         if (result.isPresent()) {
             if (result.get().equals(PopDialog.CONFIG)) {
-                config();
+                config(stage);
                 return canUse();
             } else {
                 return false;
@@ -90,9 +94,9 @@ public abstract class AbstractConfigImageStore implements ImageStore {
     }
 
     @Override
-    public boolean check() {
+    public boolean check(Window stage) {
         if (!canUse()) {
-            return pre();
+            return pre(stage);
         }
         return true;
     }

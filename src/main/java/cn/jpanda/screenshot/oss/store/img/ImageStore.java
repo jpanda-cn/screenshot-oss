@@ -3,6 +3,7 @@ package cn.jpanda.screenshot.oss.store.img;
 import cn.jpanda.screenshot.oss.store.ImageStoreResultWrapper;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.WritableImage;
+import javafx.stage.Window;
 
 import java.awt.image.BufferedImage;
 
@@ -14,14 +15,14 @@ public interface ImageStore {
     /**
      * 前置处理
      */
-    default boolean check() {
+    default boolean check(Window stage) {
         return true;
     }
 
     /**
      * 展示对应的配置页面
      */
-    default void config() {
+    default void config(Window stage) {
 
     }
 

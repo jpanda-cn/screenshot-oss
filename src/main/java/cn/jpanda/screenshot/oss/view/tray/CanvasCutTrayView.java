@@ -1,11 +1,12 @@
 package cn.jpanda.screenshot.oss.view.tray;
 
+import cn.jpanda.screenshot.oss.common.toolkit.Callable;
 import cn.jpanda.screenshot.oss.common.toolkit.EventHelper;
 import cn.jpanda.screenshot.oss.common.toolkit.ImageShower;
+import cn.jpanda.screenshot.oss.common.toolkit.PopDialog;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.ScreenshotsProcess;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
-import cn.jpanda.screenshot.oss.core.capture.ScreenCapture;
 import cn.jpanda.screenshot.oss.core.controller.ViewContext;
 import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
@@ -35,14 +36,13 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.awt.image.BufferedImage;
 import java.net.URL;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
 /**
@@ -278,15 +278,21 @@ public class CanvasCutTrayView implements Initializable {
         DestroyGroupBeanHolder destroyGroupBeanHolder = configuration.getUniqueBean(DestroyGroupBeanHolder.class);
         destroyGroupBeanHolder.destroy();
         add2Bar(new HBox());
-        Stage cutStage = (Stage) settings.getScene().getWindow();
-        cutStage.setAlwaysOnTop(false);
-        Stage stage = configuration.getViewContext().newStage();
-        stage.initOwner(settings.getScene().getWindow());
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setScene(configuration.getViewContext().getScene(SettingsView.class, true, false));
-        stage.toFront();
-        stage.showAndWait();
-        cutStage.setAlwaysOnTop(true);
+        initRectangle();
+        showConfig();
+    }
+
+    public void showConfig() {
+        // 截图配置窗口
+        Scene setting = configuration.getViewContext().getScene(SettingsView.class, true, false);
+        PopDialog
+                .create()
+                .setHeader("设置")
+                .setContent(setting.getRoot())
+                .buttonTypes(ButtonType.CLOSE)
+                .bindParent(settings.getScene().getWindow())
+                .centerOnNode(canvasProperties.getCutRectangle())
+                .showAndWait();
     }
 
     public void doCancel() {
@@ -316,47 +322,55 @@ public class CanvasCutTrayView implements Initializable {
         String imageStore = globalConfigPersistence.getImageStore();
         String clipboard = globalConfigPersistence.getClipboardCallback();
 
-        // 弹窗提示
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("提示");
-        alert.setHeaderText(String.format("本次操作会采用【%s】方式保存图片,并以【%s】形式保存在剪切板内", imageStore, clipboard));
-        alert.setContentText("如需变更保存方式或者剪切板内容，请【取消】之后，点击左侧【设置】按钮");
-        alert.getButtonTypes().clear();
-        alert.getButtonTypes().addAll(new ButtonType("取消", ButtonBar.ButtonData.BACK_PREVIOUS), new ButtonType("保存至云", ButtonBar.ButtonData.OK_DONE));
-        alert.initOwner(stage);
-        alert.initStyle(StageStyle.UTILITY);
-        alert.initModality(Modality.APPLICATION_MODAL);
-        // 调整位置，将其放置在截图框的正中间
-        ScreenCapture screenCapture = configuration.getUniqueBean(ScreenCapture.class);
-        alert.showingProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue) {
-                //  转换为全局坐标
-                double aw = alert.widthProperty().get();
-                double offsetW = (rectangle.getWidth() - aw) / 2;
-                alert.setX(screenCapture.minx() + rectangle.getX() + offsetW);
-                double ah = alert.heightProperty().get();
-                double offsetH = (rectangle.getHeight() - ah) / 2;
-                alert.setY(screenCapture.miny() + rectangle.getY() + offsetH);
-            }
-        });
+        // 弹窗提示，并允许调转到配置窗口
 
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent()) {
-            if (result.get().getButtonData() == ButtonBar.ButtonData.OK_DONE) {
-                ScreenshotsProcess screenshotsProcess = configuration.getUniqueBean(ScreenshotsProcess.class);
-                // 获取截图区域的图片交由图片处理器来完成保存图片的操作
-                if (canvasProperties == null) {
-                    return;
-                }
-                try {
-                    screenshotsProcess.done(screenshotsProcess.snapshot(scene, rectangle));
-                } finally {
-                    stage.close();
-                }
-            }
-        }
+        ButtonType change = new ButtonType("修改", ButtonBar.ButtonData.NEXT_FORWARD);
+
+        VBox body = new VBox();
+        body.setAlignment(Pos.CENTER_LEFT);
+        body.setSpacing(5);
+        Label storeWay = new Label(String.format("存储方式:【%s】", imageStore));
+        Label clipboardContent = new Label(String.format("剪切板内容：【%s】", clipboard));
+        body.getChildren().addAll(storeWay, clipboardContent);
+
+        PopDialog.create()
+                .setHeader("上传图片")
+                .setContent(body)
+                .bindParent(stage)
+                .centerOnNode(rectangle)
+                .buttonTypes(ButtonType.CANCEL, change, ButtonType.APPLY)
+                .addButtonClass(change, "button-next")
+                .callback(new Callable<Boolean, ButtonType>() {
+                    @Override
+                    public Boolean apply(ButtonType buttonType) {
+                        if (ButtonType.APPLY.equals(buttonType)) {
+                            // 上传
+                            toUpload(stage, scene, rectangle);
+                        } else if (change.equals(buttonType)) {
+                            // 变更设置
+                            showConfig();
+                        } else if (ButtonType.CANCEL.equals(buttonType)) {
+
+                        }
+                        return true;
+                    }
+                })
+                .show();
 
     }
+
+    public void toUpload(Stage stage, Scene scene, Rectangle rectangle) {
+        ScreenshotsProcess screenshotsProcess = configuration.getUniqueBean(ScreenshotsProcess.class);
+        if (canvasProperties == null) {
+            return;
+        }
+        try {
+            screenshotsProcess.done(screenshotsProcess.snapshot(scene, rectangle));
+        } finally {
+            stage.close();
+        }
+    }
+
 
     public void add2Bar(Node... nodes) {
         ObservableList<Node> child = bar.getChildren();

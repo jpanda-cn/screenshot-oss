@@ -8,8 +8,9 @@
     /*-fx-border-width: 2;*/
     -fx-alignment: center;
 }
+
 .table-view {
-    -fx-border-color:black;
+    -fx-border-color: black;
     -fx-border-width: 2;
 }
 
@@ -24,7 +25,6 @@
     -fx-padding: 0.0em;
     -fx-border-color: white;
 }
-
 
 
 .button-image {
@@ -42,4 +42,93 @@
 .button-image:pressed {
     -fx-stroke: #e6e6e6;
     -fx-stroke-width: 5;
+}
+
+
+.table-row-cell .button-info {
+    /*文本对齐方式*/
+    -fx-text-alignment: center;
+    /*合适高度*/
+    -fx-min-height: 25px;
+    /*粗体*/
+    -fx-font-weight: bold;
+    /*内边距*/
+    -fx-padding: 0 18px;
+    /*无边框*/
+    -fx-border-style: none;
+    /*鼠标样式*/
+    -fx-cursor: pointer;
+    -fx-text-fill: white;
+    -fx-background-color: rgba(22, 197, 201,1);
+    -fx-wrap-text: true;
+    /*-fx-effect: dropshadow( three-pass-box, rgba(198,47,47,1), 10.0, 0.0, 0.0, 0.0);*/
+}
+
+.table-row-cell .button-info:hover {
+    /*透明度*/
+    -fx-opacity: 0.8;
+    -fx-text-fill: rgba(22, 197, 201,1);
+    -fx-background-color: white;
+}
+
+.table-row-cell.button-info:pressed {
+    /*粗体*/
+    /*-fx-font-weight: bold;*/
+    /*透明度*/
+    -fx-opacity: 0.8;
+    -fx-text-fill: rgba(22, 197, 201,1);
+    -fx-background-color: #FFFFFF;
+}
+
+
+.table-row-cell .button-danger {
+    /*文本对齐方式*/
+    -fx-text-alignment: center;
+    /*合适高度*/
+    -fx-min-height: 25px;
+    /*粗体*/
+    -fx-font-weight: bold;
+    /*内边距*/
+    -fx-padding: 0 18px;
+    /*无边框*/
+    -fx-border-style: none;
+    /*鼠标样式*/
+    -fx-cursor: pointer;
+    -fx-text-fill: white;
+    -fx-background-color: rgba(198,47,47,1);
+    -fx-wrap-text: true;
+}
+
+
+.table-row-cell .button-danger:hover {
+    /*透明度*/
+    -fx-opacity: 0.8;
+    -fx-text-fill: rgba(198,47,47,1);
+    -fx-background-color: white;
+}
+
+.table-row-cell .button-primary {
+    /*文本对齐方式*/
+    -fx-text-alignment: center;
+    /*合适高度*/
+    -fx-min-height: 25px;
+    /*粗体*/
+    -fx-font-weight: bold;
+    /*内边距*/
+    -fx-padding: 0 18px;
+    /*无边框*/
+    -fx-border-style: none;
+    /*鼠标样式*/
+    -fx-cursor: pointer;
+    -fx-text-fill: white;
+    -fx-background-color: rgba(0,123,255,1);
+    -fx-wrap-text: true;
+}
+
+
+.table-row-cell .button-primary:hover {
+    /*透明度*/
+    -fx-opacity: 0.8;
+    -fx-text-fill: rgba(0,123,255,1);
+    -fx-background-color: white;
 }
