@@ -80,9 +80,7 @@ public class JdOssCloudStore extends AbstractConfigImageStore {
             return false;
         }
         String path = imageStoreResultWrapper.getPath();
-        String suffix = path.substring(path.lastIndexOf(".") + 1);
         String name = path.substring((int) MathUtils.max(path.lastIndexOf("/"), path.lastIndexOf("\\")) + 1);
-        name = name.substring(0, name.length() - suffix.length() - 1);
         return upload(bufferedImage, configuration.getPersistence(JdOssPersistence.class), name);
     }
 
@@ -105,7 +103,8 @@ public class JdOssCloudStore extends AbstractConfigImageStore {
             ObjectMetadata objectMetadata=new ObjectMetadata();
             objectMetadata.setContentType("image/jpg");
             PutObjectResult result = s3.putObject(jdOssPersistence.getBucket(), name, new ByteArrayInputStream(os.toByteArray()),objectMetadata );
-        } catch (IOException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             configuration.getUniqueBean(ImageStoreResultHandler.class).add(ImageStoreResult
                     .builder()
                     .image(new SimpleObjectProperty<>(image))
