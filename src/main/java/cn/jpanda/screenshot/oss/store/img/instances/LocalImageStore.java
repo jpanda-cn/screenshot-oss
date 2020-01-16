@@ -65,12 +65,12 @@ public class LocalImageStore extends AbstractConfigImageStore {
         // 本地图片存储
         try {
             File file = Paths.get(path).toFile();
-            if (!file.exists() && file.mkdirs() && file.createNewFile()) {
-                ImageIO.write(image, "PNG", file);
-            } else {
-                throw new RuntimeException(String.format("can not create file named:%s", path));
+            if (!file.exists()) {
+                file.mkdirs();
+                file.createNewFile();
             }
-        } catch (IOException e) {
+            ImageIO.write(image, "PNG", file);
+        } catch (Exception e) {
             configuration.getUniqueBean(ImageStoreResultHandler.class).add(ImageStoreResult
                     .builder()
                     .image(new SimpleObjectProperty<>(image))

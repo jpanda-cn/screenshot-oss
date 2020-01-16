@@ -325,6 +325,7 @@ public class CanvasCutTrayView implements Initializable {
         // 弹窗提示，并允许调转到配置窗口
 
         ButtonType change = new ButtonType("修改", ButtonBar.ButtonData.NEXT_FORWARD);
+        ButtonType upload = new ButtonType("上传", ButtonBar.ButtonData.APPLY);
 
         VBox body = new VBox();
         body.setAlignment(Pos.CENTER_LEFT);
@@ -338,17 +339,18 @@ public class CanvasCutTrayView implements Initializable {
                 .setContent(body)
                 .bindParent(stage)
                 .centerOnNode(rectangle)
-                .buttonTypes(ButtonType.CANCEL, change, ButtonType.APPLY)
+                .buttonTypes(ButtonType.CANCEL, change, upload)
                 .addButtonClass(change, "button-next")
                 .callback(new Callable<Boolean, ButtonType>() {
                     @Override
                     public Boolean apply(ButtonType buttonType) {
-                        if (ButtonType.APPLY.equals(buttonType)) {
+                        if (upload.equals(buttonType)) {
                             // 上传
                             toUpload(stage, scene, rectangle);
                         } else if (change.equals(buttonType)) {
                             // 变更设置
                             showConfig();
+                            return false;
                         } else if (ButtonType.CANCEL.equals(buttonType)) {
 
                         }

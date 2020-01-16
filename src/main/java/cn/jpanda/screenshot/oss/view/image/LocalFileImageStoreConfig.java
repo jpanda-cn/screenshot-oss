@@ -40,7 +40,8 @@ public class LocalFileImageStoreConfig implements Initializable {
         // 加载配置文件
         config = configuration.getPersistence(LocalImageStorePersistence.class);
         if (StringUtils.isEmpty(config.getPath())) {
-            config.setPath(configuration.getWorkPath() + File.separator + "images/saves" + File.separator);
+
+            config.setPath(Paths.get(configuration.getWorkPath(),"images","saves").toFile().getAbsolutePath());
             configuration.storePersistence(config);
         }
         show.textProperty().setValue(config.getPath());
