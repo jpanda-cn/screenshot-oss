@@ -5,6 +5,7 @@ import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.InnerSnapshotCan
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import cn.jpanda.screenshot.oss.view.tray.toolkits.CutInnerType;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.embed.swing.SwingFXUtils;
@@ -144,12 +145,11 @@ public class RgbInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEvent
             canvasProperties.getCutPane().getChildren().addAll(group, cursorRectangle);
 
         }
-
     }
 
     protected void exit() {
-        if (group!=null){
-        canvasProperties.getCutPane().getChildren().remove(group);
+        if (group != null) {
+            canvasProperties.getCutPane().getChildren().remove(group);
         }
         imageView = null;
         group = null;
@@ -177,10 +177,10 @@ public class RgbInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEvent
         UpdateImageView();
         // 获取鼠标位置的像素点
         Color color = canvasProperties.getComputerImage().getPixelReader().getColor((int) (event.getSceneX()), (int) (event.getSceneY()));
+
         setPos(event.getSceneX() + 20, event.getSceneY() + 20);
         setRGBA(color);
         setHex(color);
-
     }
 
     // 生成图片,绘制一个宽度3px的准星
@@ -221,15 +221,15 @@ public class RgbInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEvent
     }
 
     private void setRGBA(Color color) {
-        rgbaStr.set(String.format("%d,%d,%d,%d", Math.round(color.getRed() * 255), Math.round(color.getGreen() * 255), Math.round(color.getBlue() * 255), Math.round(color.getOpacity())));
+        rgbaStr.setValue(String.format("%d,%d,%d,%d", Math.round(color.getRed() * 255), Math.round(color.getGreen() * 255), Math.round(color.getBlue() * 255), Math.round(color.getOpacity())));
     }
 
     private void setHex(Color color) {
-        hexStr.set(String.format("%s%s%s", toHexString(color.getRed()), toHexString(color.getGreen()), toHexString(color.getBlue())));
+        hexStr.setValue(String.format("%s%s%s", toHexString(color.getRed()), toHexString(color.getGreen()), toHexString(color.getBlue())));
     }
 
     private Text newText() {
-        Text text = new Text();
+        Text text = new Text("132");
         text.fontProperty().set(Font.font(12));
         text.fillProperty().set(Color.WHITE);
         return text;
@@ -244,9 +244,13 @@ public class RgbInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEvent
     }
 
     private void bindProperty() {
-        posStr.addListener((observable, oldValue, newValue) -> pos.textProperty().setValue(String.format("POS:(%s)", newValue)));
-        rgbaStr.addListener((observable, oldValue, newValue) -> rgba.textProperty().setValue(String.format("RGBA:(%s)", newValue)));
-        hexStr.addListener((observable, oldValue, newValue) -> hex.textProperty().setValue(String.format("HEX:(%s)", newValue)));
+        pos.textProperty().bind(Bindings.createStringBinding(() -> String.format("POS:(%s)", posStr.getValue()), posStr));
+        rgba.textProperty().bind(Bindings.createStringBinding(() -> String.format("RGBA:(%s)", rgbaStr.getValue()), rgbaStr));
+        hex.textProperty().bind(Bindings.createStringBinding(() -> String.format("HEX:(%s)", hexStr.getValue()), hexStr));
+
+//        posStr.addListener((observable, oldValue, newValue) -> pos.textProperty().setValue(String.format("POS:(%s)", newValue)));
+//        rgbaStr.addListener((observable, oldValue, newValue) -> rgba.textProperty().setValue(String.format("RGBA:(%s)", newValue)));
+//        hexStr.addListener((observable, oldValue, newValue) -> hex.textProperty().setValue(String.format("HEX:(%s)", newValue)));
     }
 
     private void addAim(ImageView imageView) {
