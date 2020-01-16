@@ -229,7 +229,7 @@ public class RgbInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEvent
     }
 
     private Text newText() {
-        Text text = new Text("132");
+        Text text = new Text();
         text.fontProperty().set(Font.font(12));
         text.fillProperty().set(Color.WHITE);
         return text;
