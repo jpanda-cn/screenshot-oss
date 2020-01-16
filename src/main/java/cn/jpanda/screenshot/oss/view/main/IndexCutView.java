@@ -296,13 +296,6 @@ public class IndexCutView implements Initializable {
         }
     }
 
-    public void toSettings() {
-        Stage stage = configuration.getViewContext().newStage();
-        stage.initOwner(configuration.getViewContext().getStage());
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setScene(configuration.getViewContext().getScene(SettingsView.class, true, false));
-        stage.showAndWait();
-    }
 
     private void loadHotKey() {
         SettingsHotKeyPropertyHolder settingsHotKeyPropertyHolder = configuration.getUniqueBean(SettingsHotKeyPropertyHolder.class);
@@ -529,6 +522,7 @@ public class IndexCutView implements Initializable {
                 .setHeader("确认关闭吗？")
                 .setContent(b)
                 .bindParent(window)
+                .addButtonClass(back,"button-light")
                 .buttonTypes(back, ok)
                 .showAndWait().orElse(back))) {
             if (group.getSelectedToggle().getUserData().equals("close")) {
