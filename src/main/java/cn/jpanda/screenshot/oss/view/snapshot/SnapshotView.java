@@ -5,6 +5,9 @@ import cn.jpanda.screenshot.oss.core.ScreenshotsProcess;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
 import cn.jpanda.screenshot.oss.core.capture.ScreenCapture;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
+import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallback;
+import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallbackRegistryManager;
+import cn.jpanda.screenshot.oss.store.clipboard.instances.ImageClipboardCallback;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -88,12 +91,20 @@ public class SnapshotView implements Initializable {
         if (canvasProperties == null) {
             return;
         }
-        screenshotsProcess.done(screenshotsProcess.snapshot(canvas.getScene(), canvasProperties.getCutRectangle()));
-        // 关闭
-        ((WaitRemoveElementsHolder) (stage.getProperties().getOrDefault(WaitRemoveElementsHolder.class, new WaitRemoveElementsHolder()))).clear();
-        canvas.removeEventHandler(MouseEvent.ANY, canvasDrawEventHandler);
-        canvasDrawEventHandler = null;
-        this.canvas = null;
-        stage.close();
+        try {
+            // 获取截图
+            BufferedImage bufferedImage = screenshotsProcess.snapshot(canvas.getScene(), canvasProperties.getCutRectangle());
+            // 不执行图片保存操作
+            // 将图片放置剪切板
+            ClipboardCallback clipboardCallback = configuration.getUniqueBean(ClipboardCallbackRegistryManager.class).get(ImageClipboardCallback.NAME);
+            clipboardCallback.callback(bufferedImage, "");
+        } finally {
+            ((WaitRemoveElementsHolder) (stage.getProperties().getOrDefault(WaitRemoveElementsHolder.class, new WaitRemoveElementsHolder()))).clear();
+            canvas.removeEventHandler(MouseEvent.ANY, canvasDrawEventHandler);
+            canvasDrawEventHandler = null;
+            this.canvas = null;
+            stage.close();
+        }
+
     }
 }
