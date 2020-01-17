@@ -14,6 +14,7 @@ import cn.jpanda.screenshot.oss.view.image.LocalFileImageStoreConfig;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.stage.Window;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -53,7 +54,7 @@ public class LocalImageStore extends AbstractConfigImageStore {
     }
 
     @Override
-    public boolean retry(ImageStoreResultWrapper imageStoreResultWrapper) {
+    public boolean retry(ImageStoreResultWrapper imageStoreResultWrapper, Window window) {
         return false;
     }
 

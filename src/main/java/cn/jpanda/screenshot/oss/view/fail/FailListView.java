@@ -144,7 +144,7 @@ public class FailListView implements Initializable {
                     @Override
                     protected Boolean call() {
                         try {
-                            return imageStore.retry(wrapper);
+                            return imageStore.retry(wrapper, retry.getScene().getWindow());
                         } catch (Exception e) {
                             e.printStackTrace();
                             return false;

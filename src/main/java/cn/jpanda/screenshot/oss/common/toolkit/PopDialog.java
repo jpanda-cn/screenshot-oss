@@ -202,13 +202,16 @@ public class PopDialog extends Dialog<ButtonType> {
 
 
     public PopDialog bindParent(Window parent, boolean disableParent) {
-        initOwner(parent);
-        // 显示在中间
-        if (disableParent && parent != null) {
-            showingProperty().addListener((observable, oldValue, newValue) -> {
-                parent.getScene().getRoot().disableProperty().set(newValue);
-            });
-        }
+       if (parent!=null&&parent.getScene()!=null){
+           initOwner(parent);
+           // 显示在中间
+           if (disableParent) {
+               showingProperty().addListener((observable, oldValue, newValue) -> {
+                   parent.getScene().getRoot().disableProperty().set(newValue);
+               });
+           }
+       }
+
         return this;
     }
 

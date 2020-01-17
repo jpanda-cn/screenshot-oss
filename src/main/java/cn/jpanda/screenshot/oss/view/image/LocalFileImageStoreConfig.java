@@ -41,7 +41,7 @@ public class LocalFileImageStoreConfig implements Initializable {
         config = configuration.getPersistence(LocalImageStorePersistence.class);
         if (StringUtils.isEmpty(config.getPath())) {
 
-            config.setPath(Paths.get(configuration.getWorkPath(),"images","saves").toFile().getAbsolutePath());
+            config.setPath(Paths.get(configuration.getWorkPath(), "images", "saves").toFile().getAbsolutePath());
             configuration.storePersistence(config);
         }
         show.textProperty().setValue(config.getPath());
@@ -92,10 +92,10 @@ public class LocalFileImageStoreConfig implements Initializable {
         String path = config.getPath();
         String newPath = show.textProperty().get();
         if (StringUtils.isEmpty(newPath)) {
-            PopDialogShower.message("未选择路径");
+            PopDialogShower.message("未选择路径", show.getScene().getWindow());
         }
         if (newPath.equals(path)) {
-            PopDialogShower.message("当前目录未发生变化");
+            PopDialogShower.message("当前目录未发生变化", show.getScene().getWindow());
             return false;
         }
         config.setPath(newPath);

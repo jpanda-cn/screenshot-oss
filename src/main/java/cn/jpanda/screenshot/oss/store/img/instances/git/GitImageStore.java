@@ -9,6 +9,7 @@ import cn.jpanda.screenshot.oss.store.ExceptionType;
 import cn.jpanda.screenshot.oss.store.ImageStoreResultWrapper;
 import cn.jpanda.screenshot.oss.store.img.AbstractConfigImageStore;
 import cn.jpanda.screenshot.oss.view.image.GitFileImageStoreConfig;
+import javafx.stage.Window;
 import lombok.SneakyThrows;
 import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.CloneCommand;
@@ -105,7 +106,7 @@ public class GitImageStore extends AbstractConfigImageStore {
     }
 
     @Override
-    public boolean retry(ImageStoreResultWrapper imageStoreResultWrapper) {
+    public boolean retry(ImageStoreResultWrapper imageStoreResultWrapper, Window window) {
         ExceptionType exceptionType = imageStoreResultWrapper.getExceptionType();
         if (exceptionType instanceof GitExceptionType) {
             GitPersistence gitPersistence = configuration.getPersistence(GitPersistence.class);

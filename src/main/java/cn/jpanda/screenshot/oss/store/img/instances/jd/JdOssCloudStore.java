@@ -23,6 +23,7 @@ import com.amazonaws.services.s3.model.PutObjectResult;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.stage.Window;
 import lombok.SneakyThrows;
 
 import javax.imageio.ImageIO;
@@ -72,7 +73,7 @@ public class JdOssCloudStore extends AbstractConfigImageStore {
     }
 
     @Override
-    public boolean retry(ImageStoreResultWrapper imageStoreResultWrapper) {
+    public boolean retry(ImageStoreResultWrapper imageStoreResultWrapper, Window window) {
         BufferedImage bufferedImage;
         try {
             bufferedImage = ImageIO.read(Paths.get(imageStoreResultWrapper.getPath()).toFile());

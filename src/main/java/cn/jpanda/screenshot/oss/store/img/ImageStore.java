@@ -33,7 +33,7 @@ public interface ImageStore {
      */
     String store(BufferedImage image);
 
-    boolean retry(ImageStoreResultWrapper imageStoreResultWrapper);
+    boolean retry(ImageStoreResultWrapper imageStoreResultWrapper,Window window);
 
     /**
      * 执行存储图片的操作

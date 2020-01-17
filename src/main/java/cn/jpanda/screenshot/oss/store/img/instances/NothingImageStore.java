@@ -4,6 +4,7 @@ import cn.jpanda.screenshot.oss.common.enums.ImageType;
 import cn.jpanda.screenshot.oss.core.annotations.ImgStore;
 import cn.jpanda.screenshot.oss.store.ImageStoreResultWrapper;
 import cn.jpanda.screenshot.oss.store.img.ImageStore;
+import javafx.stage.Window;
 
 import java.awt.image.BufferedImage;
 
@@ -20,7 +21,7 @@ public class NothingImageStore implements ImageStore {
     }
 
     @Override
-    public boolean retry(ImageStoreResultWrapper imageStoreResultWrapper) {
+    public boolean retry(ImageStoreResultWrapper imageStoreResultWrapper, Window window) {
         return true;
     }
 }
