@@ -37,6 +37,8 @@ public class JPandaApplicationRunner {
         // 加载视图上下文，准备处理视图问题
         viewContext = new DefaultViewContext(stage, new ControllerAnnotationSameNameFXMLSearch(FXMLLoader.getDefaultClassLoader()), configuration);
         configuration.setViewContext(viewContext);
+        configuration.getViewLoaded().set(true);
+
         return viewContext;
     }
 }

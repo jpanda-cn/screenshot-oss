@@ -5,7 +5,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="131.0" prefWidth="386.0" stylesheets="@SettingsView.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.jpanda.screenshot.oss.view.main.SettingsView">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="131.0" prefWidth="386.0"  xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.jpanda.screenshot.oss.view.main.SettingsView">
     <Button fx:id="edit" layoutX="303.0" layoutY="46.0" mnemonicParsing="false" onMouseClicked="#editImageStore" text="编辑" />
     <Label layoutX="21.0" layoutY="45.0" prefHeight="18.0" prefWidth="96.0" text="存储方式" />
     <ComboBox fx:id="imageSave" layoutX="133.0" layoutY="46.0" prefWidth="150.0" />

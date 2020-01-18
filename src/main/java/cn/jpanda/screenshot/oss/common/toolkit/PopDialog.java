@@ -165,6 +165,11 @@ public class PopDialog extends Dialog<ButtonType> {
                 return button;
             }
 
+            @Override
+            protected Node createButtonBar() {
+                Node node=super.createButtonBar();
+                return EventHelper.addDrag(node);
+            }
         };
         setDialogPane(dialogPane);
     }

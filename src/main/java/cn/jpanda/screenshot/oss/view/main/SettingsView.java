@@ -72,8 +72,7 @@ public class SettingsView implements Initializable {
                     return;
                 }
                 // 判断是否有对应的配置界面，决定是否展示配置按钮
-                Class<? extends Initializable> conf = imageStoreRegisterManager.getConfig((String) newValue);
-                edit.disableProperty().setValue((conf == null || conf.equals(NoImageStoreConfig.class)));
+                edit.disableProperty().setValue((!imageStoreRegisterManager.canConfig((String) newValue)));
                 ImageType type = imageStoreRegisterManager.getType((String) newValue);
                 List<String> cls;
                 switch (type) {
@@ -108,7 +107,7 @@ public class SettingsView implements Initializable {
         imageSave.getItems().addAll(imageStoreRegisterManager.getNames());
         imageSave.getSelectionModel().select(globalConfigPersistence.getImageStore());
         // 判断是否有对应的配置界面，决定是否展示配置按钮
-        edit.visibleProperty().setValue(imageStoreRegisterManager.getConfig(globalConfigPersistence.getImageStore()) != null);
+        edit.visibleProperty().setValue(imageStoreRegisterManager.canConfig(globalConfigPersistence.getImageStore()));
 
     }
 

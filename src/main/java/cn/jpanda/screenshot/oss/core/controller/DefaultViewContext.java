@@ -31,6 +31,7 @@ public class DefaultViewContext implements ViewContext {
 
     @Override
     public Stage getStage() {
+        defaultStage.getIcons().add(new Image("/images/icon-red.png"));
         return defaultStage;
     }
 

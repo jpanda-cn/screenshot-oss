@@ -5,8 +5,12 @@ import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.log.Log;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.stage.Stage;
 import lombok.Getter;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -101,11 +105,7 @@ public class ImageStoreResultHandler {
             if (configuration.getCutting().get() != null) {
                 // 当前处于截图状态中
                 // 当截图窗口关闭后，展示弹窗
-                configuration.getCutting().addListener((observable, oldValue, newValue) -> {
-                    if (newValue == null) {
-                        showExceptionTips(imageStoreResult);
-                    }
-                });
+                configuration.getCutting().addListener(new ShowMessageChangeListener(imageStoreResult));
             } else {
                 showExceptionTips(imageStoreResult);
             }
@@ -113,7 +113,23 @@ public class ImageStoreResultHandler {
     }
 
     public void showExceptionTips(ImageStoreResult result) {
+
         ImageStoreResultExceptionShower.showExceptionTips(result, configuration);
 
+    }
+    public  class ShowMessageChangeListener implements ChangeListener<Stage>{
+        private ImageStoreResult imageStoreResult;
+
+        public ShowMessageChangeListener(ImageStoreResult imageStoreResult) {
+            this.imageStoreResult = imageStoreResult;
+        }
+
+        @Override
+        public void changed(ObservableValue<? extends Stage> observable, Stage oldValue, Stage newValue) {
+            if (newValue == null) {
+                showExceptionTips(imageStoreResult);
+                configuration.getCutting().removeListener(this);
+            }
+        }
     }
 }

@@ -7,6 +7,7 @@ import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.store.ImageStoreConfigBuilder;
 import com.sun.webkit.dom.HTMLDocumentImpl;
 import com.sun.webkit.network.CookieManager;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -21,23 +22,12 @@ import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import lombok.SneakyThrows;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicHeader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.html.HTMLCollection;
 
-import java.io.File;
 import java.net.CookieHandler;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -47,6 +37,8 @@ import java.util.*;
  */
 public class OSChinaImageStoreBuilder implements ImageStoreConfigBuilder {
     public static final String ACCESS_URL = "https://www.oschina.net/";
+
+
     private Configuration configuration;
     CustomCookieManager cookieManager;
 
@@ -63,6 +55,8 @@ public class OSChinaImageStoreBuilder implements ImageStoreConfigBuilder {
     @SneakyThrows
     public Parent createContent() {
         CookieHandler.setDefault(cookieManager);
+        loadCookie();
+
         WebView webView = new WebView();
 
         final WebEngine webEngine = webView.getEngine();
@@ -108,16 +102,10 @@ public class OSChinaImageStoreBuilder implements ImageStoreConfigBuilder {
             OSChainPersistence persistence = configuration.getPersistence(OSChainPersistence.class);
             persistence.setUid(uid);
             persistence.setCookie(cookie);
-            persistence.setExpire(new Date().getTime() + 1000 * 60 * 60 * 24 * 365);
+            persistence.setExpire(new Date().getTime() + 1000 * 60 * 60 * 24 * 365L);
             configuration.storePersistence(persistence);
-            // 创建一个定时器，进行cookie的更新工作
-
-            new Timer().schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    requestWithCookie();
-                }
-            }, 0L, 1000 * 10);
+            SimpleBooleanProperty updateCookie=configuration.getUniquePropertiesHolder(OSChinaCookieUpdateAfterBootstrapLoaderProcess.UPDATE_COOKIE_SHARD_PROPERTY_NAME);
+            updateCookie.set(true);
             return true;
         };
 
@@ -159,38 +147,15 @@ public class OSChinaImageStoreBuilder implements ImageStoreConfigBuilder {
     }
 
     @SneakyThrows
-    private void requestWithCookie() {
-        try (CloseableHttpClient httpClient = HttpClients.custom()
-                .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36")
-                .setDefaultHeaders(Collections.singletonList(new BasicHeader("Cookie", getCookie())))
-                .build();) {
-            HttpPost post = new HttpPost("https://my.oschina.net/u/3101282/space/ckeditor_dialog_img_upload");
-
-            FileBody fileBody = new FileBody(new File("C:\\Users\\Suning\\Desktop\\chapter7_1_6.jpg"));
-            HttpEntity entity = MultipartEntityBuilder
-                    .create()
-                    .setCharset(StandardCharsets.UTF_8)
-
-                    .setContentType(ContentType.APPLICATION_FORM_URLENCODED)
-                    .addPart("upload", fileBody)
-
-                    .build();
-            post.setEntity(entity);
-
-            HttpResponse response = httpClient.execute(post);
-            int code = response.getStatusLine().getStatusCode();
-            System.out.println(code);
-//            HttpGet get = new HttpGet(ACCESS_URL);
-//            get.setHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36");
-//            HttpResponse response = httpClient.execute(get);
-//            if (response.getStatusLine().getStatusCode() == 200) {
-//                // 更新cookie到期时间
-//                OSChainPersistence persistence = configuration.getPersistence(OSChainPersistence.class);
-//                persistence.setExpire(new Date().toInstant().plus(365, ChronoUnit.DAYS));
-//                configuration.storePersistence(persistence);
-//            }
-
+    private void loadCookie(){
+        OSChainPersistence persistence = configuration.getPersistence(OSChainPersistence.class);
+        String cookie=persistence.getCookie();
+        if (StringUtils.isEmpty(cookie)){
+            return;
         }
-
+        String[]cookies=cookie.split(";");
+        Map<String,List<String>> cookieMap=new HashMap<>();
+        cookieMap.put("Set-Cookie",Arrays.asList(cookies));
+        CookieHandler.getDefault().put(new URI(ACCESS_URL),cookieMap);
     }
 }
