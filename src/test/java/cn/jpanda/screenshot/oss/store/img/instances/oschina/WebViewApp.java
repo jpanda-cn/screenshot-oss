@@ -3,7 +3,6 @@ package cn.jpanda.screenshot.oss.store.img.instances.oschina;
 import cn.jpanda.screenshot.oss.common.toolkit.Callable;
 import cn.jpanda.screenshot.oss.common.toolkit.PopDialog;
 import cn.jpanda.screenshot.oss.common.utils.StringUtils;
-import com.sun.javafx.webkit.WebConsoleListener;
 import com.sun.webkit.dom.HTMLDocumentImpl;
 import com.sun.webkit.network.CookieManager;
 import javafx.application.Application;
@@ -24,7 +23,9 @@ import javafx.stage.Stage;
 import lombok.SneakyThrows;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.html.HTMLCollection;
 
 import java.net.CookieHandler;
 import java.net.URI;
@@ -71,23 +72,24 @@ public class WebViewApp extends Application {
         callable = new Callable<Boolean, ButtonType>() {
             @Override
             public Boolean apply(ButtonType buttonType) {
-                Document document = webEngine.getDocument();
-                Element element = document.getElementById("userSidebar");
-                NodeList nodeList = element.getElementsByTagName("div");
+                if (ButtonType.CANCEL.equals(buttonType)) {
+                    return true;
+                }
 
-                String userId = ((HTMLDocumentImpl) document).getElementsByClassName("current-user-avatar").item(0).getAttributes().getNamedItem("data-user-id").getTextContent();
-                return true;
+                Element element = webEngine.getDocument().getElementById("list");
+
+                NodeList nodeList = element.getElementsByTagName("a");
+                for (int i = 0; i < nodeList.getLength(); i++) {
+                    Node n = nodeList.item(i);
+                    String url = n.getAttributes().getNamedItem("href").getTextContent();
+                    System.out.println("\"https://www.52bqg.com/book_117053/"+url+"\",");
+                }
+
+                System.out.println("userId=" + getUserId(webEngine.getDocument()));
+                System.out.println("cookieValue=" + getCookie());
+                return false;
             }
         };
-
-        WebConsoleListener.setDefaultListener(new WebConsoleListener() {
-            @Override
-            public void messageAdded(WebView webView, String message, int lineNumber, String sourceId) {
-
-                System.out.println("Console: [" + sourceId + ":" + lineNumber + "] " + message);
-            }
-        });
-
 
         Button goButton = new Button("Go");
         goButton.setMinSize(Button.USE_PREF_SIZE, Button.USE_PREF_SIZE);
@@ -107,19 +109,37 @@ public class WebViewApp extends Application {
         return vBox;
     }
 
+    @SneakyThrows
+    private String getCookie() {
+        String cookieValue = String.join(";", Optional.ofNullable(CookieHandler.getDefault().get(new URI("https://www.oschina.net/"), new HashMap<>()).get("Cookie")).orElse(Collections.emptyList()));
+        return cookieValue;
+    }
+
+    private String getUserId(Document document) {
+        HTMLCollection divs = ((HTMLDocumentImpl) document).getElementsByClassName("current-user-avatar");
+        if (divs.getLength() < 1) {
+            return null;
+        }
+        Node dataUserId = divs.item(0).getAttributes().getNamedItem("data-user-id");
+        if (dataUserId == null) {
+            return null;
+        }
+        return dataUserId.getTextContent();
+    }
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         PopDialog
                 .create()
                 .setHeader("OSCHINA")
                 .setContent(createContent())
-                .buttonTypes(ButtonType.FINISH)
+                .buttonTypes(ButtonType.CANCEL, ButtonType.FINISH)
                 .callback(callable)
                 .showAndWait();
 
 
         Map<String, List<String>> cookies = CookieHandler.getDefault().get(new URI("https://www.oschina.net/"), new HashMap<>());
-        String cookieValue = String.join(";", Optional.ofNullable(cookies.get("Cookie")).orElse(Collections.emptyList()));
+        String cookieValue = String.join(";", Optional.ofNullable(CookieHandler.getDefault().get(new URI("https://www.oschina.net/"), new HashMap<>()).get("Cookie")).orElse(Collections.emptyList()));
         if (StringUtils.isEmpty(cookieValue)) {
             // 没有拿到Cookie,表示数据错误，弹窗提示
         }

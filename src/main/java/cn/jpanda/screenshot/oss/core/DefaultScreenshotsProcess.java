@@ -1,14 +1,19 @@
 package cn.jpanda.screenshot.oss.core;
 
+import cn.jpanda.screenshot.oss.common.toolkit.LoadingShower;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
 import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallback;
 import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallbackRegistryManager;
 import cn.jpanda.screenshot.oss.store.img.ImageStore;
 import cn.jpanda.screenshot.oss.store.img.ImageStoreRegisterManager;
+import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Scene;
 import javafx.scene.image.WritableImage;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Stage;
+import javafx.stage.Window;
+import lombok.SneakyThrows;
 
 import java.awt.image.BufferedImage;
 
@@ -34,15 +39,25 @@ public class DefaultScreenshotsProcess implements ScreenshotsProcess {
     }
 
     @Override
-    public void done(BufferedImage image) {
-        handlerClipboardContent(image, saveImage(image));
+    public void done(Window window, BufferedImage image) {
+        handlerClipboardContent(image, saveImage(window, image));
 
     }
 
-    public String saveImage(BufferedImage image) {
+    @SneakyThrows
+    public String saveImage(Window window, BufferedImage image) {
         // 获取当前
+        Stage loading = LoadingShower.createUploading(window);
         ImageStore imageStore = configuration.getUniqueBean(ImageStoreRegisterManager.class).getImageStore(configuration.getPersistence(GlobalConfigPersistence.class).getImageStore());
-        return imageStore.store(image);
+        System.out.println(imageStore.getClass().getCanonicalName());
+        final String[] path = {null};
+        new Thread(() -> {
+            path[0] = imageStore.store(image);
+            Platform.runLater(loading::close);
+        }).start();
+
+        loading.showAndWait();
+        return path[0];
     }
 
     public String saveImage(WritableImage image) {

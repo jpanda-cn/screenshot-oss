@@ -17,6 +17,8 @@ import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import javafx.util.Duration;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -139,19 +141,25 @@ public class PopDialog extends Dialog<ButtonType> {
                 button.setDefaultButton(buttonData.isDefaultButton());
                 button.setCancelButton(buttonData.isCancelButton());
                 button.addEventHandler(ActionEvent.ACTION, ae -> {
-                    if (callableSimpleObjectProperty.get().apply(buttonType)) {
-                        if (Optional.ofNullable(animation.get()).isPresent()) {
-                            animation.get().setAutoReverse(true);
-                            animation.get().setRate(-1);
-                            animation.get().play();
-                            animation.get().setOnFinished(e -> {
+                    try {
+                        if (callableSimpleObjectProperty.get().apply(buttonType)) {
+                            if (Optional.ofNullable(animation.get()).isPresent()) {
+                                animation.get().setAutoReverse(true);
+                                animation.get().setRate(-1);
+                                animation.get().play();
+                                animation.get().setOnFinished(e -> {
+                                    setResult(null==buttonType?PLACE_HOLDER:buttonType);
+                                    close();
+                                });
+                            } else {
                                 setResult(null==buttonType?PLACE_HOLDER:buttonType);
                                 close();
-                            });
-                        } else {
-                            setResult(null==buttonType?PLACE_HOLDER:buttonType);
-                            close();
+                            }
                         }
+                    } catch (URISyntaxException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 });
                 return button;

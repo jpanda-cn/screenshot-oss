@@ -7,29 +7,31 @@ import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.ImgStore;
 import cn.jpanda.screenshot.oss.store.*;
 import cn.jpanda.screenshot.oss.store.img.AbstractConfigImageStore;
-import cn.jpanda.screenshot.oss.view.image.OSChinaFileImageStoreConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.stage.Window;
-import org.apache.http.Consts;
+import lombok.SneakyThrows;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.ByteArrayBody;
-import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
+import org.w3c.dom.Document;
+import sun.plugin.dom.html.HTMLDocument;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.UUID;
 
 /**
@@ -39,7 +41,7 @@ import java.util.UUID;
  * @version 1.0
  * @since 2020/1/17 9:45
  */
-@ImgStore(name = OSChinaImageStore.NAME, type = ImageType.HAS_PATH, config = OSChinaFileImageStoreConfig.class)
+@ImgStore(name = OSChinaImageStore.NAME, type = ImageType.HAS_PATH, builder = OSChinaImageStoreBuilder.class)
 public class OSChinaImageStore extends AbstractConfigImageStore {
 
     public static final String NAME = "OS-CHINA";
@@ -57,8 +59,8 @@ public class OSChinaImageStore extends AbstractConfigImageStore {
     @Override
     public String store(BufferedImage image) {
         OSChainPersistence persistence = configuration.getPersistence(OSChainPersistence.class);
-        String url = loadUrl(persistence.getBlogId());
-        return upload(image, url);
+        String url = loadUrl(persistence.getUid());
+        return upload(image, url, persistence);
     }
 
     @Override
@@ -67,32 +69,31 @@ public class OSChinaImageStore extends AbstractConfigImageStore {
         return false;
     }
 
-    public String upload(BufferedImage image, String url) {
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost post = new HttpPost(url);
+    @SneakyThrows
+    public String upload(BufferedImage image, String url, OSChainPersistence persistence) {
 
-        try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+        SimpleStringProperty path = new SimpleStringProperty(UUID.randomUUID().toString().concat(".png"));
+        System.out.println(path.get());
+        try (CloseableHttpClient httpClient = HttpClients.custom()
+                .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36")
+                .setDefaultHeaders(Collections.singletonList(new BasicHeader("Cookie", persistence.getCookie()))).build();
+             ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ) {
             ImageIO.write(image, "png", os);
-            FileBody fileBody=new FileBody(new File("C:\\Users\\Suning\\Desktop\\chapter7_1_6.jpg"));
-            ByteArrayBody byteArrayBody = new ByteArrayBody(os.toByteArray(), ContentType.create("image/png", Consts.UTF_8), "foo.png");
+            byte[] bytes = os.toByteArray();
+            HttpPost post = new HttpPost(url);
             HttpEntity entity = MultipartEntityBuilder
                     .create()
-                    .setCharset(StandardCharsets.UTF_8)
-                    .addPart("upload", fileBody)
+                    .addBinaryBody("upload",os.toByteArray(),ContentType.DEFAULT_BINARY,path.get())
                     .build();
-
             post.setEntity(entity);
 
-            post.addHeader("Content-Type", "multipart/form-data");
-
-            HttpResponse response = client.execute(post);
-
-            if (response.getStatusLine().getStatusCode() != 200) {
-                System.out.println(response.getStatusLine().getStatusCode());
+            HttpResponse response = httpClient.execute(post);
+            int code = response.getStatusLine().getStatusCode();
+            String result = EntityUtils.toString(response.getEntity());
+            if (code != 200) {
                 throw new UploadException(OSChinaExceptionType.UPLOAD_FAILED);
             }
-            String result = EntityUtils.toString(response.getEntity());
-            System.out.println(result);
             OSChinaUploadResult oschinaRequstResult = new ObjectMapper().readValue(result, OSChinaUploadResult.class);
             return oschinaRequstResult.getUrl();
         } catch (Exception e) {
@@ -100,7 +101,7 @@ public class OSChinaImageStore extends AbstractConfigImageStore {
             if (e instanceof UploadException) {
                 exceptionType = ((UploadException) e).getExceptionType();
             }
-            SimpleStringProperty path = new SimpleStringProperty(UUID.randomUUID().toString().concat(".png"));
+
             configuration.getUniqueBean(ImageStoreResultHandler.class).add(ImageStoreResult
                     .builder()
                     .image(new SimpleObjectProperty<>(image))
@@ -112,6 +113,7 @@ public class OSChinaImageStore extends AbstractConfigImageStore {
                     .build());
             return path.get();
         }
+
     }
 
     public String loadUrl(String id) {
@@ -121,7 +123,10 @@ public class OSChinaImageStore extends AbstractConfigImageStore {
     @Override
     public boolean canUse() {
         OSChainPersistence persistence = configuration.getPersistence(OSChainPersistence.class);
-        return StringUtils.isNotEmpty(persistence.getBlogId());
+        return StringUtils.isNotEmpty(persistence.getUid());
     }
 
+//    public void Test(){
+//        Document document=new HTMLDocument()
+//    }
 }

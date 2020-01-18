@@ -40,6 +40,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.Window;
 
 import java.awt.image.BufferedImage;
 import java.net.URL;
@@ -346,7 +347,7 @@ public class CanvasCutTrayView implements Initializable {
                     public Boolean apply(ButtonType buttonType) {
                         if (upload.equals(buttonType)) {
                             // 上传
-                            toUpload(stage, scene, rectangle);
+                            toUpload(stage,body.getScene().getWindow(), scene, rectangle);
                         } else if (change.equals(buttonType)) {
                             // 变更设置
                             showConfig();
@@ -361,13 +362,13 @@ public class CanvasCutTrayView implements Initializable {
 
     }
 
-    public void toUpload(Stage stage, Scene scene, Rectangle rectangle) {
+    public void toUpload(Stage stage, Window window, Scene scene, Rectangle rectangle) {
         ScreenshotsProcess screenshotsProcess = configuration.getUniqueBean(ScreenshotsProcess.class);
         if (canvasProperties == null) {
             return;
         }
         try {
-            screenshotsProcess.done(screenshotsProcess.snapshot(scene, rectangle));
+            screenshotsProcess.done(window, screenshotsProcess.snapshot(scene, rectangle));
         } finally {
             stage.close();
         }

@@ -16,7 +16,6 @@ import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
 import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallbackRegistryManager;
 import cn.jpanda.screenshot.oss.store.img.ImageStore;
 import cn.jpanda.screenshot.oss.store.img.ImageStoreRegisterManager;
-import cn.jpanda.screenshot.oss.store.img.NoImageStoreConfig;
 import cn.jpanda.screenshot.oss.view.fail.FailListView;
 import cn.jpanda.screenshot.oss.view.password.modify.ModifyPassword;
 import javafx.application.Platform;
@@ -33,7 +32,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
@@ -340,8 +338,8 @@ public class IndexCutView implements Initializable {
                     return;
                 }
                 // 判断是否有对应的配置界面，决定是否展示配置按钮
-                Class<? extends Initializable> conf = imageStoreRegisterManager.getConfig((String) newValue);
-                storeEdit.disableProperty().setValue((conf == null || conf.equals(NoImageStoreConfig.class)));
+
+                storeEdit.disableProperty().setValue(!imageStoreRegisterManager.canConfig((String) newValue));
                 ImageType type = imageStoreRegisterManager.getType((String) newValue);
                 List<String> cls;
                 switch (type) {
@@ -376,7 +374,7 @@ public class IndexCutView implements Initializable {
         imageSave.getItems().addAll(imageStoreRegisterManager.getNames());
         imageSave.getSelectionModel().select(globalConfigPersistence.getImageStore());
         // 判断是否有对应的配置界面，决定是否展示配置按钮
-        storeEdit.visibleProperty().setValue(imageStoreRegisterManager.getConfig(globalConfigPersistence.getImageStore()) != null);
+        storeEdit.visibleProperty().setValue(imageStoreRegisterManager.canConfig(globalConfigPersistence.getImageStore()));
 
     }
 
@@ -522,7 +520,7 @@ public class IndexCutView implements Initializable {
                 .setHeader("确认关闭吗？")
                 .setContent(b)
                 .bindParent(window)
-                .addButtonClass(back,"button-light")
+                .addButtonClass(back, "button-light")
                 .buttonTypes(back, ok)
                 .showAndWait().orElse(back))) {
             if (group.getSelectedToggle().getUserData().equals("close")) {

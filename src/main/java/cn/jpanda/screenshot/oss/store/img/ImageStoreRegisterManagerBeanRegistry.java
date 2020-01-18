@@ -5,6 +5,7 @@ import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.Component;
 import cn.jpanda.screenshot.oss.core.annotations.ImgStore;
 import cn.jpanda.screenshot.oss.core.toolkit.BeanInstance;
+import cn.jpanda.screenshot.oss.store.ImageStoreConfigBuilder;
 
 @Component
 public class ImageStoreRegisterManagerBeanRegistry implements BeanRegistry {
@@ -29,6 +30,7 @@ public class ImageStoreRegisterManagerBeanRegistry implements BeanRegistry {
             if (imgStore != null) {
                 imageStoreRegisterManager.registry(imgStore, beanInstance.instance(c));
             }
+
         }
     }
 }

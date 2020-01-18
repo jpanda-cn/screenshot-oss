@@ -42,6 +42,7 @@ public class AliOssImageStore extends AbstractConfigImageStore {
     @Override
     @SneakyThrows
     public String store(BufferedImage image) {
+        System.out.println(NAME);
         AliOssPersistence aliOssPersistence = configuration.getPersistence(AliOssPersistence.class);
         String name = fileNameGenerator();
         if (aliOssPersistence.isAsync()) {

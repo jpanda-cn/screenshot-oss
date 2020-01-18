@@ -1,9 +1,11 @@
 package cn.jpanda.screenshot.oss.store.img;
 
 import cn.jpanda.screenshot.oss.common.enums.ImageType;
-import cn.jpanda.screenshot.oss.core.log.Log;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.ImgStore;
+import cn.jpanda.screenshot.oss.core.log.Log;
+import cn.jpanda.screenshot.oss.store.ImageStoreConfigBuilder;
+import cn.jpanda.screenshot.oss.store.NoImageStoreConfigBuilder;
 import javafx.fxml.Initializable;
 
 import java.util.ArrayList;
@@ -31,7 +33,10 @@ public class ImageStoreRegisterManager {
      * 渠道以及配置面板的关系
      */
     private Map<String, Class<? extends Initializable>> configs = new HashMap<>();
+    private Map<String, Class<? extends ImageStoreConfigBuilder>> builders = new HashMap<>();
     private Map<String, ImageType> name2type = new HashMap<>();
+
+    private Map<String, Boolean> canConfig = new HashMap<>();
 
     /**
      * 获取所有渠道名称
@@ -52,7 +57,18 @@ public class ImageStoreRegisterManager {
         List<String> names = typeMap.computeIfAbsent(type, k -> new ArrayList<>());
         names.add(name);
         Class<? extends Initializable> config = imgStore.config();
-        configs.put(name, config);
+        boolean can = false;
+        if (!NoImageStoreConfig.class.equals(config)) {
+            configs.put(name, config);
+            can = true;
+        }
+        if (!imgStore.builder().equals(NoImageStoreConfigBuilder.class)) {
+            builders.put(name, imgStore.builder());
+            ImageStoreConfigBuilder builder = configuration.createBeanInstance(ImageStoreConfigBuilder.class).instance(imgStore.builder());
+            configuration.registryUniqueBean(imgStore.builder(), builder);
+            can = true;
+        }
+        canConfig.put(name, can);
         name2type.put(name, type);
     }
 
@@ -64,8 +80,16 @@ public class ImageStoreRegisterManager {
         return configs.get(name);
     }
 
+    public Class<? extends ImageStoreConfigBuilder> getBuilder(String name) {
+        return builders.get(name);
+    }
+
     public List<String> getNamesByType(ImageType imageType) {
         return typeMap.getOrDefault(imageType, new ArrayList<>());
+    }
+
+    public boolean canConfig(String name) {
+        return canConfig.getOrDefault(name, false);
     }
 
     public ImageType getType(String name) {

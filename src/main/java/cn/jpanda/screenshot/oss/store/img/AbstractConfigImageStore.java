@@ -3,15 +3,12 @@ package cn.jpanda.screenshot.oss.store.img;
 import cn.jpanda.screenshot.oss.common.toolkit.Callable;
 import cn.jpanda.screenshot.oss.common.toolkit.PopDialog;
 import cn.jpanda.screenshot.oss.core.Configuration;
-import cn.jpanda.screenshot.oss.store.ExceptionType;
-import cn.jpanda.screenshot.oss.store.ExceptionWrapper;
-import cn.jpanda.screenshot.oss.store.ImageStoreResult;
-import cn.jpanda.screenshot.oss.store.ImageStoreResultHandler;
+import cn.jpanda.screenshot.oss.store.*;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
+import javafx.scene.Parent;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
@@ -35,11 +32,19 @@ public abstract class AbstractConfigImageStore implements ImageStore {
             stage = configuration.getViewContext().getStage();
         }
         // 获取当前选择的图片存储方式
-        Class<? extends Initializable> config = imageStoreRegisterManager.getConfig(getName());
-        if (config == null) {
+        if (!imageStoreRegisterManager.canConfig(getName())) {
             return;
         }
-        Scene scene = configuration.getViewContext().getScene(config);
+
+        Class<? extends ImageStoreConfigBuilder> builder = imageStoreRegisterManager.getBuilder(getName());
+        Parent parent = null;
+        if (builder != null) {
+            parent = configuration.getUniqueBean(builder).load();
+        }
+        if (parent == null) {
+            Class<? extends Initializable> config = imageStoreRegisterManager.getConfig(getName());
+            parent = configuration.getViewContext().getScene(config).getRoot();
+        }
 
         HBox header = new HBox();
         Label main = new Label(getName());
@@ -48,7 +53,7 @@ public abstract class AbstractConfigImageStore implements ImageStore {
         Callable<Boolean, ButtonType> callable = configuration.getUniquePropertiesHolder(Callable.class.getCanonicalName() + "-" + getName());
         PopDialog.create()
                 .setHeader(header)
-                .setContent(scene.getRoot())
+                .setContent(parent)
                 .bindParent(stage)
                 .buttonTypes(ButtonType.CANCEL, ButtonType.APPLY)
                 .callback(callable).showAndWait();

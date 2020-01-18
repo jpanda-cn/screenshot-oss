@@ -1,5 +1,8 @@
 package cn.jpanda.screenshot.oss.common.toolkit;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 /**
  * 回调方法
  *
@@ -9,5 +12,5 @@ package cn.jpanda.screenshot.oss.common.toolkit;
  */
 @FunctionalInterface
 public interface Callable<R, P> {
-    R apply(P p);
+    R apply(P p) throws URISyntaxException, IOException;
 }

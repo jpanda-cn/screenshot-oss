@@ -50,7 +50,7 @@ public class OSChinaFileImageStoreConfig implements Initializable {
             PopDialogShower.message("请输入文章ID", blogId.getScene().getWindow());
             return false;
         }
-        persistence.setBlogId(id);
+        persistence.setUid(id);
         configuration.storePersistence(persistence);
         return true;
     }

@@ -1,6 +1,8 @@
 package cn.jpanda.screenshot.oss.core.annotations;
 
 import cn.jpanda.screenshot.oss.common.enums.ImageType;
+import cn.jpanda.screenshot.oss.store.ImageStoreConfigBuilder;
+import cn.jpanda.screenshot.oss.store.NoImageStoreConfigBuilder;
 import cn.jpanda.screenshot.oss.store.img.NoImageStoreConfig;
 import javafx.fxml.Initializable;
 
@@ -29,4 +31,8 @@ public @interface ImgStore {
     Class<? extends Initializable> config() default NoImageStoreConfig.class;
 
 
+    /**
+     * 对应的配置界面构建器
+     */
+    Class<? extends ImageStoreConfigBuilder> builder() default NoImageStoreConfigBuilder.class;
 }
