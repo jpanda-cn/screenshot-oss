@@ -8,8 +8,8 @@ import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
 import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallbackRegistryManager;
 import cn.jpanda.screenshot.oss.store.img.ImageStore;
 import cn.jpanda.screenshot.oss.store.img.ImageStoreRegisterManager;
-import cn.jpanda.screenshot.oss.store.img.NoImageStoreConfig;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -99,6 +99,12 @@ public class SettingsView implements Initializable {
                     globalConfigPersistence.setClipboardCallback((String) clipboard.getItems().get(0));
                 }
                 configuration.storePersistence(globalConfigPersistence);
+                SimpleStringProperty cliProperty=configuration.getUniquePropertiesHolder(GlobalConfigPersistence.class.getCanonicalName()+"-"+"clipboard-save");
+                cliProperty.set(globalConfigPersistence.getClipboardCallback());
+
+                SimpleStringProperty imageProperty=configuration.getUniquePropertiesHolder(GlobalConfigPersistence.class.getCanonicalName()+"-"+"image-save");
+                imageProperty.set(globalConfigPersistence.getImageStore());
+
             }
         });
 
@@ -145,6 +151,11 @@ public class SettingsView implements Initializable {
                         globalConfigPersistence.setImageStore((String) imageSave.getItems().get(0));
                     }
                     configuration.storePersistence(globalConfigPersistence);
+                    SimpleStringProperty cliProperty=configuration.getUniquePropertiesHolder(GlobalConfigPersistence.class.getCanonicalName()+"-"+"clipboard-save");
+                    cliProperty.set(globalConfigPersistence.getClipboardCallback());
+
+                    SimpleStringProperty imageProperty=configuration.getUniquePropertiesHolder(GlobalConfigPersistence.class.getCanonicalName()+"-"+"image-save");
+                    imageProperty.set(globalConfigPersistence.getImageStore());
                 }
             }
         });

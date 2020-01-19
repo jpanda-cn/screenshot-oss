@@ -38,12 +38,17 @@ public abstract class AbstractConfigImageStore implements ImageStore {
 
         Class<? extends ImageStoreConfigBuilder> builder = imageStoreRegisterManager.getBuilder(getName());
         Parent parent = null;
+        PopDialog config=null;
         if (builder != null) {
-            parent = configuration.getUniqueBean(builder).load();
+            ImageStoreConfigBuilder imageStoreConfigBuilderu=configuration.getUniqueBean(builder);
+            parent = imageStoreConfigBuilderu.config();
+            if (!imageStoreConfigBuilderu.tips(stage)){
+                return;
+            }
         }
         if (parent == null) {
-            Class<? extends Initializable> config = imageStoreRegisterManager.getConfig(getName());
-            parent = configuration.getViewContext().getScene(config).getRoot();
+            Class<? extends Initializable> cf = imageStoreRegisterManager.getConfig(getName());
+            parent = configuration.getViewContext().getScene(cf).getRoot();
         }
 
         HBox header = new HBox();
@@ -51,6 +56,7 @@ public abstract class AbstractConfigImageStore implements ImageStore {
         main.setStyle(" -fx-underline: true;-fx-font-weight: bold;");
         header.getChildren().addAll(main);
         Callable<Boolean, ButtonType> callable = configuration.getUniquePropertiesHolder(Callable.class.getCanonicalName() + "-" + getName());
+        Parent p=stage.getScene().getRoot();
         PopDialog.create()
                 .setHeader(header)
                 .setContent(parent)

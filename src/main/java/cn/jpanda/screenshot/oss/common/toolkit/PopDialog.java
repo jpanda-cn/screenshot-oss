@@ -1,5 +1,9 @@
 package cn.jpanda.screenshot.oss.common.toolkit;
 
+import cn.jpanda.screenshot.oss.core.Configuration;
+import cn.jpanda.screenshot.oss.core.ConfigurationHolder;
+import cn.jpanda.screenshot.oss.core.capture.JPandaScreenCapture;
+import cn.jpanda.screenshot.oss.core.capture.ScreenCapture;
 import javafx.animation.*;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -19,6 +23,7 @@ import javafx.util.Duration;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -51,7 +56,7 @@ public class PopDialog extends Dialog<ButtonType> {
      * 按钮样式
      */
     private ObjectProperty<Map<ButtonType, String>> buttonStyleClassProperty = new SimpleObjectProperty<>(new HashMap<>());
-
+    private  ScreenCapture screenCapture;
     {
         buttonStyleClassProperty.get().put(ButtonType.APPLY, "button-apply");
         buttonStyleClassProperty.get().put(ButtonType.CANCEL, "button-cancel");
@@ -74,6 +79,7 @@ public class PopDialog extends Dialog<ButtonType> {
     }
 
     private PopDialog() {
+        loadScreenCapture();
         init();
     }
 
@@ -219,6 +225,21 @@ public class PopDialog extends Dialog<ButtonType> {
            initOwner(parent);
            // 显示在中间
            if (disableParent) {
+               ChangeListener<Number> bindParent=new ChangeListener<Number>() {
+                   @Override
+                   public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                       double x=parent.getX()+((parent.getWidth()-getWidth())/2);
+                       double y=parent.getY()+((parent.getHeight()-getHeight())/2);
+                       updateX(x,getWidth());
+                       updateY(y,getHeight());
+                   }
+               };
+               parent.widthProperty().addListener(bindParent);
+               parent.heightProperty().addListener(bindParent);
+               parent.xProperty().addListener(bindParent);
+               parent.yProperty().addListener(bindParent);
+               widthProperty().addListener(bindParent);
+               heightProperty().addListener(bindParent);
                showingProperty().addListener((observable, oldValue, newValue) -> {
                    parent.getScene().getRoot().disableProperty().set(newValue);
                });
@@ -233,15 +254,19 @@ public class PopDialog extends Dialog<ButtonType> {
         node.boundsInLocalProperty().addListener(new ChangeListener<Bounds>() {
             @Override
             public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
-                setX(newValue.getMinX() + ((newValue.getWidth() - getWidth()) / 2));
-                setY(newValue.getMinY() + ((newValue.getHeight() - getHeight()) / 2));
+                double x=newValue.getMinX() + ((newValue.getWidth() - getWidth()) / 2);
+                double y=newValue.getMinY() + ((newValue.getHeight() - getHeight()) / 2);
+                updateX(x,getWidth());
+                updateY(y,getHeight());
             }
         });
 
         showingProperty().addListener((observable, oldValue, newValue) -> {
             Bounds bounds = node.getBoundsInLocal();
-            setX(bounds.getMinX() + ((bounds.getWidth() - getWidth()) / 2));
-            setY(bounds.getMinY() + ((bounds.getHeight() - getHeight()) / 2));
+            double x=bounds.getMinX() + ((bounds.getWidth() - getWidth()) / 2);
+            double y=bounds.getMinY() + ((bounds.getHeight() - getHeight()) / 2);
+            updateX(x,getWidth());
+            updateY(y,getHeight());
         });
         return this;
     }
@@ -251,4 +276,37 @@ public class PopDialog extends Dialog<ButtonType> {
         return this;
     }
 
+    protected void loadScreenCapture(){
+        Configuration configuration=ConfigurationHolder.getInstance().getConfiguration();
+        if (configuration!=null){
+            screenCapture=configuration.getUniqueBean(ScreenCapture.class);
+        }
+        if (screenCapture==null){
+            screenCapture=new JPandaScreenCapture();
+        }
+    }
+    public void  updateX(final double x,final double w){
+        double[] xa=new double[]{x};
+        if (xa[0]<screenCapture.minx()){
+            xa[0]=screenCapture.minx();
+        }
+        screenCapture.screens().stream().max(Comparator.comparingDouble(s -> s.getBounds().getMaxX())).ifPresent(s->{
+            if (xa[0]>s.getBounds().getMaxX()-w){
+                xa[0]=s.getBounds().getMaxX()-w;
+            }
+        });
+        setX(xa[0]);
+    }
+    public void updateY(final double y,final double h){
+        double[] ya=new double[]{y};
+        if (ya[0]<screenCapture.miny()){
+            ya[0]=screenCapture.miny();
+        }
+        screenCapture.screens().stream().max(Comparator.comparingDouble(s -> s.getBounds().getMaxY())).ifPresent(s->{
+            if (ya[0]>s.getBounds().getMaxY()-h){
+                ya[0]=s.getBounds().getMaxY()-h;
+            }
+        });
+        setY(ya[0]);
+    }
 }

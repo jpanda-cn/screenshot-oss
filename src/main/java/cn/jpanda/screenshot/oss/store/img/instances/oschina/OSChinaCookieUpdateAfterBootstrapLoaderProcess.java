@@ -73,7 +73,7 @@ public class OSChinaCookieUpdateAfterBootstrapLoaderProcess implements AfterBoot
                 }
             }
         };
-       Timer timer=new Timer();
+       Timer timer=new Timer("OS China cookie Refresh Task",true);
         updateCookie.addListener((observable, oldValue, newValue) -> {
             if (newValue){
                 log.debug("refresh cookie  task is started ...");

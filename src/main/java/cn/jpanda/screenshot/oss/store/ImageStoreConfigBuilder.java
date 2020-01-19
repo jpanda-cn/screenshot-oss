@@ -1,6 +1,9 @@
 package cn.jpanda.screenshot.oss.store;
 
+import cn.jpanda.screenshot.oss.common.toolkit.PopDialog;
 import javafx.scene.Parent;
+import javafx.scene.control.Dialog;
+import javafx.stage.Window;
 
 /**
  * @author HanQi [Jpanda@aliyun.com]
@@ -10,6 +13,7 @@ import javafx.scene.Parent;
 
 public interface ImageStoreConfigBuilder {
 
-    Parent load();
+    default boolean   tips(Window stage){return true;}
+    Parent config();
 
 }

@@ -1,6 +1,7 @@
 package cn.jpanda.screenshot.oss.store.img.instances.oschina;
 
 import cn.jpanda.screenshot.oss.common.toolkit.Callable;
+import cn.jpanda.screenshot.oss.common.toolkit.PopDialog;
 import cn.jpanda.screenshot.oss.common.toolkit.PopDialogShower;
 import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.Configuration;
@@ -12,15 +13,18 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import javafx.stage.Window;
 import lombok.SneakyThrows;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -48,8 +52,39 @@ public class OSChinaImageStoreBuilder implements ImageStoreConfigBuilder {
     }
 
     @Override
-    public Parent load() {
+    public boolean tips(Window stage) {
+        Label step=new Label("STEP1:  点击右下角的下一步按钮，将会打开一个浏览器窗口");
+        Label step2=new Label("STEP2:  在浏览器中登录【OSCHINA】，并保持页面在【OSCHINA】站点内");
+        Label step3=new Label("STEP3:  点击右下角【应用】按钮即可完成登录操作");
+        VBox box=new VBox(step,step2,step3);
+        box.styleProperty().setValue("-fx-alignment:center-LEFT");
+        box.alignmentProperty().set(Pos.TOP_LEFT);
+        PopDialog.create()
+                .setHeader("使用说明")
+                .setContent(box)
+                .bindParent(stage)
+                .buttonTypes(new ButtonType("下一步"))
+                .showAndWait();
+        return true;
+    }
+
+    @Override
+    public Parent config() {
+
+        Parent parent=createContent();
+
         return createContent();
+//        Label step=new Label("STEP1:点击右下角的下一步按钮，将会打开一个浏览器窗口");
+//        Label step2=new Label("STEP2：在浏览器中登录【OSCHINA】，并保持页面在【OSCHINA】站点内");
+//        Label step3=new Label("STEP3:点击右下角【应用】按钮即可完成登录操作");
+//        VBox box=new VBox(step,step2,step3);
+//        box.styleProperty().setValue("-fx-alignment:center-LEFT");
+//        box.alignmentProperty().set(Pos.TOP_LEFT);
+//
+//        box.setPrefWidth(1366);
+//        box.setPrefHeight(768);
+
+
     }
 
     @SneakyThrows
@@ -91,7 +126,7 @@ public class OSChinaImageStoreBuilder implements ImageStoreConfigBuilder {
             String cookie = getCookie();
             if (StringUtils.isEmpty(uid)) {
                 // 无法获取用户ID
-                PopDialogShower.message("无法获取用户登录信息，请确认是否登录，如确定已登录，该问题可能是因为版本变更导致，请联系开发人员", webView.getScene().getWindow());
+                PopDialogShower.message("无法获取用户登录信息，请确认是否已登录，且停留在OSCHINA网站内，否则，该问题可能是因为版本变更导致，请联系开发人员", webView.getScene().getWindow());
                 return false;
             }
             if (StringUtils.isEmpty(cookie)) {

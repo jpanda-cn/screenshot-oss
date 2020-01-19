@@ -2,8 +2,15 @@ package cn.jpanda.screenshot.oss.common.toolkit;
 
 import cn.jpanda.screenshot.oss.common.utils.MathUtils;
 import cn.jpanda.screenshot.oss.common.utils.StringUtils;
+import cn.jpanda.screenshot.oss.core.Configuration;
+import cn.jpanda.screenshot.oss.core.ConfigurationHolder;
+import cn.jpanda.screenshot.oss.core.ScreenshotsProcess;
+import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
+import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
+import cn.jpanda.screenshot.oss.view.main.SettingsView;
 import cn.jpanda.screenshot.oss.view.tray.subs.ResizeEventHandler;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -28,17 +35,16 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Font;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
+import javafx.stage.*;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
 import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 /**
@@ -115,10 +121,10 @@ public class ImageShower extends Stage {
     public void init() {
         top = buildTop();
         body = new AnchorPane();
-        body.styleProperty().set(" -fx-background-color: rgba(0,0,0,0.7);");
+        body.styleProperty().set(" -fx-background-color: rgba(234,123,123,0.7);");
         box = new VBox(top, body);
         box.styleProperty().set(" -fx-background-color: transparent;");
-        top.maxWidthProperty().bind(body.widthProperty());
+        top.prefWidthProperty().bind(body.widthProperty());
         top.addEventHandler(MouseEvent.ANY, addDrag(top));
         rect = new Rectangle();
 
@@ -136,7 +142,7 @@ public class ImageShower extends Stage {
             if (oldValue.intValue() == 0) {
                 return;
             }
-            rect.widthProperty().set(rect.widthProperty().add(newValue.doubleValue() - oldValue.doubleValue()).getValue());
+            rect.widthProperty().set(newValue.doubleValue()-((rect.strokeWidthProperty().multiply(2)).get()));
         });
 
         body.heightProperty().addListener((observable, oldValue, newValue) -> {
@@ -152,6 +158,54 @@ public class ImageShower extends Stage {
         rect.addEventHandler(MouseEvent.ANY, stageHandler(rect, resize, drag));
 
         ContextMenu contextMenu = new ContextMenu();
+        MenuItem close=new MenuItem("关闭");
+        MenuItem onTop=new MenuItem("置顶");
+        alwaysOnTopProperty().addListener((observable, oldValue, newValue) -> onTop.setText(newValue?"取消置顶":"置顶"));
+        onTop.setOnAction(e->setAlwaysOnTop(alwaysOnTopProperty().not().getValue()));
+
+        close.setOnAction(e->doDelete(body));
+        MenuItem hideTop = new MenuItem("隐藏标题");
+
+        MenuItem hideBorder = new MenuItem("隐藏边框");
+        AtomicBoolean isHide= new AtomicBoolean(true);
+        hideTop.setOnAction(e->{
+            if(isHide.get()){
+                hideTop.setUserData(top.heightProperty().getValue());
+                top.visibleProperty().setValue(false);
+                top.setPrefHeight(0);
+                hideTop.setText("显示标题");
+                isHide.set(false);
+                return;
+            }
+            top.visibleProperty().setValue(true);
+            top.setPrefHeight((Double) hideTop.getUserData());
+            isHide.set(true);
+            hideTop.setText("隐藏标题");
+        });
+        AtomicBoolean isHideBorder= new AtomicBoolean(true);
+        hideBorder.setOnAction(e->{
+            if (isHideBorder.get()){
+                double w=rect.strokeWidthProperty().getValue();
+                hideBorder.setUserData(w);
+                rect.layoutXProperty().set(0);
+                rect.layoutYProperty().set(0);
+                this.setWidth(getWidth()-w*2);
+                this.setHeight(getHeight()-w*2);
+                rect.strokeWidthProperty().set(0);
+                isHideBorder.set(false);
+                hideBorder.setText("展示边框");
+                return;
+            }
+            rect.strokeWidthProperty().set((Double) hideBorder.getUserData());
+            double w=rect.strokeWidthProperty().getValue();
+            rect.layoutXProperty().set(w);
+            rect.layoutYProperty().set(w);
+            this.setWidth(getWidth()+w*2);
+            this.setHeight(getHeight()+w*2);
+            isHideBorder.set(true);
+            hideBorder.setText("隐藏边框");
+        });
+
         MenuItem saveOther = new MenuItem("图像另存为");
         MenuItem sceneSaveOther = new MenuItem("窗口图像另存为");
 
@@ -169,7 +223,16 @@ public class ImageShower extends Stage {
         copyFullItem.setOnAction((e) -> {
             saveAndShowTips(this.getScene().snapshot(null), "窗口已复制", rect);
         });
-        contextMenu.getItems().addAll(saveOther, sceneSaveOther, copyItem, copyFullItem);
+
+        MenuItem cImageToUpload = new MenuItem("上传当前图片到云环境");
+        MenuItem cFrameToUpload = new MenuItem("上传当前窗口快照到云环境");
+        cImageToUpload.setOnAction((e) -> {
+            doSave(image);
+        });
+        cFrameToUpload.setOnAction((e) -> {
+            doSave(this.getScene().snapshot(null));
+        });
+        contextMenu.getItems().addAll(close,onTop,hideTop,hideBorder,saveOther, sceneSaveOther, copyItem, copyFullItem,cImageToUpload,cFrameToUpload);
 
         body.addEventHandler(MouseEvent.MOUSE_CLICKED, (e) -> {
             if (e.getButton().equals(MouseButton.SECONDARY)) {
@@ -284,38 +347,7 @@ public class ImageShower extends Stage {
 
 
         close.setOnMouseClicked(event -> {
-            AnchorPane center = new AnchorPane();
-            Label label = new Label("确认删除吗？");
-            label.setFont(Font.font(11));
-            center.getChildren().addAll(label);
-            Tooltip tooltip = new Tooltip();
-            VBox box = new VBox();
-            box.getStylesheets().add(stylesheets.get());
-            box.setSpacing(10);
-            box.getChildren().add(center);
-            Button ok = new Button("确认");
-            ok.fontProperty().set(Font.font(11));
-            ok.getStyleClass().addAll("tool-tip-ok");
-
-            Button cancel = new Button("取消");
-            cancel.fontProperty().set(Font.font(11));
-            cancel.getStyleClass().addAll("tool-tip-cancel");
-            ok.setOnMouseClicked((e) -> {
-                close();
-            });
-            cancel.setOnMouseClicked((e) -> {
-                tooltip.hide();
-            });
-
-
-            HBox h = new HBox();
-            h.setAlignment(Pos.CENTER_RIGHT);
-            h.getChildren().addAll(ok, cancel);
-            box.getChildren().addAll(h);
-
-            tooltip.setGraphic(box);
-            this.box.disableProperty().bind(tooltip.showingProperty());
-            tooltip.show(close, this.getX() + this.getWidth(), this.getY());
+          doDelete(close);
 
         });
         HBox.setHgrow(topTitle, Priority.ALWAYS);
@@ -323,6 +355,40 @@ public class ImageShower extends Stage {
         return top;
     }
 
+    public void doDelete(Node node){
+        AnchorPane center = new AnchorPane();
+        Label label = new Label("确认删除吗？");
+        label.setFont(Font.font(11));
+        center.getChildren().addAll(label);
+        Tooltip tooltip = new Tooltip();
+        VBox box = new VBox();
+        box.getStylesheets().add(stylesheets.get());
+        box.setSpacing(10);
+        box.getChildren().add(center);
+        Button ok = new Button("确认");
+        ok.fontProperty().set(Font.font(11));
+        ok.getStyleClass().addAll("tool-tip-ok");
+
+        Button cancel = new Button("取消");
+        cancel.fontProperty().set(Font.font(11));
+        cancel.getStyleClass().addAll("tool-tip-cancel");
+        ok.setOnMouseClicked((e) -> {
+            close();
+        });
+        cancel.setOnMouseClicked((e) -> {
+            tooltip.hide();
+        });
+
+
+        HBox h = new HBox();
+        h.setAlignment(Pos.CENTER_RIGHT);
+        h.getChildren().addAll(ok, cancel);
+        box.getChildren().addAll(h);
+
+        tooltip.setGraphic(box);
+        this.box.disableProperty().bind(tooltip.showingProperty());
+        tooltip.show(node, this.getX() + this.getWidth(), this.getY());
+    }
 
     public EventHandler<MouseEvent> addDrag(Node node) {
 
@@ -372,15 +438,20 @@ public class ImageShower extends Stage {
         btn.setLayoutX(0);
         btn.setLayoutY(0);
         btn.getStyleClass().add("drawing-pin");
+        alwaysOnTopProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if (newValue){
+                    btn.setGraphic(checkedSvg);
+                }else {
+                    btn.setGraphic(svg);
+                }
+            }
+        });
         btn.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 setAlwaysOnTop(!alwaysOnTopProperty().getValue());
-                if (alwaysOnTopProperty().getValue()) {
-                    btn.setGraphic(checkedSvg);
-                } else {
-                    btn.setGraphic(svg);
-                }
             }
         });
 
@@ -455,5 +526,79 @@ public class ImageShower extends Stage {
                 }
             }
         };
+    }
+
+    public void doSave(Image image) {
+        Configuration configuration= ConfigurationHolder.getInstance().getConfiguration();
+        if (configuration==null){
+            return;
+        }
+        // 执行销毁操作
+        DestroyGroupBeanHolder destroyGroupBeanHolder = configuration.getUniqueBean(DestroyGroupBeanHolder.class);
+        destroyGroupBeanHolder.destroy();
+
+        // 提示用户当前采用保存方式
+        GlobalConfigPersistence globalConfigPersistence = configuration.getPersistence(GlobalConfigPersistence.class);
+        String imageStore = globalConfigPersistence.getImageStore();
+        String clipboard = globalConfigPersistence.getClipboardCallback();
+
+        // 弹窗提示，并允许调转到配置窗口
+
+        ButtonType change = new ButtonType("修改", ButtonBar.ButtonData.NEXT_FORWARD);
+        ButtonType upload = new ButtonType("上传", ButtonBar.ButtonData.APPLY);
+
+        VBox body = new VBox();
+        body.setAlignment(Pos.CENTER_LEFT);
+        body.setSpacing(5);
+        Label storeWay = new Label(String.format("存储方式:【%s】", imageStore));
+        Label clipboardContent = new Label(String.format("剪切板内容：【%s】", clipboard));
+
+        SimpleStringProperty imageProperty=configuration.getUniquePropertiesHolder(GlobalConfigPersistence.class.getCanonicalName()+"-"+"image-save");
+        SimpleStringProperty cliProperty=configuration.getUniquePropertiesHolder(GlobalConfigPersistence.class.getCanonicalName()+"-"+"clipboard-save");
+        storeWay.textProperty().bind(Bindings.createStringBinding(() -> String.format("存储方式:【%s】", imageProperty.get()),imageProperty));
+        clipboardContent.textProperty().bind(Bindings.createStringBinding(() -> String.format("剪切板内容：【%s】", cliProperty.get()),cliProperty));
+
+
+        body.getChildren().addAll(storeWay, clipboardContent);
+
+        PopDialog.create()
+                .setHeader("上传图片")
+                .setContent(body)
+                .bindParent(this)
+                .buttonTypes(ButtonType.CANCEL, change, upload)
+                .addButtonClass(change, "button-next")
+                .callback(new Callable<Boolean, ButtonType>() {
+                    @Override
+                    public Boolean apply(ButtonType buttonType) {
+                        if (upload.equals(buttonType)) {
+                            // 上传
+                            toUpload(configuration,body.getScene().getWindow(), SwingFXUtils.fromFXImage(image,null));
+                        } else if (change.equals(buttonType)) {
+                            // 变更设置
+                            showConfig(configuration,body.getScene().getWindow());
+                            return false;
+                        } else if (ButtonType.CANCEL.equals(buttonType)) {
+
+                        }
+                        return true;
+                    }
+                })
+                .show();
+
+    }
+    public void showConfig(Configuration configuration,Window window) {
+        // 截图配置窗口
+        Scene setting = configuration.getViewContext().getScene(SettingsView.class, true, false);
+        PopDialog
+                .create()
+                .setHeader("设置")
+                .setContent(setting.getRoot())
+                .buttonTypes(ButtonType.CLOSE)
+                .bindParent(window)
+                .showAndWait();
+    }
+    public void toUpload(Configuration configuration, Window window, BufferedImage image) {
+        ScreenshotsProcess screenshotsProcess = configuration.getUniqueBean(ScreenshotsProcess.class);
+        screenshotsProcess.done(window, image);
     }
 }

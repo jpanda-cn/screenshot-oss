@@ -19,7 +19,9 @@ import cn.jpanda.screenshot.oss.store.img.ImageStoreRegisterManager;
 import cn.jpanda.screenshot.oss.view.fail.FailListView;
 import cn.jpanda.screenshot.oss.view.password.modify.ModifyPassword;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -375,7 +377,15 @@ public class IndexCutView implements Initializable {
         imageSave.getSelectionModel().select(globalConfigPersistence.getImageStore());
         // 判断是否有对应的配置界面，决定是否展示配置按钮
         storeEdit.visibleProperty().setValue(imageStoreRegisterManager.canConfig(globalConfigPersistence.getImageStore()));
-
+        // 主窗口数据同步，同步保存方式
+        SimpleStringProperty imageSaveProperty=new SimpleStringProperty(globalConfigPersistence.getImageStore());
+        imageSaveProperty.addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                imageSave.getSelectionModel().select(newValue);
+            }
+        });
+        configuration.registryUniquePropertiesHolder(GlobalConfigPersistence.class.getCanonicalName()+"-"+"image-save",imageSaveProperty);
     }
 
     @SuppressWarnings("unchecked")
@@ -420,6 +430,15 @@ public class IndexCutView implements Initializable {
         clipboard.getItems().addAll(clipboardCallbackRegistryManager.getNames());
         clipboard.getSelectionModel().select(globalConfigPersistence.getClipboardCallback());
 
+        // 主窗口数据同步，同步剪切板选项
+        SimpleStringProperty clipboardSaveProperty=new SimpleStringProperty(globalConfigPersistence.getImageStore());
+        clipboardSaveProperty.addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                clipboard.getSelectionModel().select(newValue);
+            }
+        });
+        configuration.registryUniquePropertiesHolder(GlobalConfigPersistence.class.getCanonicalName()+"-"+"clipboard-save",clipboardSaveProperty);
     }
 
 

@@ -38,7 +38,6 @@ public class MonitoringMemoryLogBeanAfterBootstrapLoaderProcess implements After
 
         // 守护线程
         Timer timer = new Timer("Memory Monitoring Task",true);
-
         timer.schedule(timerTask
                 , 1000, 10 * 1000);
     }
