@@ -3,6 +3,7 @@ package cn.jpanda.screenshot.oss.core;
 import cn.jpanda.screenshot.oss.core.capture.ScreenCapture;
 import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
 import cn.jpanda.screenshot.oss.core.log.Log;
+import cn.jpanda.screenshot.oss.core.shotkey.shortcut.*;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
 import cn.jpanda.screenshot.oss.service.handlers.KeyExitStageEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
@@ -10,11 +11,15 @@ import cn.jpanda.screenshot.oss.view.snapshot.SnapshotView;
 import cn.jpanda.screenshot.oss.view.snapshot.WaitRemoveElementsHolder;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
+import javafx.event.EventTarget;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 经典样式的截图实现
@@ -22,11 +27,21 @@ import javafx.stage.StageStyle;
 public class ClassicScreenshot implements Snapshot {
     private Log log;
     private Configuration configuration;
+    /**
+     * 快捷键注册表
+     */
+    private List<ShortCutExecutorHolder> shortCutExecutorHolders = new ArrayList<>();
+    private KeyboardShortcutsManager keyboardShortcutsManager;
+    private ShortcutMatch shortcutMatch;
 
     public ClassicScreenshot(Configuration configuration) {
         this.configuration = configuration;
         this.log = configuration.getLogFactory().getLog(getClass());
+        this.keyboardShortcutsManager = getKeyboardShortcutsManager();
+        this.shortcutMatch = getShortcutMatch();
     }
+
+
 
     @Override
     public synchronized void cut() {
@@ -61,11 +76,26 @@ public class ClassicScreenshot implements Snapshot {
             stage.setY(screenCapture.miny());
             EventHandler<KeyEvent> keyEventEventHandler = new KeyExitStageEventHandler(KeyCode.ESCAPE, stage);
             stage.addEventHandler(KeyEvent.KEY_RELEASED, keyEventEventHandler);
+            addShortCut(stage,ShortCutExecutorHolder
+                    .builder()
+                    .shortcut(Shortcut.Builder.create().addCode(KeyCode.ESCAPE).description("退出截图").build())
+                    .match(shortcutMatch)
+                    .executor(keyEventEventHandler::handle)
+                    .build());
+
+            addShortCut(
+                    stage
+                    ,ShortCutExecutorHolder
+                            .builder()
+                            .shortcut(Shortcut.Builder.create().ctrl(false).alt(false).addCode(KeyCode.SLASH).description("展示快捷键列表").build())
+                            .match(shortcutMatch)
+                            .executor(event -> ShortcutHelperShower.show(shortCutExecutorHolders,stage).show())
+                            .build()
+            );
             stage.toFront();
             stage.setResizable(false);
             stage.setAlwaysOnTop(true);
             stage.showAndWait();
-            stage.removeEventHandler(KeyEvent.KEY_RELEASED, keyEventEventHandler);
             stage.close();
             afterCut(stage);
             configuration.getCutting().set(null);
@@ -88,6 +118,7 @@ public class ClassicScreenshot implements Snapshot {
     protected void afterCut(Stage stage) {
         // 移除需要移除的数据
         // 注意顺序
+        shortCutExecutorHolders.clear();
         CanvasProperties canvasProperties = ((CanvasProperties) stage.getProperties().get(CanvasProperties.class));
 
         if (canvasProperties != null) {
@@ -102,5 +133,16 @@ public class ClassicScreenshot implements Snapshot {
             defaultStage.opacityProperty().set(1);
         }
 
+    }
+    protected KeyboardShortcutsManager getKeyboardShortcutsManager() {
+        return new KeyboardShortcutsManager();
+    }
+
+    protected ShortcutMatch getShortcutMatch() {
+        return new SimpleShortcutMatch();
+    }
+    private void addShortCut(EventTarget target, ShortCutExecutorHolder holder) {
+        keyboardShortcutsManager.registryShortCut(target, holder);
+        shortCutExecutorHolders.add(holder);
     }
 }

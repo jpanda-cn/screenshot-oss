@@ -6,16 +6,24 @@ import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.ConfigurationHolder;
 import cn.jpanda.screenshot.oss.core.ScreenshotsProcess;
 import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
+import cn.jpanda.screenshot.oss.core.shotkey.shortcut.*;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
 import cn.jpanda.screenshot.oss.view.main.SettingsView;
 import cn.jpanda.screenshot.oss.view.tray.subs.ResizeEventHandler;
+import com.sun.javafx.collections.ObservableListWrapper;
+import com.sun.javafx.collections.ObservableSequentialListWrapper;
+import com.sun.javafx.collections.TrackableObservableList;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.EventHandler;
+import javafx.event.EventTarget;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -66,6 +74,15 @@ public class ImageShower extends Stage {
     private Image image;
     private TextField topTitle;
 
+    /**
+     * 快捷键注册表
+     */
+    private List<ShortCutExecutorHolder> shortCutExecutorHolders = new ArrayList<>();
+
+    private KeyboardShortcutsManager keyboardShortcutsManager = getKeyboardShortcutsManager();
+
+    private ShortcutMatch shortcutMatch = getShortcutMatch();
+
     {
         stylesheets.addListener(new ChangeListener<String>() {
             @Override
@@ -79,7 +96,8 @@ public class ImageShower extends Stage {
     }
 
     public ImageShower setTopTitle(String message) {
-        if (StringUtils.isNotEmpty(message)){
+
+        if (StringUtils.isNotEmpty(message)) {
             topTitle.textProperty().set(message);
         }
         return this;
@@ -142,7 +160,7 @@ public class ImageShower extends Stage {
             if (oldValue.intValue() == 0) {
                 return;
             }
-            rect.widthProperty().set(newValue.doubleValue()-((rect.strokeWidthProperty().multiply(2)).get()));
+            rect.widthProperty().set(newValue.doubleValue() - ((rect.strokeWidthProperty().multiply(2)).get()));
         });
 
         body.heightProperty().addListener((observable, oldValue, newValue) -> {
@@ -158,18 +176,18 @@ public class ImageShower extends Stage {
         rect.addEventHandler(MouseEvent.ANY, stageHandler(rect, resize, drag));
 
         ContextMenu contextMenu = new ContextMenu();
-        MenuItem close=new MenuItem("关闭");
-        MenuItem onTop=new MenuItem("置顶");
-        alwaysOnTopProperty().addListener((observable, oldValue, newValue) -> onTop.setText(newValue?"取消置顶":"置顶"));
-        onTop.setOnAction(e->setAlwaysOnTop(alwaysOnTopProperty().not().getValue()));
+        MenuItem close = new MenuItem("关闭");
+        MenuItem onTop = new MenuItem("置顶");
+        alwaysOnTopProperty().addListener((observable, oldValue, newValue) -> onTop.setText(newValue ? "取消置顶" : "置顶"));
+        onTop.setOnAction(e -> setAlwaysOnTop(alwaysOnTopProperty().not().getValue()));
 
-        close.setOnAction(e->doDelete(body));
+        close.setOnAction(e -> doDelete(body));
         MenuItem hideTop = new MenuItem("隐藏标题");
 
         MenuItem hideBorder = new MenuItem("隐藏边框");
-        AtomicBoolean isHide= new AtomicBoolean(true);
-        hideTop.setOnAction(e->{
-            if(isHide.get()){
+        AtomicBoolean isHide = new AtomicBoolean(true);
+        hideTop.setOnAction(e -> {
+            if (isHide.get()) {
                 hideTop.setUserData(top.heightProperty().getValue());
                 top.visibleProperty().setValue(false);
                 top.setPrefHeight(0);
@@ -182,26 +200,26 @@ public class ImageShower extends Stage {
             isHide.set(true);
             hideTop.setText("隐藏标题");
         });
-        AtomicBoolean isHideBorder= new AtomicBoolean(true);
-        hideBorder.setOnAction(e->{
-            if (isHideBorder.get()){
-                double w=rect.strokeWidthProperty().getValue();
+        AtomicBoolean isHideBorder = new AtomicBoolean(true);
+        hideBorder.setOnAction(e -> {
+            if (isHideBorder.get()) {
+                double w = rect.strokeWidthProperty().getValue();
                 hideBorder.setUserData(w);
                 rect.layoutXProperty().set(0);
                 rect.layoutYProperty().set(0);
-                this.setWidth(getWidth()-w*2);
-                this.setHeight(getHeight()-w*2);
+                this.setWidth(getWidth() - w * 2);
+                this.setHeight(getHeight() - w * 2);
                 rect.strokeWidthProperty().set(0);
                 isHideBorder.set(false);
                 hideBorder.setText("展示边框");
                 return;
             }
             rect.strokeWidthProperty().set((Double) hideBorder.getUserData());
-            double w=rect.strokeWidthProperty().getValue();
+            double w = rect.strokeWidthProperty().getValue();
             rect.layoutXProperty().set(w);
             rect.layoutYProperty().set(w);
-            this.setWidth(getWidth()+w*2);
-            this.setHeight(getHeight()+w*2);
+            this.setWidth(getWidth() + w * 2);
+            this.setHeight(getHeight() + w * 2);
             isHideBorder.set(true);
             hideBorder.setText("隐藏边框");
         });
@@ -232,30 +250,62 @@ public class ImageShower extends Stage {
         cFrameToUpload.setOnAction((e) -> {
             doSave(this.getScene().snapshot(null));
         });
-        contextMenu.getItems().addAll(close,onTop,hideTop,hideBorder,saveOther, sceneSaveOther, copyItem, copyFullItem,cImageToUpload,cFrameToUpload);
+        contextMenu.getItems().addAll(close, onTop, hideTop, hideBorder, saveOther, sceneSaveOther, copyItem, copyFullItem, cImageToUpload, cFrameToUpload);
 
         body.addEventHandler(MouseEvent.MOUSE_CLICKED, (e) -> {
             if (e.getButton().equals(MouseButton.SECONDARY)) {
                 contextMenu.show(body, e.getScreenX(), e.getScreenY() + 10);
             }
         });
+
         body.addEventHandler(MouseEvent.MOUSE_PRESSED, (e) -> {
             if (contextMenu.showingProperty().getValue()) {
                 contextMenu.hide();
             }
         });
-        box.addEventHandler(KeyEvent.KEY_PRESSED, (e) -> {
-            if (e.isControlDown() && e.getCode().equals(KeyCode.C)) {
-                if (e.isShiftDown() || e.isMetaDown()) {
-                    return;
-                }
-                if (e.isAltDown()) {
-                    saveAndShowTips(this.getScene().snapshot(null), "窗口已复制", rect);
-                } else {
-                    saveAndShowTips(image, "图片已复制", rect);
-                }
-            }
-        });
+//        box.addEventHandler(KeyEvent.KEY_PRESSED, (e) -> {
+//            if (e.isControlDown() && e.getCode().equals(KeyCode.C)) {
+//                if (e.isShiftDown() || e.isMetaDown()) {
+//                    return;
+//                }
+//                if (e.isAltDown()) {
+//                    saveAndShowTips(this.getScene().snapshot(null), "窗口已复制", rect);
+//                } else {
+//                    saveAndShowTips(image, "图片已复制", rect);
+//                }
+//            }
+//        });
+
+        addShortCut(
+                box
+                ,ShortCutExecutorHolder
+                    .builder()
+                        .shortcut(Shortcut.Builder.create().ctrl(true).addCode(KeyCode.C).description("复制当前图片").build())
+                        .match(shortcutMatch)
+                        .executor(event -> saveAndShowTips(image, "图片已复制", rect))
+                    .build()
+        );
+
+        addShortCut(
+                box
+                ,ShortCutExecutorHolder
+                        .builder()
+                        .shortcut(Shortcut.Builder.create().ctrl(true).alt(true).addCode(KeyCode.C).description("复制当前窗口").build())
+                        .match(shortcutMatch)
+                        .executor(event -> saveAndShowTips(image, "图片已复制", rect))
+                        .build()
+        );
+
+        // 展示当前所有快捷键
+        addShortCut(
+                box
+                ,ShortCutExecutorHolder
+                        .builder()
+                        .shortcut(Shortcut.Builder.create().ctrl(false).alt(false).addCode(KeyCode.SLASH).description("展示快捷键列表").build())
+                        .match(shortcutMatch)
+                        .executor(event -> ShortcutHelperShower.show(shortCutExecutorHolders,this).show())
+                        .build()
+        );
 
         Scene sc = new Scene(box);
         sc.setFill(Color.TRANSPARENT);
@@ -264,6 +314,11 @@ public class ImageShower extends Stage {
 
         setAlwaysOnTop(true);
 
+    }
+
+    private void addShortCut(EventTarget target, ShortCutExecutorHolder holder) {
+        keyboardShortcutsManager.registryShortCut(target, holder);
+        shortCutExecutorHolders.add(holder);
     }
 
     @SneakyThrows
@@ -347,7 +402,7 @@ public class ImageShower extends Stage {
 
 
         close.setOnMouseClicked(event -> {
-          doDelete(close);
+            doDelete(close);
 
         });
         HBox.setHgrow(topTitle, Priority.ALWAYS);
@@ -355,7 +410,7 @@ public class ImageShower extends Stage {
         return top;
     }
 
-    public void doDelete(Node node){
+    public void doDelete(Node node) {
         AnchorPane center = new AnchorPane();
         Label label = new Label("确认删除吗？");
         label.setFont(Font.font(11));
@@ -441,9 +496,9 @@ public class ImageShower extends Stage {
         alwaysOnTopProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                if (newValue){
+                if (newValue) {
                     btn.setGraphic(checkedSvg);
-                }else {
+                } else {
                     btn.setGraphic(svg);
                 }
             }
@@ -529,8 +584,8 @@ public class ImageShower extends Stage {
     }
 
     public void doSave(Image image) {
-        Configuration configuration= ConfigurationHolder.getInstance().getConfiguration();
-        if (configuration==null){
+        Configuration configuration = ConfigurationHolder.getInstance().getConfiguration();
+        if (configuration == null) {
             return;
         }
         // 执行销毁操作
@@ -553,10 +608,10 @@ public class ImageShower extends Stage {
         Label storeWay = new Label(String.format("存储方式:【%s】", imageStore));
         Label clipboardContent = new Label(String.format("剪切板内容：【%s】", clipboard));
 
-        SimpleStringProperty imageProperty=configuration.getUniquePropertiesHolder(GlobalConfigPersistence.class.getCanonicalName()+"-"+"image-save");
-        SimpleStringProperty cliProperty=configuration.getUniquePropertiesHolder(GlobalConfigPersistence.class.getCanonicalName()+"-"+"clipboard-save");
-        storeWay.textProperty().bind(Bindings.createStringBinding(() -> String.format("存储方式:【%s】", imageProperty.get()),imageProperty));
-        clipboardContent.textProperty().bind(Bindings.createStringBinding(() -> String.format("剪切板内容：【%s】", cliProperty.get()),cliProperty));
+        SimpleStringProperty imageProperty = configuration.getUniquePropertiesHolder(GlobalConfigPersistence.class.getCanonicalName() + "-" + "image-save");
+        SimpleStringProperty cliProperty = configuration.getUniquePropertiesHolder(GlobalConfigPersistence.class.getCanonicalName() + "-" + "clipboard-save");
+        storeWay.textProperty().bind(Bindings.createStringBinding(() -> String.format("存储方式:【%s】", imageProperty.get()), imageProperty));
+        clipboardContent.textProperty().bind(Bindings.createStringBinding(() -> String.format("剪切板内容：【%s】", cliProperty.get()), cliProperty));
 
 
         body.getChildren().addAll(storeWay, clipboardContent);
@@ -572,10 +627,10 @@ public class ImageShower extends Stage {
                     public Boolean apply(ButtonType buttonType) {
                         if (upload.equals(buttonType)) {
                             // 上传
-                            toUpload(configuration,body.getScene().getWindow(), SwingFXUtils.fromFXImage(image,null));
+                            toUpload(configuration, body.getScene().getWindow(), SwingFXUtils.fromFXImage(image, null));
                         } else if (change.equals(buttonType)) {
                             // 变更设置
-                            showConfig(configuration,body.getScene().getWindow());
+                            showConfig(configuration, body.getScene().getWindow());
                             return false;
                         } else if (ButtonType.CANCEL.equals(buttonType)) {
 
@@ -586,7 +641,8 @@ public class ImageShower extends Stage {
                 .show();
 
     }
-    public void showConfig(Configuration configuration,Window window) {
+
+    public void showConfig(Configuration configuration, Window window) {
         // 截图配置窗口
         Scene setting = configuration.getViewContext().getScene(SettingsView.class, true, false);
         PopDialog
@@ -597,8 +653,17 @@ public class ImageShower extends Stage {
                 .bindParent(window)
                 .showAndWait();
     }
+
     public void toUpload(Configuration configuration, Window window, BufferedImage image) {
         ScreenshotsProcess screenshotsProcess = configuration.getUniqueBean(ScreenshotsProcess.class);
         screenshotsProcess.done(window, image);
+    }
+
+    protected KeyboardShortcutsManager getKeyboardShortcutsManager() {
+        return new KeyboardShortcutsManager();
+    }
+
+    protected ShortcutMatch getShortcutMatch() {
+        return new SimpleShortcutMatch();
     }
 }

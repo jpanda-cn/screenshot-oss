@@ -158,6 +158,7 @@ public class TextRectangle extends StackPane {
                 scrollBar.setDisable(true);
             }
         };
+
         // 透明背景
         this.textArea.getStylesheets().add("/css/text-area-transparent.css");
 

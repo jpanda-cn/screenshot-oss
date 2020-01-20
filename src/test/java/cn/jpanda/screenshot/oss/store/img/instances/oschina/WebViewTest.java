@@ -30,12 +30,7 @@ public class WebViewTest extends Application {
 
         webEngine.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36");
         webEngine.setJavaScriptEnabled(true);
-        webEngine.locationProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                primaryStage.setTitle(newValue);
-            }
-        });
+        webEngine.locationProperty().addListener((observable, oldValue, newValue) -> primaryStage.setTitle(newValue));
 
         webEngine.load("https://www.oschina.net/home/login");
 //        ScrollPane scrollPane = new ScrollPane();
