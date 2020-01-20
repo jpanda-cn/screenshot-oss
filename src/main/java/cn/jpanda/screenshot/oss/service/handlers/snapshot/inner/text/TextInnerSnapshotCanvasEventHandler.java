@@ -2,7 +2,6 @@ package cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.text;
 
 import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
 import cn.jpanda.screenshot.oss.core.shotkey.DefaultGroupScreenshotsElements;
-import cn.jpanda.screenshot.oss.core.shotkey.ScreenshotsElementsHolder;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.InnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.shape.TextRectangle;
@@ -39,11 +38,11 @@ public class TextInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEven
 
     @Override
     protected void press(MouseEvent event) {
+        clear();
         if (onShowing) {
-            clear();
+            onShowing = false;
             return;
         }
-
         initText(event);
         onShowing = true;
     }
@@ -86,8 +85,9 @@ public class TextInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEven
                 text.getTextArea().fontProperty().unbind();
                 text.getExtBorder().fillProperty().set(Color.TRANSPARENT);
                 text.getExtBorder().visibleProperty().setValue(false);
+                text.getTextArea().deselect();
             }
-            onShowing = false;
+
         });
     }
 
