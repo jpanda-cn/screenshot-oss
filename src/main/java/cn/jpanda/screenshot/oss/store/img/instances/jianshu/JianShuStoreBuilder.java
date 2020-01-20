@@ -1,4 +1,4 @@
-package cn.jpanda.screenshot.oss.store.img.instances.oschina;
+package cn.jpanda.screenshot.oss.store.img.instances.jianshu;
 
 import cn.jpanda.screenshot.oss.common.toolkit.Callable;
 import cn.jpanda.screenshot.oss.common.toolkit.PopDialog;
@@ -6,6 +6,7 @@ import cn.jpanda.screenshot.oss.common.toolkit.PopDialogShower;
 import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.store.ImageStoreConfigBuilder;
+import cn.jpanda.screenshot.oss.store.img.instances.oschina.CustomCookieManager;
 import com.sun.webkit.dom.HTMLDocumentImpl;
 import com.sun.webkit.network.CookieManager;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -39,24 +40,24 @@ import java.util.*;
  * @version 1.0
  * @since 2020/1/18 11:51
  */
-public class OSChinaImageStoreBuilder implements ImageStoreConfigBuilder {
-    public static final String ACCESS_URL = "https://www.oschina.net/";
+public class JianShuStoreBuilder implements ImageStoreConfigBuilder {
+    public static final String ACCESS_URL = "https://www.jianshu.com/";
 
 
     private Configuration configuration;
     CustomCookieManager cookieManager;
 
-    public OSChinaImageStoreBuilder(Configuration configuration) {
+    public JianShuStoreBuilder(Configuration configuration) {
         this.configuration = configuration;
         cookieManager = new CustomCookieManager(new CookieManager(), new java.net.CookieManager());
     }
 
     @Override
     public boolean tips(Window stage) {
-        Label step = new Label("STEP1:  点击右下角的下一步按钮，将会打开一个浏览器窗口");
-        Label step2 = new Label("STEP2:  在浏览器中登录【OSCHINA】，并保持页面在【OSCHINA】站点内");
-        Label step3 = new Label("STEP3:  点击右下角【应用】按钮即可完成登录操作");
-        VBox box = new VBox(step, step2, step3);
+        Label step=new Label("STEP1:  点击右下角的下一步按钮，将会打开一个浏览器窗口");
+        Label step2=new Label("STEP2:  在浏览器中登录【简书】，并保持页面在【简书】站点内");
+        Label step3=new Label("STEP3:  点击右下角【应用】按钮即可完成登录操作");
+        VBox box=new VBox(step,step2,step3);
         box.styleProperty().setValue("-fx-alignment:center-LEFT");
         box.alignmentProperty().set(Pos.TOP_LEFT);
         PopDialog.create()
@@ -83,7 +84,7 @@ public class OSChinaImageStoreBuilder implements ImageStoreConfigBuilder {
         WebView webView = new WebView();
 
         final WebEngine webEngine = webView.getEngine();
-        final String DEFAULT_URL = "https://www.oschina.net/home/login";
+        final String DEFAULT_URL = "https://www.jianshu.com/sign_in";
         webEngine.load(DEFAULT_URL);
         webEngine.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36");
         webEngine.setJavaScriptEnabled(true);
@@ -110,29 +111,28 @@ public class OSChinaImageStoreBuilder implements ImageStoreConfigBuilder {
             if (ButtonType.CANCEL.equals(buttonType)) {
                 return true;
             }
-            String uid = getUserId(webEngine.getDocument());
             String cookie = getCookie();
-            if (StringUtils.isEmpty(uid)) {
-                // 无法获取用户ID
-                PopDialogShower.message("无法获取用户登录信息，请确认是否已登录，且停留在OSCHINA网站内，否则，该问题可能是因为版本变更导致，请联系开发人员", webView.getScene().getWindow());
-                return false;
-            }
+            System.out.println(cookie);
             if (StringUtils.isEmpty(cookie)) {
                 PopDialogShower.message("无法获取Cookie，请联系开发人员", webView.getScene().getWindow());
                 return false;
             }
+            if (!cookie.contains("remember_user_token")) {
+                // 无法获取用户ID
+                PopDialogShower.message("无法获取用户登录信息，请确认是否已登录，否则，该问题可能是因为版本变更导致，请联系开发人员", webView.getScene().getWindow());
+                return false;
+            }
 
-            OSChinaPersistence persistence = configuration.getPersistence(OSChinaPersistence.class);
-            persistence.setUid(uid);
+            JianShuPersistence persistence = configuration.getPersistence(JianShuPersistence.class);
             persistence.setCookie(cookie);
-            persistence.setExpire(new Date().getTime() + 1000 * 60 * 60 * 24 * 365L);
+            persistence.setExpire(new Date().getTime() + 1000 * 60 * 60 * 24 * 30L);
             configuration.storePersistence(persistence);
-            SimpleBooleanProperty updateCookie = configuration.getUniquePropertiesHolder(OSChinaCookieUpdateAfterBootstrapLoaderProcess.UPDATE_COOKIE_SHARD_PROPERTY_NAME);
+            SimpleBooleanProperty updateCookie=configuration.getUniquePropertiesHolder(JianShuCookieUpdateAfterBootstrapLoaderProcess.UPDATE_COOKIE_SHARD_PROPERTY_NAME);
             updateCookie.set(true);
             return true;
         };
 
-        configuration.registryUniquePropertiesHolder(Callable.class.getCanonicalName() + "-" + OSChinaImageStore.NAME, callable);
+        configuration.registryUniquePropertiesHolder(Callable.class.getCanonicalName() + "-" + JianShuImageStore.NAME, callable);
 
         Button goButton = new Button("Go");
         goButton.setMinSize(Button.USE_PREF_SIZE, Button.USE_PREF_SIZE);
@@ -170,15 +170,15 @@ public class OSChinaImageStoreBuilder implements ImageStoreConfigBuilder {
     }
 
     @SneakyThrows
-    private void loadCookie() {
-        OSChinaPersistence persistence = configuration.getPersistence(OSChinaPersistence.class);
-        String cookie = persistence.getCookie();
-        if (StringUtils.isEmpty(cookie)) {
+    private void loadCookie(){
+        JianShuPersistence persistence = configuration.getPersistence(JianShuPersistence.class);
+        String cookie=persistence.getCookie();
+        if (StringUtils.isEmpty(cookie)){
             return;
         }
-        String[] cookies = cookie.split(";");
-        Map<String, List<String>> cookieMap = new HashMap<>();
-        cookieMap.put("Set-Cookie", Arrays.asList(cookies));
-        CookieHandler.getDefault().put(new URI(ACCESS_URL), cookieMap);
+        String[]cookies=cookie.split(";");
+        Map<String,List<String>> cookieMap=new HashMap<>();
+        cookieMap.put("Set-Cookie",Arrays.asList(cookies));
+        CookieHandler.getDefault().put(new URI(ACCESS_URL),cookieMap);
     }
 }

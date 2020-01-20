@@ -1,4 +1,4 @@
-package cn.jpanda.screenshot.oss.store.img.instances.oschina;
+package cn.jpanda.screenshot.oss.store.img.instances.jianshu;
 
 import cn.jpanda.screenshot.oss.common.toolkit.Callable;
 import cn.jpanda.screenshot.oss.common.toolkit.PopDialog;
@@ -30,9 +30,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 @Component
-public class OSChinaCookieUpdateAfterBootstrapLoaderProcess implements AfterBootstrapLoaderProcess {
+public class JianShuCookieUpdateAfterBootstrapLoaderProcess implements AfterBootstrapLoaderProcess {
 
-    public static final String UPDATE_COOKIE_SHARD_PROPERTY_NAME=OSChinaCookieUpdateAfterBootstrapLoaderProcess.class.getCanonicalName()+"-"+"UPDATE_COOKIE_SHARD_PROPERTY_NAME";
+    public static final String UPDATE_COOKIE_SHARD_PROPERTY_NAME= JianShuCookieUpdateAfterBootstrapLoaderProcess.class.getCanonicalName()+"-"+"UPDATE_COOKIE_SHARD_PROPERTY_NAME";
 
     /**
      * 刷新OSCHINA cookie的时间 间隔
@@ -43,7 +43,7 @@ public class OSChinaCookieUpdateAfterBootstrapLoaderProcess implements AfterBoot
     private SimpleBooleanProperty updateCookie=new SimpleBooleanProperty(false);
     private Log log;
 
-    public OSChinaCookieUpdateAfterBootstrapLoaderProcess(Configuration configuration) {
+    public JianShuCookieUpdateAfterBootstrapLoaderProcess(Configuration configuration) {
         this.configuration = configuration;
         configuration.registryUniquePropertiesHolder(UPDATE_COOKIE_SHARD_PROPERTY_NAME,updateCookie);
         log=configuration.getLogFactory().getLog(getClass());
@@ -51,7 +51,7 @@ public class OSChinaCookieUpdateAfterBootstrapLoaderProcess implements AfterBoot
 
     @Override
     public void after() {
-        log.info("oSChinaCookieUpdateAfterBootstrapLoaderProcess loaded!");
+        log.info("JianShuCookieUpdateAfterBootstrapLoaderProcess loaded!");
         if (configuration.getViewLoaded().get()){
             updateCookie();
         }else {
@@ -73,7 +73,7 @@ public class OSChinaCookieUpdateAfterBootstrapLoaderProcess implements AfterBoot
                 }
             }
         };
-       Timer timer=new Timer("OS China cookie Refresh Task",true);
+       Timer timer=new Timer("jian shu  cookie Refresh Task",true);
         updateCookie.addListener((observable, oldValue, newValue) -> {
             if (newValue){
                 log.debug("refresh cookie  task is started ...");
@@ -90,8 +90,8 @@ public class OSChinaCookieUpdateAfterBootstrapLoaderProcess implements AfterBoot
 
     public void  doUpdateCookie(){
         log.debug("will refresh cookie ...");
-        OSChinaPersistence osChinaPersistence =configuration.getPersistence(OSChinaPersistence.class);
-        String cookie= osChinaPersistence.getCookie();
+        JianShuPersistence jianShuPersistence =configuration.getPersistence(JianShuPersistence.class);
+        String cookie= jianShuPersistence.getCookie();
         if (StringUtils.isEmpty(cookie)){
             log.debug("no cookie ...");
             // 没有Cookie
@@ -101,7 +101,7 @@ public class OSChinaCookieUpdateAfterBootstrapLoaderProcess implements AfterBoot
             return;
         }
 
-        Long expire= osChinaPersistence.getExpire();
+        Long expire= jianShuPersistence.getExpire();
         if (new Date().getTime()>expire){
             // cookie已失效
             log.debug(" cookie is expire ...");
@@ -127,15 +127,15 @@ public class OSChinaCookieUpdateAfterBootstrapLoaderProcess implements AfterBoot
         if (!updateCookie.get()){
             updateCookie.set(true);
         }
-        requestForRefresh(osChinaPersistence);
+        requestForRefresh(jianShuPersistence);
     }
 public void  cookieExpireTips(){
     Stage stage = configuration.getViewContext().newStage();
         stage.initStyle(StageStyle.TRANSPARENT);
-    stage.setTitle("OSCHINA 登录信息失效");
+    stage.setTitle("简书 登录信息失效");
     stage.setScene(new Scene(new AnchorPane(PopDialog.create()
             .setHeader("警告")
-            .setContent("OSCHINA登录信息已失效，为了不影响使用，请重新进行登录操作。")
+            .setContent("简书登录信息已失效，为了不影响使用，请重新进行登录操作。")
             .buttonTypes(new ButtonType("知道了"))
             .callback(new Callable<Boolean, ButtonType>() {
                 @Override
@@ -148,24 +148,24 @@ public void  cookieExpireTips(){
             .getDialogPane())));
     stage.showAndWait();
 }
-    public void requestForRefresh(OSChinaPersistence osChinaPersistence){
+    public void requestForRefresh(JianShuPersistence jianShuPersistence){
         try (
                 CloseableHttpClient client= HttpClients.custom()
                         .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36")
                         .setDefaultHeaders(Collections.singletonList(
-                                new BasicHeader("Cookie", osChinaPersistence.getCookie()))
+                                new BasicHeader("Cookie", jianShuPersistence.getCookie()))
 
                 )
              .build()
         ){
 
             Date now=new Date();
-            HttpGet get=new HttpGet(OSChinaImageStoreBuilder.ACCESS_URL);
+            HttpGet get=new HttpGet(JianShuStoreBuilder.ACCESS_URL);
             HttpResponse response=client.execute(get);
             if (response.getStatusLine().getStatusCode()==200){
                 log.debug("refresh cookie is done");
-                osChinaPersistence.setExpire(now.getTime()+1000*60*60*24*365L);
-                configuration.storePersistence(osChinaPersistence);
+                jianShuPersistence.setExpire(now.getTime()+1000 * 60 * 60 * 24 * 30L);
+                configuration.storePersistence(jianShuPersistence);
             }else {
                 log.info("{}",response.getStatusLine().getStatusCode());
                 log.info(EntityUtils.toString(response.getEntity()));

@@ -80,14 +80,7 @@ public class IndexCutView implements Initializable {
      */
     public TextField hotKey;
 
-    /**
-     * 编辑存储方式
-     */
-    public Button storeEdit;
-    /**
-     * 图片存储方式复选框
-     */
-    public ComboBox imageSave;
+    public AnchorPane setting;
     /**
      * 剪切板内容复选框
      */
@@ -118,12 +111,16 @@ public class IndexCutView implements Initializable {
         initHidden();
         loadShotKey();
 
-        loadImageSave();
-        loadClipboard();
+        loadSettings();
         loadHotKey();
 
         addDrag();
 
+    }
+
+    private void loadSettings() {
+        Scene set = configuration.getViewContext().getScene(SettingsView.class, true, false);
+        setting.getChildren().add(set.getRoot());
     }
 
     private void initExit() {
@@ -235,7 +232,7 @@ public class IndexCutView implements Initializable {
             PopDialog.create()
                     .setHeader(header)
                     .setContent(scene.getRoot())
-                    .bindParent(imageSave.getScene().getWindow())
+                    .bindParent(setting.getScene().getWindow())
                     .buttonTypes(ButtonType.CANCEL, ButtonType.APPLY)
                     .callback(callable).showAndWait();
 
@@ -276,7 +273,7 @@ public class IndexCutView implements Initializable {
         PopDialog.create()
                 .setHeader("失败任务列表")
                 .setContent(configuration.getViewContext().getScene(FailListView.class, true, false).getRoot())
-                .bindParent(imageSave.getScene().getWindow())
+                .bindParent(setting.getScene().getWindow())
                 .callback(buttonType -> {
                     configuration.registryUniquePropertiesHolder(FailListView.IS_SHOWING, false);
                     return true;
@@ -319,140 +316,11 @@ public class IndexCutView implements Initializable {
         hotKey.textProperty().setValue(stringBuilder.toString());
     }
 
-    @SuppressWarnings("unchecked")
-    private void loadImageSave() {
-        // 监听事件
-        imageSave.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue instanceof String) {
-                globalConfigPersistence.setImageStore((String) newValue);
-
-                // 联动，剪切板的内容同步发生变化
-                ImageStore imageStore = imageStoreRegisterManager.getImageStore((String) newValue);
-                Window stage = configuration.getViewContext().getStage();
-                if (Optional.ofNullable(storeEdit.getScene()).isPresent()) {
-                    stage = storeEdit.getScene().getWindow();
-                }
-                if (!imageStore.check(stage)) {
-                    // 会出现异常，但是不影响正常业务
-                    // 2019年6月22日21:48:55 修复角标越界异常
-                    // 2020年1月11日17:07:24 调整 若选择的图片存储方式不可使用，恢复到上一次选择的方式
-                    Platform.runLater(new Thread(() -> imageSave.getSelectionModel().select(oldValue)));
-                    return;
-                }
-                // 判断是否有对应的配置界面，决定是否展示配置按钮
-
-                storeEdit.disableProperty().setValue(!imageStoreRegisterManager.canConfig((String) newValue));
-                ImageType type = imageStoreRegisterManager.getType((String) newValue);
-                List<String> cls;
-                switch (type) {
-                    case NO_PATH: {
-                        cls = clipboardCallbackRegistryManager.getNamesByType(ClipboardType.NOT_NEED);
-                        break;
-                    }
-                    case HAS_PATH: {
-                        cls = clipboardCallbackRegistryManager.getNames();
-                        break;
-                    }
-                    default: {
-                        cls = clipboardCallbackRegistryManager.getNames();
-                    }
-                }
-                // 更新剪切板
-                clipboard.getItems().clear();
-                clipboard.getItems().addAll(cls);
-                // 校验之前选中的是否还可用，不可用使用第一个
-                if (cls.contains(globalConfigPersistence.getClipboardCallback())) {
-                    clipboard.getSelectionModel().select(globalConfigPersistence.getClipboardCallback());
-                } else {
-                    clipboard.getSelectionModel().select(0);
-                    globalConfigPersistence.setClipboardCallback((String) clipboard.getItems().get(0));
-                }
-                configuration.storePersistence(globalConfigPersistence);
-            }
-        });
-
-        // 初始化存储方式列表
-        imageSave.getItems().clear();
-        imageSave.getItems().addAll(imageStoreRegisterManager.getNames());
-        imageSave.getSelectionModel().select(globalConfigPersistence.getImageStore());
-        // 判断是否有对应的配置界面，决定是否展示配置按钮
-        storeEdit.visibleProperty().setValue(imageStoreRegisterManager.canConfig(globalConfigPersistence.getImageStore()));
-        // 主窗口数据同步，同步保存方式
-        SimpleStringProperty imageSaveProperty=new SimpleStringProperty(globalConfigPersistence.getImageStore());
-        imageSaveProperty.addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                imageSave.getSelectionModel().select(newValue);
-            }
-        });
-        configuration.registryUniquePropertiesHolder(GlobalConfigPersistence.class.getCanonicalName()+"-"+"image-save",imageSaveProperty);
-    }
-
-    @SuppressWarnings("unchecked")
-    private void loadClipboard() {
-        clipboard.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue instanceof String) {
-                if (!globalConfigPersistence.getClipboardCallback().equalsIgnoreCase((String) newValue)) {
-                    globalConfigPersistence.setClipboardCallback((String) newValue);
-                    // 刷新配置
-                    // 联动
-                    ClipboardType clipboardType = clipboardCallbackRegistryManager.getType((String) newValue);
-                    List<String> is;
-                    switch (clipboardType) {
-                        case NOT_NEED: {
-                            is = imageStoreRegisterManager.getNames();
-                            break;
-                        }
-                        case NEED_PATH: {
-                            is = imageStoreRegisterManager.getNamesByType(ImageType.HAS_PATH);
-                            break;
-                        }
-                        default: {
-                            is = imageStoreRegisterManager.getNamesByType(ImageType.HAS_PATH);
-                            break;
-                        }
-                    }
-                    imageSave.getItems().clear();
-                    imageSave.getItems().addAll(is);
-                    // 校验之前选中的是否还可用，不可用使用第一个
-                    if (is.contains(globalConfigPersistence.getImageStore())) {
-                        imageSave.getSelectionModel().select(globalConfigPersistence.getImageStore());
-                    } else {
-                        imageSave.getSelectionModel().select(0);
-                        globalConfigPersistence.setImageStore((String) imageSave.getItems().get(0));
-                    }
-                    configuration.storePersistence(globalConfigPersistence);
-                }
-            }
-        });
-        clipboard.getItems().clear();
-        // 初始化保存到剪切板的内容
-        clipboard.getItems().addAll(clipboardCallbackRegistryManager.getNames());
-        clipboard.getSelectionModel().select(globalConfigPersistence.getClipboardCallback());
-
-        // 主窗口数据同步，同步剪切板选项
-        SimpleStringProperty clipboardSaveProperty=new SimpleStringProperty(globalConfigPersistence.getImageStore());
-        clipboardSaveProperty.addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                clipboard.getSelectionModel().select(newValue);
-            }
-        });
-        configuration.registryUniquePropertiesHolder(GlobalConfigPersistence.class.getCanonicalName()+"-"+"clipboard-save",clipboardSaveProperty);
-    }
-
-
-    public void editImageStore() {
-        // 获取当前选择的图片存储方式
-        String name = (String) imageSave.getValue();
-        ImageStore imageStore = imageStoreRegisterManager.getImageStore(name);
-        imageStore.config(storeEdit.getScene().getWindow());
-    }
 
 
     public void back() {
         // 取消
-        ((Stage) storeEdit.getScene().getWindow()).close();
+        ((Stage) setting.getScene().getWindow()).close();
     }
 
     public void keyBack(KeyEvent e) {

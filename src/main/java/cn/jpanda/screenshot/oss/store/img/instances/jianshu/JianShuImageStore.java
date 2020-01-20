@@ -1,4 +1,4 @@
-package cn.jpanda.screenshot.oss.store.img.instances.oschina;
+package cn.jpanda.screenshot.oss.store.img.instances.jianshu;
 
 import cn.jpanda.screenshot.oss.common.enums.ImageType;
 import cn.jpanda.screenshot.oss.common.toolkit.PopDialogShower;
@@ -15,6 +15,7 @@ import javafx.stage.Window;
 import lombok.SneakyThrows;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
@@ -36,13 +37,13 @@ import java.util.UUID;
  * @version 1.0
  * @since 2020/1/17 9:45
  */
-@ImgStore(name = OSChinaImageStore.NAME, type = ImageType.HAS_PATH, builder = OSChinaImageStoreBuilder.class)
-public class OSChinaImageStore extends AbstractConfigImageStore {
+@ImgStore(name = JianShuImageStore.NAME, type = ImageType.HAS_PATH, builder = JianShuStoreBuilder.class)
+public class JianShuImageStore extends AbstractConfigImageStore {
 
-    public static final String NAME = "OS-CHINA";
+    public static final String NAME = "简书";
 
 
-    public OSChinaImageStore(Configuration configuration) {
+    public JianShuImageStore(Configuration configuration) {
         super(configuration);
     }
 
@@ -53,9 +54,8 @@ public class OSChinaImageStore extends AbstractConfigImageStore {
 
     @Override
     public String store(BufferedImage image) {
-        OSChinaPersistence persistence = configuration.getPersistence(OSChinaPersistence.class);
-        String url = loadUrl(persistence.getUid());
-        return upload(image, url, persistence);
+        JianShuPersistence persistence = configuration.getPersistence(JianShuPersistence.class);
+        return upload(image, persistence);
     }
 
     @Override
@@ -65,7 +65,8 @@ public class OSChinaImageStore extends AbstractConfigImageStore {
     }
 
     @SneakyThrows
-    public String upload(BufferedImage image, String url, OSChinaPersistence persistence) {
+    public String upload(BufferedImage image, JianShuPersistence persistence) {
+
 
         SimpleStringProperty path = new SimpleStringProperty(UUID.randomUUID().toString().concat(".png"));
         System.out.println(path.get());
@@ -74,25 +75,41 @@ public class OSChinaImageStore extends AbstractConfigImageStore {
                 .setDefaultHeaders(Collections.singletonList(new BasicHeader("Cookie", persistence.getCookie()))).build();
              ByteArrayOutputStream os = new ByteArrayOutputStream();
         ) {
+
+            // 获取token
+            HttpGet get = new HttpGet(String.format("https://www.jianshu.com/upload_images/token.json?filename=%s", path.get()));
+            HttpResponse response = httpClient.execute(get);
+            if (response.getStatusLine().getStatusCode() != 200) {
+                throw new UploadException(JianShuExceptionType.TOKEN_FAIL);
+            }
+            ObjectMapper objectMapper = new ObjectMapper();
+            JIanShuTokenResult jIanShuTokenResult = objectMapper.readValue(EntityUtils.toString(response.getEntity()), JIanShuTokenResult.class);
+            String token = jIanShuTokenResult.getToken();
+            String key = jIanShuTokenResult.getKey();
+
+            // 上传图片
             ImageIO.write(image, "png", os);
             byte[] bytes = os.toByteArray();
-            HttpPost post = new HttpPost(url);
+            HttpPost post = new HttpPost("https://upload.qiniup.com/");
             HttpEntity entity = MultipartEntityBuilder
                     .create()
-                    .addBinaryBody("upload",os.toByteArray(),ContentType.DEFAULT_BINARY,path.get())
+                    .addTextBody("token", token)
+                    .addTextBody("key", key)
+                    .addTextBody("x:protocol", "https")
+                    .addBinaryBody("file", os.toByteArray(), ContentType.DEFAULT_BINARY, path.get())
                     .build();
             post.setEntity(entity);
 
-            HttpResponse response = httpClient.execute(post);
-            int code = response.getStatusLine().getStatusCode();
-            String result = EntityUtils.toString(response.getEntity());
+            HttpResponse upRes = httpClient.execute(post);
+            int code = upRes.getStatusLine().getStatusCode();
+            String result = EntityUtils.toString(upRes.getEntity());
             if (code != 200) {
-                throw new UploadException(OSChinaExceptionType.UPLOAD_FAILED);
+                throw new UploadException(JianShuExceptionType.UPLOAD_FAILED);
             }
-            OSChinaUploadResult oschinaRequstResult = new ObjectMapper().readValue(result, OSChinaUploadResult.class);
-            return oschinaRequstResult.getUrl();
+            JianShuUploadResult uploadResult = objectMapper.readValue(result, JianShuUploadResult.class);
+            return uploadResult.getUrl();
         } catch (Exception e) {
-            ExceptionType exceptionType = OSChinaExceptionType.TIME_OUT;
+            ExceptionType exceptionType = JianShuExceptionType.TIME_OUT;
             if (e instanceof UploadException) {
                 exceptionType = ((UploadException) e).getExceptionType();
             }
@@ -111,17 +128,10 @@ public class OSChinaImageStore extends AbstractConfigImageStore {
 
     }
 
-    public String loadUrl(String id) {
-        return String.format("https://my.oschina.net/u/%s/space/ckeditor_dialog_img_upload", id);
-    }
-
     @Override
     public boolean canUse() {
-        OSChinaPersistence persistence = configuration.getPersistence(OSChinaPersistence.class);
-        return StringUtils.isNotEmpty(persistence.getUid());
+        JianShuPersistence persistence = configuration.getPersistence(JianShuPersistence.class);
+        return StringUtils.isNotEmpty(persistence.getCookie());
     }
 
-//    public void Test(){
-//        Document document=new HTMLDocument()
-//    }
 }

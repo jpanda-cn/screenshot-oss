@@ -335,8 +335,8 @@ public class CanvasCutTrayView implements Initializable {
         body.setSpacing(5);
         Label storeWay = new Label(String.format("存储方式:【%s】", imageStore));
         Label clipboardContent = new Label(String.format("剪切板内容：【%s】", clipboard));
-        SimpleStringProperty imageProperty=configuration.getUniquePropertiesHolder(GlobalConfigPersistence.class.getCanonicalName()+"-"+"image-save");
-        SimpleStringProperty cliProperty=configuration.getUniquePropertiesHolder(GlobalConfigPersistence.class.getCanonicalName()+"-"+"clipboard-save");
+        SimpleStringProperty imageProperty=configuration.getUniquePropertiesHolder(GlobalConfigPersistence.class.getCanonicalName()+"-"+"image-save",new SimpleStringProperty());
+        SimpleStringProperty cliProperty=configuration.getUniquePropertiesHolder(GlobalConfigPersistence.class.getCanonicalName()+"-"+"clipboard-save",new SimpleStringProperty());
         storeWay.textProperty().bind(Bindings.createStringBinding(() -> String.format("存储方式:【%s】", imageProperty.get()),imageProperty));
         clipboardContent.textProperty().bind(Bindings.createStringBinding(() -> String.format("剪切板内容：【%s】", cliProperty.get()),cliProperty));
 

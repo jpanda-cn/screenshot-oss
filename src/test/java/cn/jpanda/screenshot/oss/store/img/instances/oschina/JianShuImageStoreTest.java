@@ -28,7 +28,7 @@ import java.util.UUID;
  * @version 1.0
  * @since 2020/1/17 11:08
  */
-public class OSChinaImageStoreTest {
+public class JianShuImageStoreTest {
 
     @Test
     @SneakyThrows

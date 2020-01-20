@@ -24,7 +24,6 @@ import java.util.ResourceBundle;
 
 @Controller
 public class SettingsView implements Initializable {
-    public TextField hotKey;
     private Configuration configuration;
 
     public SettingsView(Configuration configuration) {
@@ -99,10 +98,10 @@ public class SettingsView implements Initializable {
                     globalConfigPersistence.setClipboardCallback((String) clipboard.getItems().get(0));
                 }
                 configuration.storePersistence(globalConfigPersistence);
-                SimpleStringProperty cliProperty=configuration.getUniquePropertiesHolder(GlobalConfigPersistence.class.getCanonicalName()+"-"+"clipboard-save");
+                SimpleStringProperty cliProperty=configuration.getUniquePropertiesHolder(GlobalConfigPersistence.class.getCanonicalName()+"-"+"clipboard-save",new SimpleStringProperty());
                 cliProperty.set(globalConfigPersistence.getClipboardCallback());
 
-                SimpleStringProperty imageProperty=configuration.getUniquePropertiesHolder(GlobalConfigPersistence.class.getCanonicalName()+"-"+"image-save");
+                SimpleStringProperty imageProperty=configuration.getUniquePropertiesHolder(GlobalConfigPersistence.class.getCanonicalName()+"-"+"image-save",new SimpleStringProperty());
                 imageProperty.set(globalConfigPersistence.getImageStore());
 
             }

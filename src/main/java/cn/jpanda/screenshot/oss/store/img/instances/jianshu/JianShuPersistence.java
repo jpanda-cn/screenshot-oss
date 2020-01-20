@@ -1,10 +1,8 @@
-package cn.jpanda.screenshot.oss.store.img.instances.oschina;
+package cn.jpanda.screenshot.oss.store.img.instances.jianshu;
 
 import cn.jpanda.screenshot.oss.core.annotations.Encrypt;
 import cn.jpanda.screenshot.oss.core.persistence.Persistence;
 import lombok.Data;
-
-import java.time.Instant;
 
 /**
  * @author HanQi [Jpanda@aliyun.com]
@@ -12,11 +10,7 @@ import java.time.Instant;
  * @since 2020/1/17 10:30
  */
 @Data
-public class OSChainPersistence implements Persistence {
-    /**
-     * 用户ID
-     */
-    private String uid;
+public class JianShuPersistence implements Persistence {
 
     /**
      * 用户Cookie
