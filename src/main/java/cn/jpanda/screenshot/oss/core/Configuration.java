@@ -59,7 +59,7 @@ public class Configuration {
      * 上下文是否已加载完毕
      */
     @Getter
-    private volatile SimpleBooleanProperty viewLoaded=new SimpleBooleanProperty(false);
+    private volatile SimpleBooleanProperty viewLoaded = new SimpleBooleanProperty(false);
     /**
      * 程序执行器所处的工作目录
      */
@@ -109,7 +109,11 @@ public class Configuration {
 
     @SuppressWarnings("unchecked")
     public <T> T getUniquePropertiesHolder(Object key, T defaultValue) {
-        return (T) uniquePropertiesHolder.getOrDefault(key, defaultValue);
+        if (uniquePropertiesHolder.containsKey(key)) {
+            return (T) uniquePropertiesHolder.get(key);
+        }
+        uniquePropertiesHolder.put(key, defaultValue);
+        return defaultValue;
     }
 
     public <T> T getUniquePropertiesHolder(Object key) {

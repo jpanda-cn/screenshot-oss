@@ -208,6 +208,17 @@ public class PopDialog extends Dialog<ButtonType> {
         return this;
     }
 
+    public PopDialog removeContentClass(String styleClass){
+        if (content.get()!=null){
+            content.get().getStyleClass().remove(styleClass);
+        }
+        content.addListener((observable, oldValue, newValue) -> {
+            if (newValue!=null){
+                newValue.getStyleClass().remove(styleClass);
+            }
+        });
+        return this;
+    }
     public PopDialog buttonTypes(ButtonType... types) {
         getDialogPane().getButtonTypes().clear();
 

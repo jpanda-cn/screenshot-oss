@@ -60,8 +60,8 @@
             <AnchorPane fx:id="setting" layoutY="8.0" prefHeight="87.0" prefWidth="314.0">
             </AnchorPane>
 
-            <Label fx:id="shotKeyL" layoutX="3.0" layoutY="135.0" text="系统快捷键" />
-            <TextField fx:id="hotKey" layoutX="83.0" layoutY="131.0" onKeyPressed="#changeHotKey" prefHeight="23.0" prefWidth="150.0" />
+            <Label fx:id="shotKeyL" layoutX="1.0" layoutY="133.0" text="系统快捷键" />
+            <TextField fx:id="hotKey" layoutX="84.0" layoutY="129.0" onKeyPressed="#changeHotKey" prefHeight="23.0" prefWidth="150.0" />
         </AnchorPane>
 
         <!-- 底部截图区域 -->

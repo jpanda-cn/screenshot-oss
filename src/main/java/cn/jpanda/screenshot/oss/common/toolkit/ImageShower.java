@@ -25,11 +25,9 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.event.EventHandler;
 import javafx.event.EventTarget;
 import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Cursor;
-import javafx.scene.Group;
-import javafx.scene.Node;
-import javafx.scene.Scene;
+import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.*;
@@ -645,10 +643,15 @@ public class ImageShower extends Stage {
     public void showConfig(Configuration configuration, Window window) {
         // 截图配置窗口
         Scene setting = configuration.getViewContext().getScene(SettingsView.class, true, false);
+        Parent root = setting.getRoot();
+        root.setStyle("-fx-background-color: #FFFFFF");
+        AnchorPane anchorPane = new AnchorPane();
+        anchorPane.setPadding(new Insets(0,20,0,20));
+        anchorPane.getChildren().add(root);
         PopDialog
                 .create()
                 .setHeader("设置")
-                .setContent(setting.getRoot())
+                .setContent(anchorPane)
                 .buttonTypes(ButtonType.CLOSE)
                 .bindParent(window)
                 .showAndWait();

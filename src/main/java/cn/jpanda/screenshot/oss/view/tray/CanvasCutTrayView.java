@@ -30,6 +30,7 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.WritableImage;
@@ -288,10 +289,15 @@ public class CanvasCutTrayView implements Initializable {
     public void showConfig() {
         // 截图配置窗口
         Scene setting = configuration.getViewContext().getScene(SettingsView.class, true, false);
+        Parent root = setting.getRoot();
+        root.setStyle("-fx-background-color: #FFFFFF");
+        AnchorPane anchorPane = new AnchorPane();
+        anchorPane.setPadding(new Insets(0, 20, 0, 20));
+        anchorPane.getChildren().add(root);
         PopDialog
                 .create()
                 .setHeader("设置")
-                .setContent(setting.getRoot())
+                .setContent(anchorPane)
                 .buttonTypes(ButtonType.CLOSE)
                 .bindParent(settings.getScene().getWindow())
                 .centerOnNode(canvasProperties.getCutRectangle())
@@ -335,10 +341,11 @@ public class CanvasCutTrayView implements Initializable {
         body.setSpacing(5);
         Label storeWay = new Label(String.format("存储方式:【%s】", imageStore));
         Label clipboardContent = new Label(String.format("剪切板内容：【%s】", clipboard));
-        SimpleStringProperty imageProperty=configuration.getUniquePropertiesHolder(GlobalConfigPersistence.class.getCanonicalName()+"-"+"image-save",new SimpleStringProperty());
-        SimpleStringProperty cliProperty=configuration.getUniquePropertiesHolder(GlobalConfigPersistence.class.getCanonicalName()+"-"+"clipboard-save",new SimpleStringProperty());
-        storeWay.textProperty().bind(Bindings.createStringBinding(() -> String.format("存储方式:【%s】", imageProperty.get()),imageProperty));
-        clipboardContent.textProperty().bind(Bindings.createStringBinding(() -> String.format("剪切板内容：【%s】", cliProperty.get()),cliProperty));
+        SimpleStringProperty imageProperty = configuration.getUniquePropertiesHolder(GlobalConfigPersistence.class.getCanonicalName() + "-" + "image-save", new SimpleStringProperty());
+        SimpleStringProperty cliProperty = configuration.getUniquePropertiesHolder(GlobalConfigPersistence.class.getCanonicalName() + "-" + "clipboard-save", new SimpleStringProperty());
+
+        storeWay.textProperty().bind(Bindings.createStringBinding(() -> String.format("存储方式:【%s】", imageProperty.get()), imageProperty));
+        clipboardContent.textProperty().bind(Bindings.createStringBinding(() -> String.format("剪切板内容：【%s】", cliProperty.get()), cliProperty));
 
         body.getChildren().addAll(storeWay, clipboardContent);
 
@@ -354,7 +361,7 @@ public class CanvasCutTrayView implements Initializable {
                     public Boolean apply(ButtonType buttonType) {
                         if (upload.equals(buttonType)) {
                             // 上传
-                            toUpload(stage,body.getScene().getWindow(), scene, rectangle);
+                            toUpload(stage, body.getScene().getWindow(), scene, rectangle);
                         } else if (change.equals(buttonType)) {
                             // 变更设置
                             showConfig();
