@@ -10,18 +10,13 @@ import cn.jpanda.screenshot.oss.core.shotkey.shortcut.*;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
 import cn.jpanda.screenshot.oss.view.main.SettingsView;
 import cn.jpanda.screenshot.oss.view.tray.subs.ResizeEventHandler;
-import com.sun.javafx.collections.ObservableListWrapper;
-import com.sun.javafx.collections.ObservableSequentialListWrapper;
-import com.sun.javafx.collections.TrackableObservableList;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.event.EventTarget;
 import javafx.geometry.Bounds;
@@ -137,6 +132,7 @@ public class ImageShower extends Stage {
     public void init() {
         top = buildTop();
         body = new AnchorPane();
+        body.setFocusTraversable(true);
         body.styleProperty().set(" -fx-background-color: rgba(234,123,123,0.7);");
         box = new VBox(top, body);
         box.styleProperty().set(" -fx-background-color: transparent;");
@@ -174,80 +170,23 @@ public class ImageShower extends Stage {
         rect.addEventHandler(MouseEvent.ANY, stageHandler(rect, resize, drag));
 
         ContextMenu contextMenu = new ContextMenu();
-        MenuItem close = new MenuItem("关闭");
-        MenuItem onTop = new MenuItem("置顶");
-        alwaysOnTopProperty().addListener((observable, oldValue, newValue) -> onTop.setText(newValue ? "取消置顶" : "置顶"));
-        onTop.setOnAction(e -> setAlwaysOnTop(alwaysOnTopProperty().not().getValue()));
+        MenuItem close = getClose(box);
+        MenuItem onTop = getOnTop(box);
 
-        close.setOnAction(e -> doDelete(body));
-        MenuItem hideTop = new MenuItem("隐藏标题");
+        MenuItem copyItem = getCopyItem(box);
+        MenuItem copyFullItem =getCopyFullItem(box);
 
-        MenuItem hideBorder = new MenuItem("隐藏边框");
-        AtomicBoolean isHide = new AtomicBoolean(true);
-        hideTop.setOnAction(e -> {
-            if (isHide.get()) {
-                hideTop.setUserData(top.heightProperty().getValue());
-                top.visibleProperty().setValue(false);
-                top.setPrefHeight(0);
-                hideTop.setText("显示标题");
-                isHide.set(false);
-                return;
-            }
-            top.visibleProperty().setValue(true);
-            top.setPrefHeight((Double) hideTop.getUserData());
-            isHide.set(true);
-            hideTop.setText("隐藏标题");
-        });
-        AtomicBoolean isHideBorder = new AtomicBoolean(true);
-        hideBorder.setOnAction(e -> {
-            if (isHideBorder.get()) {
-                double w = rect.strokeWidthProperty().getValue();
-                hideBorder.setUserData(w);
-                rect.layoutXProperty().set(0);
-                rect.layoutYProperty().set(0);
-                this.setWidth(getWidth() - w * 2);
-                this.setHeight(getHeight() - w * 2);
-                rect.strokeWidthProperty().set(0);
-                isHideBorder.set(false);
-                hideBorder.setText("展示边框");
-                return;
-            }
-            rect.strokeWidthProperty().set((Double) hideBorder.getUserData());
-            double w = rect.strokeWidthProperty().getValue();
-            rect.layoutXProperty().set(w);
-            rect.layoutYProperty().set(w);
-            this.setWidth(getWidth() + w * 2);
-            this.setHeight(getHeight() + w * 2);
-            isHideBorder.set(true);
-            hideBorder.setText("隐藏边框");
-        });
+        MenuItem hideTop = getHideTop(box);
+        MenuItem hideBorder = getHideBorder(box);
 
-        MenuItem saveOther = new MenuItem("图像另存为");
-        MenuItem sceneSaveOther = new MenuItem("窗口图像另存为");
 
-        MenuItem copyItem = new MenuItem("复制图像到剪切板(Ctrl+C)");
-        MenuItem copyFullItem = new MenuItem("复制当前窗口到剪切板(Ctrl+Alt+C)");
-        saveOther.setOnAction((e) -> {
-            saveAndChooseFile(image);
-        });
-        sceneSaveOther.setOnAction((e) -> {
-            saveAndChooseFile(this.getScene().snapshot(null));
-        });
-        copyItem.setOnAction((e) -> {
-            saveAndShowTips(image, "图片已复制", rect);
-        });
-        copyFullItem.setOnAction((e) -> {
-            saveAndShowTips(this.getScene().snapshot(null), "窗口已复制", rect);
-        });
+        MenuItem saveOther = getSaveOther(box);
+        MenuItem sceneSaveOther = getSceneSaveOther(box);
 
-        MenuItem cImageToUpload = new MenuItem("上传当前图片到云环境");
-        MenuItem cFrameToUpload = new MenuItem("上传当前窗口快照到云环境");
-        cImageToUpload.setOnAction((e) -> {
-            doSave(image);
-        });
-        cFrameToUpload.setOnAction((e) -> {
-            doSave(this.getScene().snapshot(null));
-        });
+
+        MenuItem cImageToUpload = getCImageToUpload(box);
+        MenuItem cFrameToUpload = getCFrameToUpload(box);
+
         contextMenu.getItems().addAll(close, onTop, hideTop, hideBorder, saveOther, sceneSaveOther, copyItem, copyFullItem, cImageToUpload, cFrameToUpload);
 
         body.addEventHandler(MouseEvent.MOUSE_CLICKED, (e) -> {
@@ -261,47 +200,16 @@ public class ImageShower extends Stage {
                 contextMenu.hide();
             }
         });
-//        box.addEventHandler(KeyEvent.KEY_PRESSED, (e) -> {
-//            if (e.isControlDown() && e.getCode().equals(KeyCode.C)) {
-//                if (e.isShiftDown() || e.isMetaDown()) {
-//                    return;
-//                }
-//                if (e.isAltDown()) {
-//                    saveAndShowTips(this.getScene().snapshot(null), "窗口已复制", rect);
-//                } else {
-//                    saveAndShowTips(image, "图片已复制", rect);
-//                }
-//            }
-//        });
 
-        addShortCut(
-                box
-                ,ShortCutExecutorHolder
-                    .builder()
-                        .shortcut(Shortcut.Builder.create().ctrl(true).addCode(KeyCode.C).description("复制当前图片").build())
-                        .match(shortcutMatch)
-                        .executor(event -> saveAndShowTips(image, "图片已复制", rect))
-                    .build()
-        );
-
-        addShortCut(
-                box
-                ,ShortCutExecutorHolder
-                        .builder()
-                        .shortcut(Shortcut.Builder.create().ctrl(true).alt(true).addCode(KeyCode.C).description("复制当前窗口").build())
-                        .match(shortcutMatch)
-                        .executor(event -> saveAndShowTips(image, "图片已复制", rect))
-                        .build()
-        );
 
         // 展示当前所有快捷键
         addShortCut(
                 box
-                ,ShortCutExecutorHolder
+                , ShortCutExecutorHolder
                         .builder()
-                        .shortcut(Shortcut.Builder.create().ctrl(false).alt(false).addCode(KeyCode.SLASH).description("展示快捷键列表").build())
+                        .shortcut(Shortcut.Builder.create().ctrl(true).alt(false).addCode(KeyCode.SLASH).description("展示快捷键列表").build())
                         .match(shortcutMatch)
-                        .executor(event -> ShortcutHelperShower.show(shortCutExecutorHolders,this).show())
+                        .executor(event -> ShortcutHelperShower.show(shortCutExecutorHolders, this).show())
                         .build()
         );
 
@@ -312,6 +220,221 @@ public class ImageShower extends Stage {
 
         setAlwaysOnTop(true);
 
+    }
+
+    private MenuItem getCFrameToUpload(VBox box) {
+        MenuItem cFrameToUpload = new MenuItem("上传当前窗口快照到云环境(Ctrl+Alt+U)");
+        cFrameToUpload.setOnAction((e) -> {
+            doSave(this.getScene().snapshot(null));
+        });
+        addShortCut(
+                box
+                , ShortCutExecutorHolder
+                        .builder()
+                        .shortcut(Shortcut.Builder.create().ctrl(true).alt(true).addCode(KeyCode.U).description("上传当前窗口快照到云环境").build())
+                        .match(shortcutMatch)
+                        .executor(event -> doSave(this.getScene().snapshot(null)))
+                        .build()
+        );
+        return cFrameToUpload;
+    }
+
+    private MenuItem getCImageToUpload(VBox box) {
+        MenuItem cImageToUpload = new MenuItem("上传当前图片到云环境(Ctrl+U)");
+        cImageToUpload.setOnAction((e) -> {
+            doSave(image);
+        });
+        addShortCut(
+                box
+                , ShortCutExecutorHolder
+                        .builder()
+                        .shortcut(Shortcut.Builder.create().ctrl(true).alt(false).addCode(KeyCode.U).description("上传当前图片到云环境").build())
+                        .match(shortcutMatch)
+                        .executor(event -> doSave(image))
+                        .build()
+        );
+        return  cImageToUpload;
+    }
+
+    private MenuItem getCopyFullItem(VBox box) {
+        MenuItem copyFullItem = new MenuItem("复制当前窗口到剪切板(Ctrl+Alt+C)");
+        copyFullItem.setOnAction((e) -> {
+            saveAndShowTips(this.getScene().snapshot(null), "窗口已复制", rect);
+        });
+        addShortCut(
+                box
+                , ShortCutExecutorHolder
+                        .builder()
+                        .shortcut(Shortcut.Builder.create().ctrl(true).alt(true).addCode(KeyCode.C).description("复制当前窗口到剪切板").build())
+                        .match(shortcutMatch)
+                        .executor(event -> saveAndShowTips(this.getScene().snapshot(null), "窗口已复制", rect))
+                        .build()
+        );
+        return copyFullItem;
+    }
+
+    private MenuItem getSceneSaveOther(VBox box) {
+        MenuItem sceneSaveOther = new MenuItem("窗口图像另存为(Ctrl+Alt+S)");
+        sceneSaveOther.setOnAction((e) -> {
+            saveAndChooseFile(this.getScene().snapshot(null));
+        });
+        addShortCut(
+                box
+                , ShortCutExecutorHolder
+                        .builder()
+                        .shortcut(Shortcut.Builder.create().ctrl(true).alt(true).addCode(KeyCode.S).description("窗口图像另存为").build())
+                        .match(shortcutMatch)
+                        .executor(event ->     saveAndChooseFile(this.getScene().snapshot(null)))
+                        .build()
+        );
+        return sceneSaveOther;
+    }
+
+    private MenuItem getSaveOther(VBox box) {
+        MenuItem saveOther = new MenuItem("图像另存为(Ctrl+S)");
+        saveOther.setOnAction((e) -> {
+            saveAndChooseFile(image);
+        });
+        addShortCut(
+                box
+                , ShortCutExecutorHolder
+                        .builder()
+                        .shortcut(Shortcut.Builder.create().ctrl(true).alt(false).addCode(KeyCode.S).description("图像另存为").build())
+                        .match(shortcutMatch)
+                        .executor(event ->   saveAndChooseFile(image))
+                        .build()
+        );
+        return saveOther;
+    }
+
+    private MenuItem getHideBorder(VBox box) {
+        MenuItem hideBorder = new MenuItem("隐藏边框(Ctrl+B)");
+        AtomicBoolean isHideBorder = new AtomicBoolean(true);
+        EventHandler<ActionEvent> hideBorderEvent = e -> {
+            if (isHideBorder.get()) {
+                double w = rect.strokeWidthProperty().getValue();
+                hideBorder.setUserData(w);
+                rect.layoutXProperty().set(0);
+                rect.layoutYProperty().set(0);
+                this.setWidth(getWidth() - w * 2);
+                this.setHeight(getHeight() - w * 2);
+                rect.strokeWidthProperty().set(0);
+                isHideBorder.set(false);
+                hideBorder.setText("展示边框(Ctrl+B)");
+                return;
+            }
+            rect.strokeWidthProperty().set((Double) hideBorder.getUserData());
+            double w = rect.strokeWidthProperty().getValue();
+            rect.layoutXProperty().set(w);
+            rect.layoutYProperty().set(w);
+            this.setWidth(getWidth() + w * 2);
+            this.setHeight(getHeight() + w * 2);
+            isHideBorder.set(true);
+            hideBorder.setText("隐藏边框(Ctrl+B)");
+        };
+        hideBorder.setOnAction(hideBorderEvent);
+        // 展示隐藏边框
+        addShortCut(
+                box
+                , ShortCutExecutorHolder
+                        .builder()
+                        .shortcut(Shortcut.Builder.create().ctrl(true).alt(false).addCode(KeyCode.B).description("展示/隐藏边框").build())
+                        .match(shortcutMatch)
+                        .executor(event -> hideBorderEvent.handle(null))
+                        .build()
+        );
+
+        return hideBorder;
+    }
+
+    private MenuItem getHideTop(VBox box) {
+        MenuItem hideTop = new MenuItem("隐藏标题(Ctrl+T)");
+        AtomicBoolean isHide = new AtomicBoolean(true);
+        EventHandler<ActionEvent> actionEventEventHandler=e -> {
+            if (isHide.get()) {
+                hideTop.setUserData(top.heightProperty().getValue());
+                top.visibleProperty().setValue(false);
+                top.setPrefHeight(0);
+                hideTop.setText("显示标题(Ctrl+T)");
+                isHide.set(false);
+                return;
+            }
+            top.visibleProperty().setValue(true);
+            top.setPrefHeight((Double) hideTop.getUserData());
+            isHide.set(true);
+            hideTop.setText("隐藏标题(Ctrl+T)");
+        };
+
+        hideTop.setOnAction(actionEventEventHandler);
+        // 展示隐藏标题
+        addShortCut(
+                box
+                , ShortCutExecutorHolder
+                        .builder()
+                        .shortcut(Shortcut.Builder.create().ctrl(true).alt(false).addCode(KeyCode.T).description("展示/隐藏标题").build())
+                        .match(shortcutMatch)
+                        .executor(event -> actionEventEventHandler.handle(null))
+                        .build()
+        );
+        return hideTop;
+    }
+
+    private MenuItem getOnTop(VBox box) {
+        MenuItem onTop = new MenuItem("置顶(Ctrl+O)");
+        alwaysOnTopProperty().addListener((observable, oldValue, newValue) -> onTop.setText(newValue ? "取消置顶(Ctrl+O)" : "置顶(Ctrl+O)"));
+        // 展示隐藏标题
+        addShortCut(
+                box
+                , ShortCutExecutorHolder
+                        .builder()
+                        .shortcut(Shortcut.Builder.create().ctrl(true).alt(false).addCode(KeyCode.O).description("置顶/取消置顶").build())
+                        .match(shortcutMatch)
+                        .executor(event -> setAlwaysOnTop(alwaysOnTopProperty().not().getValue()))
+                        .build()
+        );
+        return onTop;
+    }
+
+    private MenuItem getClose(VBox box) {
+        MenuItem close = new MenuItem("关闭(ESC/Ctrl+W)");
+
+        close.setOnAction(e -> doDelete(body));
+        addShortCut(
+                box
+                , ShortCutExecutorHolder
+                        .builder()
+                        .shortcut(Shortcut.Builder.create().ctrl(true).addCode(KeyCode.W).description("关闭当前窗口").build())
+                        .match(shortcutMatch)
+                        .executor(event -> doDelete(body))
+                        .build()
+        );
+        addShortCut(
+                box
+                , ShortCutExecutorHolder
+                        .builder()
+                        .shortcut(Shortcut.Builder.create().addCode(KeyCode.ESCAPE).description("关闭当前窗口").build())
+                        .match(shortcutMatch)
+                        .executor(event -> doDelete(body))
+                        .build()
+        );
+        return close;
+    }
+
+    protected MenuItem getCopyItem(VBox box) {
+        MenuItem copyItem = new MenuItem("复制图像到剪切板(Ctrl+C)");
+        copyItem.setOnAction((e) -> {
+            saveAndShowTips(image, "图片已复制", rect);
+        });
+        addShortCut(
+                box
+                , ShortCutExecutorHolder
+                        .builder()
+                        .shortcut(Shortcut.Builder.create().ctrl(true).addCode(KeyCode.C).description("复制当前图片").build())
+                        .match(shortcutMatch)
+                        .executor(event -> saveAndShowTips(image, "图片已复制", rect))
+                        .build()
+        );
+        return copyItem;
     }
 
     private void addShortCut(EventTarget target, ShortCutExecutorHolder holder) {
@@ -428,6 +551,11 @@ public class ImageShower extends Stage {
         ok.setOnMouseClicked((e) -> {
             close();
         });
+        ok.setOnKeyPressed(e -> {
+            if (e.getCode().equals(KeyCode.ENTER)) {
+                close();
+            }
+        });
         cancel.setOnMouseClicked((e) -> {
             tooltip.hide();
         });
@@ -440,7 +568,15 @@ public class ImageShower extends Stage {
 
         tooltip.setGraphic(box);
         this.box.disableProperty().bind(tooltip.showingProperty());
+        ImageShower that = this;
+        ChangeListener<Boolean> c = (observable, oldValue, newValue) -> {
+            tooltip.setAnchorX(that.xProperty().add(that.widthProperty().subtract(tooltip.widthProperty()).divide(2)).get());
+            tooltip.setAnchorY(that.yProperty().add(that.heightProperty().subtract(tooltip.heightProperty()).divide(2)).get());
+        };
+        tooltip.showingProperty().addListener(c);
         tooltip.show(node, this.getX() + this.getWidth(), this.getY());
+        ok.requestFocus();
+
     }
 
     public EventHandler<MouseEvent> addDrag(Node node) {
@@ -646,7 +782,7 @@ public class ImageShower extends Stage {
         Parent root = setting.getRoot();
         root.setStyle("-fx-background-color: #FFFFFF");
         AnchorPane anchorPane = new AnchorPane();
-        anchorPane.setPadding(new Insets(0,20,0,20));
+        anchorPane.setPadding(new Insets(0, 20, 0, 20));
         anchorPane.getChildren().add(root);
         PopDialog
                 .create()

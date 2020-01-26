@@ -14,7 +14,7 @@ public final class KeyCodeNameConvertor {
     private static Map<KeyCode, String> SPECIFIC_CODE_NAME = new HashMap<>();
 
     static {
-        SPECIFIC_CODE_NAME.put(KeyCode.SLASH, "CTRL + ?");
+        SPECIFIC_CODE_NAME.put(KeyCode.SLASH, "/");
     }
 
     public static String get(KeyCode code) {

@@ -12,22 +12,29 @@ public class SimpleShortcutMatch implements ShortcutMatch {
 
     @Override
     public boolean isMatch(KeyEvent event, Shortcut shortcut) {
-        System.out.println(event.getEventType().getName());
-        System.out.println(event.getCode().getName());
-
-        if (shortcut.getAlt() && !event.isAltDown()) {
+        if (event.isConsumed()) {
             return false;
         }
-        if (shortcut.getCtrl() && !event.isControlDown()) {
+        if (!shortcut.getAlt().equals(event.isAltDown())) {
             return false;
         }
-        if (shortcut.getShift() && !event.isShiftDown()) {
+        if (!shortcut.getCtrl().equals(event.isControlDown())) {
+            return false;
+        }
+        if (!shortcut.getShift().equals(event.isShiftDown())) {
             return false;
         }
         KeyCode keyCode = shortcut.getCodes().stream().findFirst().orElse(null);
         if (keyCode == null) {
             return false;
         }
-        return keyCode.equals(event.getCode());
+        System.out.println(event.getEventType().getName());
+        System.out.println(event.getCode().getName());
+        System.out.println(shortcut.getDescription());
+        if (keyCode.equals(event.getCode())) {
+            event.consume();
+            return true;
+        }
+        return false;
     }
 }
