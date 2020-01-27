@@ -1,7 +1,7 @@
 package cn.jpanda.screenshot.oss.core.shotkey.shortcut;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import cn.jpanda.screenshot.oss.core.log.Log;
+import cn.jpanda.screenshot.oss.core.log.LogHolder;
 import javafx.event.EventTarget;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -16,13 +16,15 @@ import javafx.stage.Window;
  */
 public class KeyboardShortcutsManager {
 
+    private Log log = LogHolder.getInstance().getLog(getClass());
+
     /**
      * 注册快捷键
      *
      * @return
      */
     public boolean registryShortCut(EventTarget eventTarget, ShortCutExecutorHolder holder) {
-        System.out.println(String.format("will registry the short key with %s  and %s", eventTarget.toString(), holder.getShortcut().toString()));
+        log.debug(String.format("will registry the short key with %s  and %s", eventTarget.toString(), holder.getShortcut().toString()));
 
         if (eventTarget instanceof Window) {
             if (((Window) eventTarget).getScene() != null) {

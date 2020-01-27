@@ -15,11 +15,9 @@ import javafx.scene.shape.Rectangle;
 import lombok.Data;
 import lombok.SneakyThrows;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Data
@@ -94,5 +92,10 @@ public class CanvasProperties {
 
     public void addTrayConfig(CutInnerType key, TrayConfig config) {
         trayConfigs.put(key, config);
+    }
+
+    public void setCutInnerType(CutInnerType cutInnerType) {
+        this.cutInnerType = cutInnerType;
+        configuration.registryUniquePropertiesHolder(CutInnerType.class, cutInnerType);
     }
 }

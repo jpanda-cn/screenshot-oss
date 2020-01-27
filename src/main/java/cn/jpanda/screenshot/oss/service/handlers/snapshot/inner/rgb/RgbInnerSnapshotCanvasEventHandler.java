@@ -1,5 +1,8 @@
 package cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.rgb;
 
+import cn.jpanda.screenshot.oss.core.shotkey.shortcut.CanvasShortcutManager;
+import cn.jpanda.screenshot.oss.core.shotkey.shortcut.ShortCutExecutorHolder;
+import cn.jpanda.screenshot.oss.core.shotkey.shortcut.Shortcut;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.InnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
@@ -19,7 +22,7 @@ import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -53,38 +56,47 @@ public class RgbInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEvent
     private StringProperty hexStr = new SimpleStringProperty();
 
 
-    public RgbInnerSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler) {
-        super(canvasProperties, canvasDrawEventHandler);
+    public RgbInnerSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler, CanvasShortcutManager canvasShortcutManager) {
+        super(canvasProperties, canvasDrawEventHandler, canvasShortcutManager);
+        System.out.println("123");
         // 拦截外部事件
         canvasDrawEventHandler.getPane().addEventHandler(MouseEvent.ANY, this);
         // 注册快捷键
-        canvasDrawEventHandler.getPane().addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if (!canvasProperties.getCutInnerType().equals(CutInnerType.RGB)) {
-                return;
-            }
-            if (event.isControlDown()) {
-                switch (event.getCode()) {
-                    case P: {
-                        setValue(posStr.getValue(), String.format("已复制(POS):%s", posStr.getValue()));
-                        return;
-                    }
-                    case R: {
-                        setValue(rgbaStr.getValue(), String.format("已复制(RGBA):%s", rgbaStr.getValue()));
-                        return;
-                    }
-                    case H: {
-                        setValue(hexStr.getValue(), String.format("已复制(HEX):%s", hexStr.getValue()));
-                        return;
-                    }
-                    case A: {
-                        String copyValue = String.format("%s\n%s\n%s\n", pos.textProperty().getValue(), rgba.textProperty().getValue(), hex.textProperty().getValue());
-                        setValue(copyValue, String.format("已复制:\n%s", copyValue));
-                        return;
-                    }
-                }
-            }
-
-        });
+        addShortCut(canvasDrawEventHandler.getPane(),
+                CutInnerType.RGB
+                , ShortCutExecutorHolder
+                        .builder()
+                        .shortcut(Shortcut.Builder.create().ctrl(true).alt(false).addCode(KeyCode.P).description("复制当前鼠标位置").build())
+                        .match(getShortcutMatch())
+                        .executor(e -> setValue(posStr.getValue(), String.format("已复制(POS):%s", posStr.getValue())))
+                        .build());
+        addShortCut(canvasDrawEventHandler.getPane(),
+                CutInnerType.RGB
+                , ShortCutExecutorHolder
+                        .builder()
+                        .shortcut(Shortcut.Builder.create().ctrl(true).alt(false).addCode(KeyCode.R).description("复制RGBA色值").build())
+                        .match(getShortcutMatch())
+                        .executor(e -> setValue(rgbaStr.getValue(), String.format("已复制(RGBA):%s", rgbaStr.getValue())))
+                        .build());
+        addShortCut(canvasDrawEventHandler.getPane(),
+                CutInnerType.RGB
+                , ShortCutExecutorHolder
+                        .builder()
+                        .shortcut(Shortcut.Builder.create().ctrl(true).alt(false).addCode(KeyCode.H).description("复制HEX色值").build())
+                        .match(getShortcutMatch())
+                        .executor(e -> setValue(hexStr.getValue(), String.format("已复制(HEX):%s", hexStr.getValue())))
+                        .build());
+        addShortCut(canvasDrawEventHandler.getPane(),
+                CutInnerType.RGB
+                , ShortCutExecutorHolder
+                        .builder()
+                        .shortcut(Shortcut.Builder.create().ctrl(true).alt(false).addCode(KeyCode.A).description("复制全部数据").build())
+                        .match(getShortcutMatch())
+                        .executor(e -> {
+                            String copyValue = String.format("%s\n%s\n%s\n", pos.textProperty().getValue(), rgba.textProperty().getValue(), hex.textProperty().getValue());
+                            setValue(copyValue, String.format("已复制:\n%s", copyValue));
+                        })
+                        .build());
         // 补偿： 移除图片预览图
         canvasProperties.getCutRectangle().addEventHandler(MouseEvent.MOUSE_EXITED, event -> {
             exit();

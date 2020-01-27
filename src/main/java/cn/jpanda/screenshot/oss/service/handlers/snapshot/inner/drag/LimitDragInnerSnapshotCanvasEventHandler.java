@@ -3,6 +3,7 @@ package cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.drag;
 import cn.jpanda.screenshot.oss.common.toolkit.Bounds;
 import cn.jpanda.screenshot.oss.common.toolkit.ShapeCovertHelper;
 import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
+import cn.jpanda.screenshot.oss.core.shotkey.shortcut.CanvasShortcutManager;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.InnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
@@ -31,8 +32,8 @@ public class LimitDragInnerSnapshotCanvasEventHandler extends InnerSnapshotCanva
     protected double ow;
     protected double oh;
 
-    public LimitDragInnerSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler) {
-        super(canvasProperties, canvasDrawEventHandler);
+    public LimitDragInnerSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler, CanvasShortcutManager canvasShortcutManager) {
+        super(canvasProperties, canvasDrawEventHandler,canvasShortcutManager);
     }
 
     @Override

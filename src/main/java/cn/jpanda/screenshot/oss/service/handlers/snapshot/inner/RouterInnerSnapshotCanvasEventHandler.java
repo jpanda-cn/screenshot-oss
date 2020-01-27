@@ -1,5 +1,6 @@
 package cn.jpanda.screenshot.oss.service.handlers.snapshot.inner;
 
+import cn.jpanda.screenshot.oss.core.shotkey.shortcut.CanvasShortcutManager;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.arrow.ArrowInnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.drag.LimitDragInnerSnapshotCanvasEventHandler;
@@ -49,16 +50,16 @@ public class RouterInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEv
      */
     private RgbInnerSnapshotCanvasEventHandler rgbInnerSnapshotCanvasEventHandler;
 
-    public RouterInnerSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler) {
-        super(canvasProperties, canvasDrawEventHandler);
-        dragSnapshotCanvasEventHandler = new LimitDragInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler);
-        roundnessInnerSnapshotCanvasEventHandler = new RoundnessInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler);
-        rectangleInnerSnapshotCanvasEventHandler = new DrawRectangleInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler);
-        arrowInnerSnapshotCanvasEventHandler = new ArrowInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler);
-        penInnerSnapshotCanvasEventHandler = new PathPenInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler);
-        textInnerSnapshotCanvasEventHandler = new TextInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler);
-        mosaicInnerSnapshotCanvasEventHandler = new DotMatrixMosaicInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler);
-        rgbInnerSnapshotCanvasEventHandler = new RgbInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler);
+    public RouterInnerSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler, CanvasShortcutManager canvasShortcutManager) {
+        super(canvasProperties, canvasDrawEventHandler,canvasShortcutManager);
+        dragSnapshotCanvasEventHandler = new LimitDragInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler,canvasShortcutManager);
+        roundnessInnerSnapshotCanvasEventHandler = new RoundnessInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler,canvasShortcutManager);
+        rectangleInnerSnapshotCanvasEventHandler = new DrawRectangleInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler,canvasShortcutManager);
+        arrowInnerSnapshotCanvasEventHandler = new ArrowInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler,canvasShortcutManager);
+        penInnerSnapshotCanvasEventHandler = new PathPenInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler,canvasShortcutManager);
+        textInnerSnapshotCanvasEventHandler = new TextInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler,canvasShortcutManager);
+        mosaicInnerSnapshotCanvasEventHandler = new DotMatrixMosaicInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler,canvasShortcutManager);
+        rgbInnerSnapshotCanvasEventHandler = new RgbInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler, canvasShortcutManager);
     }
 
     @Override

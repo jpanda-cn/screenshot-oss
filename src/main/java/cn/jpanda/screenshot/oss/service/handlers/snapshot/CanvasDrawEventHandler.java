@@ -3,18 +3,22 @@ package cn.jpanda.screenshot.oss.service.handlers.snapshot;
 import cn.jpanda.screenshot.oss.common.toolkit.Bounds;
 import cn.jpanda.screenshot.oss.common.toolkit.ExternalComponentBinders;
 import cn.jpanda.screenshot.oss.core.Configuration;
+import cn.jpanda.screenshot.oss.core.shotkey.shortcut.CanvasShortcutManager;
+import cn.jpanda.screenshot.oss.core.shotkey.shortcut.ShortCutExecutorHolder;
+import cn.jpanda.screenshot.oss.core.shotkey.shortcut.ShortcutMatch;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import cn.jpanda.screenshot.oss.view.snapshot.EveryScreenshotWaitRemoveElement;
 import cn.jpanda.screenshot.oss.view.snapshot.WaitRemoveElementsHolder;
 import cn.jpanda.screenshot.oss.view.tray.CanvasCutTrayView;
+import cn.jpanda.screenshot.oss.view.tray.toolkits.CutInnerType;
 import javafx.event.EventHandler;
+import javafx.event.EventTarget;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.WritableImage;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -22,6 +26,7 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Window;
 import lombok.Getter;
+import lombok.Setter;
 
 import static cn.jpanda.screenshot.oss.common.utils.MathUtils.*;
 
@@ -38,12 +43,19 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
     private Rectangle cutRec;
     private Group group;
     private RoutingSnapshotCanvasEventHandler routingSnapshotCanvasEventHandler;
-    private SnapshotRegionKeyEventHandler snapshotRegionKeyEventHandler;
     private ExternalComponentBinders externalComponentBinders;
     private boolean start = true;
 
+    // 快捷键注册器
+    public static final String GLOBAL_FLAG = "GLOBAL_FLAG";
+    @Setter
+    protected ShortcutMatch shortcutMatch;
+    @Setter
+    protected CanvasShortcutManager canvasShortcutManager;
+
     private WritableImage backgroundImage;
     private WritableImage computerImage;
+
 
     public CanvasDrawEventHandler(Paint masking, GraphicsContext graphicsContext, Configuration configuration, WritableImage writableImage, WritableImage computerImage) {
         // 蒙版清晰度
@@ -59,6 +71,9 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
         // 加载工具托盘
         Scene scene = configuration.getViewContext().getScene(CanvasCutTrayView.class, false, true, false);
         toolbar = scene.getRoot();
+
+        canvasShortcutManager = getCanvasShortcutManager();
+        shortcutMatch = getShortcutMatch();
     }
 
     @Override
@@ -165,21 +180,45 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
             cutRec.setFill(Color.TRANSPARENT);
             CanvasProperties canvasProperties = new CanvasProperties(graphicsContext, cutRec, configuration, backgroundImage, computerImage);
             // 为截图区域注册事件
-            routingSnapshotCanvasEventHandler = new RoutingSnapshotCanvasEventHandler(canvasProperties, this);
+            routingSnapshotCanvasEventHandler = new RoutingSnapshotCanvasEventHandler(canvasProperties, this, canvasShortcutManager);
             cutRec.addEventHandler(MouseEvent.ANY, routingSnapshotCanvasEventHandler);
 
-
-            snapshotRegionKeyEventHandler = new SnapshotRegionKeyEventHandler(
-                    canvasProperties.getScreenshotsElementConvertor()
-                    , configuration
-                    , canvasProperties);
-
             Window window = cutRec.getScene().getWindow();
-            window.addEventHandler(KeyEvent.KEY_PRESSED, snapshotRegionKeyEventHandler);
+            new SnapshotRegionKeyEventRegister(
+                    window
+                    , canvasProperties.getScreenshotsElementConvertor()
+                    , configuration
+                    , canvasProperties
+                    , canvasShortcutManager
+            ).registry();
+
+
             // 存放截图相关数据
             window.getProperties().put(CanvasProperties.class, canvasProperties);
         }
 
-        ((WaitRemoveElementsHolder) (pane.getScene().getWindow().getProperties().get(WaitRemoveElementsHolder.class))).add(new EveryScreenshotWaitRemoveElement(group, pane, cutRec, routingSnapshotCanvasEventHandler, snapshotRegionKeyEventHandler, externalComponentBinders, cutRec.getScene().getWindow()));
+        ((WaitRemoveElementsHolder) (pane.getScene().getWindow().getProperties().get(WaitRemoveElementsHolder.class))).add(new EveryScreenshotWaitRemoveElement(group, pane, cutRec, routingSnapshotCanvasEventHandler, externalComponentBinders, cutRec.getScene().getWindow()));
     }
+
+    protected CanvasShortcutManager getCanvasShortcutManager() {
+        return configuration.getUniquePropertiesHolder(CanvasShortcutManager.class);
+
+    }
+
+    protected ShortcutMatch getShortcutMatch() {
+        return configuration.getUniquePropertiesHolder(ShortcutMatch.class);
+    }
+
+    protected void addShortCut(EventTarget target, Object type, ShortCutExecutorHolder holder) {
+        canvasShortcutManager.add(target, type, holder);
+    }
+
+    protected void addCurrent(EventTarget target, ShortCutExecutorHolder holder) {
+        addShortCut(target, configuration.getUniquePropertiesHolder(CutInnerType.class, null), holder);
+    }
+
+    protected void addGlobal(EventTarget target, ShortCutExecutorHolder holder) {
+        addShortCut(target, null, holder);
+    }
+
 }

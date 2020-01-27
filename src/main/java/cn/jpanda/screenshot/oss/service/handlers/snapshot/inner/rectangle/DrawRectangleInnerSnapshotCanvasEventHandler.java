@@ -5,6 +5,7 @@ import cn.jpanda.screenshot.oss.common.toolkit.RectangleAddTag2ResizeBinding;
 import cn.jpanda.screenshot.oss.common.toolkit.RectangleBinding;
 import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
 import cn.jpanda.screenshot.oss.core.shotkey.DefaultGroupScreenshotsElements;
+import cn.jpanda.screenshot.oss.core.shotkey.shortcut.CanvasShortcutManager;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.InnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
@@ -26,8 +27,8 @@ public class DrawRectangleInnerSnapshotCanvasEventHandler extends InnerSnapshotC
     private RectangleAddTag2ResizeBinding rectangleAddTag2ResizeBinding;
     private EventHandler<MouseEvent> dragRectangleEventHandler;
 
-    public DrawRectangleInnerSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler) {
-        super(canvasProperties, canvasDrawEventHandler);
+    public DrawRectangleInnerSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler, CanvasShortcutManager canvasShortcutManager) {
+        super(canvasProperties, canvasDrawEventHandler,canvasShortcutManager);
     }
 
     @Override

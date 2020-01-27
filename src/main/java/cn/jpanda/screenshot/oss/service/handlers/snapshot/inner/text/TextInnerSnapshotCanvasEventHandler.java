@@ -2,6 +2,7 @@ package cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.text;
 
 import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
 import cn.jpanda.screenshot.oss.core.shotkey.DefaultGroupScreenshotsElements;
+import cn.jpanda.screenshot.oss.core.shotkey.shortcut.CanvasShortcutManager;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.InnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.shape.TextRectangle;
@@ -27,8 +28,8 @@ public class TextInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEven
     private TextRectangle text;
     private boolean onShowing = false;
 
-    public TextInnerSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler) {
-        super(canvasProperties, canvasDrawEventHandler);
+    public TextInnerSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler, CanvasShortcutManager canvasShortcutManager) {
+        super(canvasProperties, canvasDrawEventHandler,canvasShortcutManager);
     }
 
     @Override

@@ -3,6 +3,7 @@ package cn.jpanda.screenshot.oss.service.handlers.snapshot;
 import cn.jpanda.screenshot.oss.common.utils.MathUtils;
 import cn.jpanda.screenshot.oss.core.log.Log;
 import cn.jpanda.screenshot.oss.core.log.LogHolder;
+import cn.jpanda.screenshot.oss.core.shotkey.shortcut.CanvasShortcutManager;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.InnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.RouterInnerSnapshotCanvasEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
@@ -14,10 +15,10 @@ public class RoutingSnapshotCanvasEventHandler extends AbstractSnapshotCanvasEve
     private boolean onEdge = false;
     private Log log = LogHolder.getInstance().getLogFactory().getLog(getClass());
 
-    public RoutingSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler) {
-        super(canvasProperties, canvasDrawEventHandler);
-        inner = new RouterInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler);
-        resize = new LimitResizeSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler);
+    public RoutingSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler, CanvasShortcutManager canvasShortcutManager) {
+        super(canvasProperties, canvasDrawEventHandler,canvasShortcutManager);
+        inner = new RouterInnerSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler,canvasShortcutManager);
+        resize = new LimitResizeSnapshotCanvasEventHandler(canvasProperties, canvasDrawEventHandler,canvasShortcutManager);
     }
 
     @Override

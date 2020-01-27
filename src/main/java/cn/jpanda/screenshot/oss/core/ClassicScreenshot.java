@@ -9,6 +9,7 @@ import cn.jpanda.screenshot.oss.service.handlers.KeyExitStageEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import cn.jpanda.screenshot.oss.view.snapshot.SnapshotView;
 import cn.jpanda.screenshot.oss.view.snapshot.WaitRemoveElementsHolder;
+import cn.jpanda.screenshot.oss.view.tray.toolkits.CutInnerType;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.event.EventTarget;
@@ -31,16 +32,14 @@ public class ClassicScreenshot implements Snapshot {
      * 快捷键注册表
      */
     private List<ShortCutExecutorHolder> shortCutExecutorHolders = new ArrayList<>();
-    private KeyboardShortcutsManager keyboardShortcutsManager;
+    private CanvasShortcutManager canvasShortcutManager;
     private ShortcutMatch shortcutMatch;
 
     public ClassicScreenshot(Configuration configuration) {
         this.configuration = configuration;
         this.log = configuration.getLogFactory().getLog(getClass());
-        this.keyboardShortcutsManager = getKeyboardShortcutsManager();
         this.shortcutMatch = getShortcutMatch();
     }
-
 
 
     @Override
@@ -76,20 +75,20 @@ public class ClassicScreenshot implements Snapshot {
             stage.setY(screenCapture.miny());
             EventHandler<KeyEvent> keyEventEventHandler = new KeyExitStageEventHandler(KeyCode.ESCAPE, stage);
             stage.addEventHandler(KeyEvent.KEY_RELEASED, keyEventEventHandler);
-            addShortCut(stage,ShortCutExecutorHolder
+            addShortCut(stage, ShortCutExecutorHolder
                     .builder()
                     .shortcut(Shortcut.Builder.create().addCode(KeyCode.ESCAPE).description("退出截图").build())
-                    .match(shortcutMatch)
+                    .match(canvasShortcutManager.getShortcutMatch())
                     .executor(keyEventEventHandler::handle)
                     .build());
 
             addShortCut(
                     stage
-                    ,ShortCutExecutorHolder
+                    , ShortCutExecutorHolder
                             .builder()
-                            .shortcut(Shortcut.Builder.create().ctrl(false).alt(false).addCode(KeyCode.SLASH).description("展示快捷键列表").build())
-                            .match(shortcutMatch)
-                            .executor(event -> ShortcutHelperShower.show(shortCutExecutorHolders,stage).show())
+                            .shortcut(Shortcut.Builder.create().ctrl(true).alt(false).addCode(KeyCode.SLASH).description("展示快捷键列表").build())
+                            .match(canvasShortcutManager.getShortcutMatch())
+                            .executor(event -> ShortcutHelperShower.show(canvasShortcutManager.loadWithGlobal(configuration.getUniquePropertiesHolder(CutInnerType.class)), stage).show())
                             .build()
             );
             stage.toFront();
@@ -109,6 +108,10 @@ public class ClassicScreenshot implements Snapshot {
             Stage stage = configuration.getViewContext().getStage();
             stage.opacityProperty().set(0);
         }
+
+        // 快捷键管理器
+        canvasShortcutManager = new CanvasShortcutManager(getKeyboardShortcutsManager(), getShortcutMatch());
+        configuration.registryUniquePropertiesHolder(CanvasShortcutManager.class, canvasShortcutManager);
     }
 
     protected void afterNewStage(Stage stage) {
@@ -119,6 +122,9 @@ public class ClassicScreenshot implements Snapshot {
         // 移除需要移除的数据
         // 注意顺序
         shortCutExecutorHolders.clear();
+        configuration.removeUniquePropertiesHolder(KeyboardShortcutsManager.class);
+        configuration.removeUniquePropertiesHolder(ShortcutMatch.class);
+
         CanvasProperties canvasProperties = ((CanvasProperties) stage.getProperties().get(CanvasProperties.class));
 
         if (canvasProperties != null) {
@@ -133,7 +139,11 @@ public class ClassicScreenshot implements Snapshot {
             defaultStage.opacityProperty().set(1);
         }
 
+        canvasShortcutManager = null;
+        configuration.removeUniquePropertiesHolder(CanvasShortcutManager.class);
+
     }
+
     protected KeyboardShortcutsManager getKeyboardShortcutsManager() {
         return new KeyboardShortcutsManager();
     }
@@ -141,8 +151,8 @@ public class ClassicScreenshot implements Snapshot {
     protected ShortcutMatch getShortcutMatch() {
         return new SimpleShortcutMatch();
     }
-    private void addShortCut(EventTarget target, ShortCutExecutorHolder holder) {
-        keyboardShortcutsManager.registryShortCut(target, holder);
-        shortCutExecutorHolders.add(holder);
+
+    protected void addShortCut(EventTarget target, ShortCutExecutorHolder holder) {
+        canvasShortcutManager.addGlobal(target, holder);
     }
 }

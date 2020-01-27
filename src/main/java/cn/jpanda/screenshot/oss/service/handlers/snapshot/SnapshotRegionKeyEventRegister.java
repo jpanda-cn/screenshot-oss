@@ -13,12 +13,18 @@ import cn.jpanda.screenshot.oss.core.log.Log;
 import cn.jpanda.screenshot.oss.core.mouse.GlobalMousePoint;
 import cn.jpanda.screenshot.oss.core.shotkey.DefaultGroupScreenshotsElements;
 import cn.jpanda.screenshot.oss.core.shotkey.ScreenshotsElementConvertor;
+import cn.jpanda.screenshot.oss.core.shotkey.shortcut.CanvasShortcutManager;
+import cn.jpanda.screenshot.oss.core.shotkey.shortcut.ShortCutExecutorHolder;
+import cn.jpanda.screenshot.oss.core.shotkey.shortcut.Shortcut;
+import cn.jpanda.screenshot.oss.core.shotkey.shortcut.ShortcutHelperShower;
 import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallback;
 import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallbackRegistryManager;
 import cn.jpanda.screenshot.oss.store.clipboard.instances.ImageClipboardCallback;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
+import cn.jpanda.screenshot.oss.view.tray.toolkits.CutInnerType;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
+import javafx.event.EventTarget;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -35,96 +41,84 @@ import javafx.stage.Stage;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-public class SnapshotRegionKeyEventHandler implements EventHandler<KeyEvent> {
+public class SnapshotRegionKeyEventRegister  {
     private Log log;
+    private EventTarget window;
     private ScreenshotsElementConvertor screenshotsElementConvertor;
     private Configuration configuration;
     private CanvasProperties canvasProperties;
+    private CanvasShortcutManager shortcutManager;
 
-    public SnapshotRegionKeyEventHandler(ScreenshotsElementConvertor screenshotsElementConvertor, Configuration configuration, CanvasProperties canvasProperties) {
+    public SnapshotRegionKeyEventRegister(EventTarget window, ScreenshotsElementConvertor screenshotsElementConvertor, Configuration configuration, CanvasProperties canvasProperties, CanvasShortcutManager shortcutManager) {
+        this.window=window;
         this.screenshotsElementConvertor = screenshotsElementConvertor;
         this.configuration = configuration;
         this.canvasProperties = canvasProperties;
+        this.shortcutManager = shortcutManager;
         this.log = configuration.getLogFactory().getLog(getClass());
-    }
-
-
-    @Override
-    public void handle(KeyEvent event) {
-        // 处理快捷键
-        if (event.isShortcutDown()) {
-            shortKey(event);
-        } else {
-            simpleKey(event);
-        }
 
     }
 
-    private boolean onlyControlDown(KeyEvent event) {
-        return event.isControlDown() && !event.isShiftDown() && !event.isAltDown() && !event.isMetaDown();
+
+
+    public void registry() {
+        shortcutManager.addGlobal(window,
+                ShortCutExecutorHolder
+                        .builder()
+                        .shortcut(Shortcut.Builder.create().ctrl(true).alt(false).addCode(KeyCode.Z).description("撤销上一步操作").build())
+                        .match(shortcutManager.getShortcutMatch())
+                        .executor(e -> screenshotsElementConvertor.destroyOne())
+                        .build()
+        );
+
+        shortcutManager.addGlobal(window,
+                ShortCutExecutorHolder
+                        .builder()
+                        .shortcut(Shortcut.Builder.create().ctrl(true).alt(false).addCode(KeyCode.Y).description("恢复上一步撤销操作").build())
+                        .match(shortcutManager.getShortcutMatch())
+                        .executor(e -> screenshotsElementConvertor.activateOne())
+                        .build()
+        );
+
+        shortcutManager.addGlobal(window,
+                ShortCutExecutorHolder
+                        .builder()
+                        .shortcut(Shortcut.Builder.create().ctrl(true).alt(false).addCode(KeyCode.V).description("粘贴当前剪切板内容到截图区域").build())
+                        .match(shortcutManager.getShortcutMatch())
+                        .executor(e -> paste())
+                        .build()
+        );
+
+        shortcutManager.addGlobal(window,
+                ShortCutExecutorHolder
+                        .builder()
+                        .shortcut(Shortcut.Builder.create().ctrl(false).alt(false).addCode(KeyCode.ENTER).description("完成截图").build())
+                        .match(shortcutManager.getShortcutMatch())
+                        .executor(e -> {
+                            if (canvasProperties == null) {
+                                return;
+                            }
+                            Scene scene = canvasProperties.getCutPane().getScene();
+                            Rectangle rectangle = canvasProperties.getCutRectangle();
+                            try {
+                                ScreenshotsProcess screenshotsProcess = configuration.getUniqueBean(ScreenshotsProcess.class);
+                                // 获取截图
+                                BufferedImage bufferedImage = screenshotsProcess.snapshot(scene, rectangle);
+                                // 不执行图片保存操作
+                                // 将图片放置剪切板
+                                ClipboardCallback clipboardCallback = configuration.getUniqueBean(ClipboardCallbackRegistryManager.class).get(ImageClipboardCallback.NAME);
+                                clipboardCallback.callback(bufferedImage, "");
+                            } finally {
+                                Stage stage = ((Stage) scene.getWindow());
+                                // 关闭
+                                Platform.runLater(stage::close);
+                            }
+                        })
+                        .build()
+        );
+
     }
 
-    private boolean onlyAltDown(KeyEvent event) {
-        return !event.isControlDown() && !event.isShiftDown() && event.isAltDown() && !event.isMetaDown();
-    }
-
-    private boolean onlyShiftDown(KeyEvent event) {
-        return !event.isControlDown() && event.isShiftDown() && !event.isAltDown() && !event.isMetaDown();
-    }
-
-    private boolean onlyMetaDown(KeyEvent event) {
-        return !event.isControlDown() && !event.isShiftDown() && !event.isAltDown() && event.isMetaDown();
-    }
-
-    private void shortKey(KeyEvent event) {
-        KeyCode code = event.getCode();
-        if (onlyControlDown(event)) {
-            // 只有control按下
-            switch (code) {
-                case Z: {
-                    // 撤销一步操作
-                    screenshotsElementConvertor.destroyOne();
-                    break;
-                }
-                case Y: {
-                    // 恢复一步操作
-                    screenshotsElementConvertor.activateOne();
-                    break;
-                }
-                case V: {
-                    paste();
-                }
-
-            }
-        }
-    }
-
-    private void simpleKey(KeyEvent event) {
-        KeyCode code = event.getCode();
-        switch (code) {
-            case ENTER: {
-                if (canvasProperties == null) {
-                    return;
-                }
-                Scene scene = canvasProperties.getCutPane().getScene();
-                Rectangle rectangle = canvasProperties.getCutRectangle();
-                try {
-                    ScreenshotsProcess screenshotsProcess = configuration.getUniqueBean(ScreenshotsProcess.class);
-                    // 获取截图
-                    BufferedImage bufferedImage = screenshotsProcess.snapshot(scene, rectangle);
-                    // 不执行图片保存操作
-                    // 将图片放置剪切板
-                    ClipboardCallback clipboardCallback = configuration.getUniqueBean(ClipboardCallbackRegistryManager.class).get(ImageClipboardCallback.NAME);
-                    clipboardCallback.callback(bufferedImage, "");
-                } finally {
-                    Stage stage = ((Stage) scene.getWindow());
-                    // 关闭
-                    Platform.runLater(stage::close);
-                }
-                break;
-            }
-        }
-    }
 
     private void paste() {
         log.info("will paste ...");

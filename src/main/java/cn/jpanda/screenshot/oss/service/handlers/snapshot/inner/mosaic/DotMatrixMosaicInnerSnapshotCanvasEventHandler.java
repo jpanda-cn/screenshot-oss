@@ -1,6 +1,7 @@
 package cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.mosaic;
 
 import cn.jpanda.screenshot.oss.core.shotkey.MosaicScreenshotsElements;
+import cn.jpanda.screenshot.oss.core.shotkey.shortcut.CanvasShortcutManager;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import cn.jpanda.screenshot.oss.view.tray.toolkits.CutInnerType;
@@ -40,8 +41,8 @@ public class DotMatrixMosaicInnerSnapshotCanvasEventHandler extends MosaicInnerS
 
     private MosaicScreenshotsElements mosaicScreenshotsElements;
 
-    public DotMatrixMosaicInnerSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler) {
-        super(canvasProperties, canvasDrawEventHandler);
+    public DotMatrixMosaicInnerSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler, CanvasShortcutManager canvasShortcutManager) {
+        super(canvasProperties, canvasDrawEventHandler,canvasShortcutManager);
         computerImage = canvasProperties.getBackgroundImage();
 
     }

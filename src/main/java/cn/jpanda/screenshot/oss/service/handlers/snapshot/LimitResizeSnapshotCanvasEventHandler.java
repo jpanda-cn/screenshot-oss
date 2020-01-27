@@ -3,6 +3,7 @@ package cn.jpanda.screenshot.oss.service.handlers.snapshot;
 import cn.jpanda.screenshot.oss.common.toolkit.ShapeCovertHelper;
 import cn.jpanda.screenshot.oss.common.utils.MathUtils;
 import cn.jpanda.screenshot.oss.common.toolkit.Bounds;
+import cn.jpanda.screenshot.oss.core.shotkey.shortcut.CanvasShortcutManager;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import cn.jpanda.screenshot.oss.common.enums.ResizeType;
 import javafx.scene.Cursor;
@@ -33,8 +34,8 @@ public class LimitResizeSnapshotCanvasEventHandler extends AbstractSnapshotCanva
     protected double ow;
     protected double oh;
 
-    public LimitResizeSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler) {
-        super(canvasProperties, canvasDrawEventHandler);
+    public LimitResizeSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler, CanvasShortcutManager canvasShortcutManager) {
+        super(canvasProperties, canvasDrawEventHandler,canvasShortcutManager);
     }
 
     @Override

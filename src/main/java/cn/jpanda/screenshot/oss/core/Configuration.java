@@ -126,7 +126,9 @@ public class Configuration {
     public <T> void registryUniquePropertiesHolder(Object key, Object value) {
         uniquePropertiesHolder.put(key, value);
     }
-
+    public <T> void removeUniquePropertiesHolder(Object key) {
+        uniquePropertiesHolder.remove(key);
+    }
 
     /**
      * 获取一个特殊且唯一的实体类
