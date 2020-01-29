@@ -381,6 +381,7 @@ public class ImageShower extends Stage {
 
     private MenuItem getOnTop(VBox box) {
         MenuItem onTop = new MenuItem("置顶(Ctrl+O)");
+        onTop.setOnAction(event -> setAlwaysOnTop(alwaysOnTopProperty().not().getValue()));
         alwaysOnTopProperty().addListener((observable, oldValue, newValue) -> onTop.setText(newValue ? "取消置顶(Ctrl+O)" : "置顶(Ctrl+O)"));
         // 展示隐藏标题
         addShortCut(

@@ -58,7 +58,6 @@ public class RgbInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEvent
 
     public RgbInnerSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler, CanvasShortcutManager canvasShortcutManager) {
         super(canvasProperties, canvasDrawEventHandler, canvasShortcutManager);
-        System.out.println("123");
         // 拦截外部事件
         canvasDrawEventHandler.getPane().addEventHandler(MouseEvent.ANY, this);
         // 注册快捷键

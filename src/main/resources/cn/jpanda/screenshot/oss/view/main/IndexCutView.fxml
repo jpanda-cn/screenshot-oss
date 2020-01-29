@@ -17,7 +17,7 @@
 <?import javafx.scene.text.Font?>
 
 <?import javafx.scene.image.Image?>
-<AnchorPane prefHeight="517.0" prefWidth="367.0" styleClass="back" stylesheets="@/css/default.css,@IndexCutView.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.jpanda.screenshot.oss.view.main.IndexCutView">
+<AnchorPane prefHeight="517.0" prefWidth="367.0" styleClass="back" stylesheets="@/css/default.css,@IndexCutView.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.jpanda.screenshot.oss.view.main.IndexCutView">
     <AnchorPane fx:id="mainContain" layoutX="8.0" layoutY="-2.0" prefHeight="556.0" prefWidth="357.0">
         <!-- 顶部title区域-->
         <AnchorPane id="contain-top" fx:id="containTop" layoutX="-8.0" layoutY="2.0" prefHeight="59.0" prefWidth="367.0" styleClass="top">
@@ -66,7 +66,7 @@
 
         <!-- 底部截图区域 -->
         <AnchorPane layoutX="21.0" layoutY="387.0" prefHeight="158.0" prefWidth="314.0">
-            <Button fx:id="cutBtn" layoutX="37.0" layoutY="22.0" mnemonicParsing="false" onKeyPressed="#doKeyCut" onMouseClicked="#doCut" prefHeight="87.0" prefWidth="238.0" text="截图" textFill="#010302">
+            <Button fx:id="cutBtn" layoutX="36.0" layoutY="22.0" mnemonicParsing="false" onKeyPressed="#doKeyCut" onMouseClicked="#doCut" prefHeight="87.0" prefWidth="238.0" text="截图" textFill="#010302">
                 <font>
                     <Font name="System Bold" size="38.0" />
                 </font>
@@ -75,8 +75,8 @@
                     <String fx:value="btn-basic" />
                 </styleClass>
             </Button>
-            <Label layoutX="130.0" layoutY="118.0" text="截图时隐藏该菜单" />
-            <RadioButton fx:id="hidden" layoutX="98.0" layoutY="118.0" mnemonicParsing="false" />
+            <Label layoutX="109.0" layoutY="118.0" text="截图时隐藏该菜单" />
+            <RadioButton fx:id="hidden" layoutX="77.0" layoutY="118.0" mnemonicParsing="false" />
             <Label fx:id="shotKeyShower" alignment="CENTER" disable="true" layoutX="127.0" layoutY="99.0" opacity="0.0" prefHeight="19.0" prefWidth="183.0" textFill="#1d27cf" />
         </AnchorPane>
     </AnchorPane>

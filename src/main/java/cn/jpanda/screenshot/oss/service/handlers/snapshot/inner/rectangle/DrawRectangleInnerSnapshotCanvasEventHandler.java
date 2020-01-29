@@ -28,7 +28,7 @@ public class DrawRectangleInnerSnapshotCanvasEventHandler extends InnerSnapshotC
     private EventHandler<MouseEvent> dragRectangleEventHandler;
 
     public DrawRectangleInnerSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler, CanvasShortcutManager canvasShortcutManager) {
-        super(canvasProperties, canvasDrawEventHandler,canvasShortcutManager);
+        super(canvasProperties, canvasDrawEventHandler, canvasShortcutManager);
     }
 
     @Override
@@ -88,6 +88,7 @@ public class DrawRectangleInnerSnapshotCanvasEventHandler extends InnerSnapshotC
             currentRectangle.yProperty().set(cy);
 
         }
+
         currentRectangle.widthProperty().set(width);
         currentRectangle.heightProperty().set(height);
 

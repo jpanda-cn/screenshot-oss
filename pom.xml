@@ -195,12 +195,11 @@
                         <launcherArgument>-Dvisualvm.display.name=Screenshot-oss</launcherArgument>
                     </launcherArguments>
                     <description>
-                        Screenshot-oss 是一款自动上传图片到云服务器中的截图工具，主要是方便coder写博客和README使用。
+                        JPanda Snapshot  是一款自动上传图片到云服务器中的截图工具，主要是方便coder写博客和README使用。
                     </description>
                 </configuration>
             </plugin>
         </plugins>
     </build>
-
 
 </project>
