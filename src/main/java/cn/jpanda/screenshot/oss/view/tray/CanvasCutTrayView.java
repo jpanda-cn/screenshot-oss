@@ -9,6 +9,7 @@ import cn.jpanda.screenshot.oss.core.ScreenshotsProcess;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
 import cn.jpanda.screenshot.oss.core.controller.ViewContext;
 import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
+import cn.jpanda.screenshot.oss.core.imageshower.ImageShowerManager;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
 import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallback;
 import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallbackRegistryManager;
@@ -261,7 +262,7 @@ public class CanvasCutTrayView implements Initializable {
         BufferedImage image = screenshotsProcess.snapshot(scene, rectangle);
         WritableImage showImage = new WritableImage(image.getWidth(), image.getHeight());
         showImage = SwingFXUtils.toFXImage(image, showImage);
-        ImageShower imageShower = ImageShower.of(configuration.getViewContext().getStage()).setTopTitle(text);
+        ImageShower imageShower = ImageShower.hidenTaskBar().setTopTitle(text).registySelf(configuration.getUniqueBean(ImageShowerManager.class));
         imageShower.setX(rectangle.getX());
         imageShower.setY(rectangle.getY());
         imageShower.show(showImage);

@@ -6,6 +6,7 @@ import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.ConfigurationHolder;
 import cn.jpanda.screenshot.oss.core.ScreenshotsProcess;
 import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
+import cn.jpanda.screenshot.oss.core.imageshower.ImageShowerManager;
 import cn.jpanda.screenshot.oss.core.shotkey.shortcut.*;
 import cn.jpanda.screenshot.oss.persistences.GlobalConfigPersistence;
 import cn.jpanda.screenshot.oss.view.main.SettingsView;
@@ -63,9 +64,16 @@ public class ImageShower extends Stage {
     private VBox box;
     private HBox top;
     private AnchorPane body;
+    @Getter
     private Rectangle rect;
+    @Getter
     private Image image;
+    @Getter
     private TextField topTitle;
+
+
+    @Getter
+    private ImageShowerManager imageShowerManager;
 
     /**
      * 快捷键注册表
@@ -96,6 +104,11 @@ public class ImageShower extends Stage {
         return this;
     }
 
+    public ImageShower registySelf(ImageShowerManager imageShowers) {
+        imageShowerManager=imageShowers;
+        return this;
+    }
+
     public ImageShower stylesheets(String stylesheets) {
         this.stylesheets.set(stylesheets);
         return this;
@@ -116,6 +129,20 @@ public class ImageShower extends Stage {
         return new ImageShower(stage);
     }
 
+    public static ImageShower hidenTaskBar() {
+        Stage stage = new Stage(StageStyle.UTILITY);
+        stage.setX(0);
+        stage.setOpacity(0);
+        stage.setMaxHeight(0);
+        stage.setMaxWidth(0);
+        stage.setX(Double.MAX_VALUE);
+        stage.setScene(new Scene(new AnchorPane()));
+        stage.show();
+        ImageShower imageShower = of(stage);
+        imageShower.setOnCloseRequest(event -> stage.hide());
+        return imageShower;
+    }
+
     public static ImageShower of() {
         return new ImageShower();
     }
@@ -124,8 +151,17 @@ public class ImageShower extends Stage {
         load(image).show();
     }
 
+    public void showAndRegistry(Image image, ImageShowerManager imageShowers) {
+        imageShowerManager=imageShowers;
+        load(image);
+        show();
+    }
+
     public ImageShower load(Image image) {
         init(image);
+        if(imageShowerManager!=null){
+            imageShowerManager.add(this);
+        }
         return this;
     }
 
@@ -174,7 +210,7 @@ public class ImageShower extends Stage {
         MenuItem onTop = getOnTop(box);
 
         MenuItem copyItem = getCopyItem(box);
-        MenuItem copyFullItem =getCopyFullItem(box);
+        MenuItem copyFullItem = getCopyFullItem(box);
 
         MenuItem hideTop = getHideTop(box);
         MenuItem hideBorder = getHideBorder(box);
@@ -253,7 +289,7 @@ public class ImageShower extends Stage {
                         .executor(event -> doSave(image))
                         .build()
         );
-        return  cImageToUpload;
+        return cImageToUpload;
     }
 
     private MenuItem getCopyFullItem(VBox box) {
@@ -284,7 +320,7 @@ public class ImageShower extends Stage {
                         .builder()
                         .shortcut(Shortcut.Builder.create().ctrl(true).alt(true).addCode(KeyCode.S).description("窗口图像另存为").build())
                         .match(shortcutMatch)
-                        .executor(event ->     saveAndChooseFile(this.getScene().snapshot(null)))
+                        .executor(event -> saveAndChooseFile(this.getScene().snapshot(null)))
                         .build()
         );
         return sceneSaveOther;
@@ -301,7 +337,7 @@ public class ImageShower extends Stage {
                         .builder()
                         .shortcut(Shortcut.Builder.create().ctrl(true).alt(false).addCode(KeyCode.S).description("图像另存为").build())
                         .match(shortcutMatch)
-                        .executor(event ->   saveAndChooseFile(image))
+                        .executor(event -> saveAndChooseFile(image))
                         .build()
         );
         return saveOther;
@@ -350,7 +386,7 @@ public class ImageShower extends Stage {
     private MenuItem getHideTop(VBox box) {
         MenuItem hideTop = new MenuItem("隐藏标题(Ctrl+T)");
         AtomicBoolean isHide = new AtomicBoolean(true);
-        EventHandler<ActionEvent> actionEventEventHandler=e -> {
+        EventHandler<ActionEvent> actionEventEventHandler = e -> {
             if (isHide.get()) {
                 hideTop.setUserData(top.heightProperty().getValue());
                 top.visibleProperty().setValue(false);
@@ -550,11 +586,11 @@ public class ImageShower extends Stage {
         cancel.fontProperty().set(Font.font(11));
         cancel.getStyleClass().addAll("tool-tip-cancel");
         ok.setOnMouseClicked((e) -> {
-            close();
+            doClose();
         });
         ok.setOnKeyPressed(e -> {
             if (e.getCode().equals(KeyCode.ENTER)) {
-                close();
+                doClose();
             }
         });
         cancel.setOnMouseClicked((e) -> {
@@ -578,6 +614,13 @@ public class ImageShower extends Stage {
         tooltip.show(node, this.getX() + this.getWidth(), this.getY());
         ok.requestFocus();
 
+    }
+
+    public void doClose(){
+        if(imageShowerManager!=null){
+            imageShowerManager.remove(this);
+        }
+        close();
     }
 
     public EventHandler<MouseEvent> addDrag(Node node) {

@@ -176,3 +176,60 @@
     -fx-opacity: 0.8;
     -fx-text-fill: rgba(248,249,250,1);
 }
+
+.dialog-pane .button-white {
+    /*文本对齐方式*/
+    -fx-text-alignment: center;
+    /*合适高度*/
+    -fx-min-height: 25px;
+    /*粗体*/
+    -fx-font-weight: bold;
+    /*内边距*/
+    -fx-padding: 0 18px;
+    /*无边框*/
+    -fx-border-style: none;
+    /*鼠标样式*/
+    -fx-cursor: pointer;
+    -fx-text-fill: black;
+    -fx-background-color: rgba(255,255,255,0);
+    -fx-wrap-text: true;
+    /*-fx-effect: dropshadow( three-pass-box, rgba(198,47,47,1), 10.0, 0.0, 0.0, 0.0);*/
+}
+
+.dialog-pane .button-white:hover {
+    /*透明度*/
+    -fx-opacity: 0.8;
+    -fx-text-fill: red;
+    -fx-background-color: black;
+}
+
+.dialog-pane .button-white:pressed {
+    /*粗体*/
+    /*-fx-font-weight: bold;*/
+    /*透明度*/
+    -fx-opacity: 0.8;
+    -fx-text-fill: rgba(248,249,250,1);
+}
+
+.dialog-pane .svg-button {
+    -fx-fill: black;
+    -fx-content-display: graphic-only;
+    -fx-background-color: rgba(255, 255, 255, 0);
+    -fx-cursor: default;
+}
+
+.dialog-pane .svg-button:hover .svg {
+    -fx-fill: WHITE;
+}
+.dialog-pane .svg-button:hover {
+    -fx-background-color: BLACK;
+
+}
+.dialog-pane .svg-button:pressed .svg {
+    -fx-fill: rgba(198,47,47,1);
+
+}
+
+.dialog-pane .svg-button:pressed {
+    -fx-background-color: rgba(255, 255, 255, 0.5);
+}
