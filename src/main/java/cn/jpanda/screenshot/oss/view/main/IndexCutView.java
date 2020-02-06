@@ -18,10 +18,8 @@ import cn.jpanda.screenshot.oss.store.img.ImageStoreRegisterManager;
 import cn.jpanda.screenshot.oss.view.fail.FailListView;
 import cn.jpanda.screenshot.oss.view.password.modify.ModifyPassword;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -34,6 +32,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -291,11 +290,11 @@ public class IndexCutView implements Initializable {
         ListView<HBox> listView = new ListView<>();
         listView.setPrefWidth(480);
         ObservableList<ImageShower> ss = showers.getShowers();
-        ObservableList<HBox> sh = FXCollections.observableList(ss.stream().map(s -> hBox(listView, s)).collect(Collectors.toList()));
+        ObservableList<HBox> sh = FXCollections.observableList(ss.stream().map(s -> hBox(listView, s, ss.indexOf(s) + 1)).collect(Collectors.toList()));
 
         ss.addListener((ListChangeListener<ImageShower>) c -> {
             sh.clear();
-            sh.addAll(FXCollections.observableList(ss.stream().map(s -> hBox(listView, s)).collect(Collectors.toList())));
+            sh.addAll(FXCollections.observableList(ss.stream().map(s -> hBox(listView, s, ss.indexOf(s) + 1)).collect(Collectors.toList())));
         });
         listView.itemsProperty().bind(new SimpleObjectProperty<>(sh));
 
@@ -309,6 +308,9 @@ public class IndexCutView implements Initializable {
                     return true;
                 })
                 .buttonTypes(ButtonType.CLOSE);
+        Stage stage = (Stage) popDialog.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(new Image("/images/icon-red.png"));
+        popDialog.titleProperty().set("图钉管理");
         popDialog.initModality(Modality.WINDOW_MODAL);
         popDialog.showAndWait();
     }
@@ -471,16 +473,17 @@ public class IndexCutView implements Initializable {
         ((Stage) containTop.getScene().getWindow()).setIconified(true);
     }
 
-    public HBox hBox(ListView listView, ImageShower imageShower) {
+    public HBox hBox(ListView listView, ImageShower imageShower, Integer n) {
 
         HBox hBox = new HBox();
         hBox.setSpacing(10);
         hBox.setAlignment(Pos.CENTER_LEFT);
-        Text num = new Text();
+        Text num = new Text(n + "");
         num.setWrappingWidth(35);
         TextField textField = new TextField();
-        textField.setEditable(false);
-        textField.textProperty().bind(imageShower.getTopTitle().textProperty());
+        textField.setEditable(true);
+//        textField.setEditable(false);
+        textField.textProperty().bindBidirectional(imageShower.getTopTitle().textProperty());
         HBox vBox = new HBox();
         vBox.setAlignment(Pos.CENTER);
         vBox.setSpacing(5);
@@ -498,7 +501,6 @@ public class IndexCutView implements Initializable {
         imageView.setFitWidth(100);
         imageView.setFitHeight(100);
         hBox.getChildren().addAll(num, imageView, textField, vBox);
-        num.textProperty().bind(Bindings.createStringBinding(() -> listView.getItems().indexOf(hBox) + 1 + "", listView.getItems()));
         return hBox;
     }
 
