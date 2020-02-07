@@ -6,6 +6,7 @@ import cn.jpanda.screenshot.oss.common.toolkit.LoadingShower;
 import cn.jpanda.screenshot.oss.common.toolkit.PopDialog;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
+import cn.jpanda.screenshot.oss.core.imageshower.ImageShowerManager;
 import cn.jpanda.screenshot.oss.store.ImageStoreResult;
 import cn.jpanda.screenshot.oss.store.ImageStoreResultHandler;
 import cn.jpanda.screenshot.oss.store.ImageStoreResultWrapper;
@@ -13,6 +14,8 @@ import cn.jpanda.screenshot.oss.store.img.ImageStore;
 import cn.jpanda.screenshot.oss.store.img.ImageStoreRegisterManager;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -29,6 +32,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutionException;
 
@@ -39,8 +44,11 @@ public class FailListView implements Initializable {
 
     private Configuration configuration;
 
+    private Map<String, Boolean> imageIsShow;
+
     public FailListView(Configuration configuration) {
         this.configuration = configuration;
+        imageIsShow = configuration.getUniquePropertiesHolder(FailListView.class.getCanonicalName() + "-" + imageIsShow, new HashMap<>());
     }
 
     public TableView<ImageStoreResult> table;
@@ -52,6 +60,8 @@ public class FailListView implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
+
         table.setFixedCellSize(130.0);
 
         table.editableProperty().set(false);
@@ -69,15 +79,30 @@ public class FailListView implements Initializable {
 
         image.setCellValueFactory((cell) -> {
             try {
-
+                // TODO 缩略图点击时应该在图钉管理界面展示，且缩略图不可重复点击
                 Image image = new Image(new FileInputStream(new File(cell.getValue().getPath().get())));
                 Button button = loadImage(image);
                 button.setMinWidth(100);
                 button.setMinHeight(100);
                 button.getStyleClass().clear();
+
+
                 button.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-                    ImageShower imageShower = ImageShower.of((Stage) table.getScene().getWindow()).setTopTitle(cell.getValue().getPath().get());
-                    imageShower.show(image);
+                    if (!imageIsShow.getOrDefault(cell.getValue().getPath().get(), false)) {
+
+                        ImageShower imageShower = ImageShower
+                                .hidenTaskBar()
+                                .setTopTitle(cell.getValue().getPath().get());
+
+                        imageShower.showingProperty().addListener(new ChangeListener<Boolean>() {
+                            @Override
+                            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                                imageIsShow.put(cell.getValue().getPath().get(), newValue);
+                            }
+                        });
+
+                        imageShower.showAndRegistry(image, configuration.getUniqueBean(ImageShowerManager.class));
+                    }
                 });
                 return new SimpleObjectProperty<>(button);
             } catch (FileNotFoundException f) {

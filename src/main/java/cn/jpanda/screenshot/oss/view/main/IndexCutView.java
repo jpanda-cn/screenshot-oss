@@ -303,11 +303,9 @@ public class IndexCutView implements Initializable {
 
                 .setHeader("图钉管理")
                 .setContent(listView)
-                .callback(buttonType -> {
-                    configuration.registryUniquePropertiesHolder(showingKey, false);
-                    return true;
-                })
+                .callback(buttonType -> true)
                 .buttonTypes(ButtonType.CLOSE);
+        popDialog.setOnCloseRequest(event -> configuration.registryUniquePropertiesHolder(showingKey, false));
         Stage stage = (Stage) popDialog.getDialogPane().getScene().getWindow();
         stage.getIcons().add(new Image("/images/icon-red.png"));
         popDialog.titleProperty().set("图钉管理");
@@ -317,6 +315,7 @@ public class IndexCutView implements Initializable {
 
 
     public void toFailList() {
+
         // 使用动画，加载至右侧
         configuration.registryUniquePropertiesHolder(FailListView.IS_SHOWING, true);
 
