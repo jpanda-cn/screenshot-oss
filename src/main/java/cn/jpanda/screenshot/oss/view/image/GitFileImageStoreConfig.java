@@ -85,10 +85,10 @@ public class GitFileImageStoreConfig implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
 
 
-
         boolean update = false;
         GitPersistence gitPersistence = configuration.getPersistence(GitPersistence.class);
-        if (StringUtils.isEmpty(gitPersistence.getLocalRepositoryDir())) {
+
+        if (StringUtils.isEmpty(gitPersistence.getLocalRepositoryDir()) || !Paths.get(gitPersistence.getLocalRepositoryDir()).toFile().exists()) {
             gitPersistence.setLocalRepositoryDir(Paths.get(configuration.getWorkPath()).toFile().getAbsolutePath());
             update = true;
         }
@@ -336,6 +336,6 @@ public class GitFileImageStoreConfig implements Initializable {
     }
 
     protected void message(String message) {
-        PopDialogShower.message(message,username.getScene().getWindow());
+        PopDialogShower.message(message, username.getScene().getWindow());
     }
 }

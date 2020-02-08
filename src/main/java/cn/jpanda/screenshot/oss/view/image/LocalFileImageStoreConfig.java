@@ -39,8 +39,10 @@ public class LocalFileImageStoreConfig implements Initializable {
 
         // 加载配置文件
         config = configuration.getPersistence(LocalImageStorePersistence.class);
-        if (StringUtils.isEmpty(config.getPath())) {
-
+        if (StringUtils.isEmpty(config.getPath())
+                || !Paths.get(config.getPath()).toFile().exists()
+        ) {
+            // 未配置图片路径或者图片路径不存在均会使用当前默认地址
             config.setPath(Paths.get(configuration.getWorkPath(), "images", "saves").toFile().getAbsolutePath());
             configuration.storePersistence(config);
         }
@@ -50,7 +52,6 @@ public class LocalFileImageStoreConfig implements Initializable {
         tooltip.textProperty().bind(show.textProperty());
         show.tooltipProperty().setValue(tooltip);
         configuration.registryUniquePropertiesHolder(Callable.class.getCanonicalName() + "-" + LocalImageStore.NAME, (Callable<Boolean, ButtonType>) a -> {
-            System.out.println(a);
             if (a.equals(ButtonType.APPLY)) {
                 return save();
             }
@@ -68,8 +69,9 @@ public class LocalFileImageStoreConfig implements Initializable {
             directoryChooser.setInitialDirectory(dir);
         }
         directoryChooser.setTitle("请选择本地图片保存地址");
+        // fixed 在截图状态下，修改本地保存地址无法正确的将文件选择框展示在最上层。
+        File file = directoryChooser.showDialog(show.getScene().getWindow());
 
-        File file = directoryChooser.showDialog(configuration.getViewContext().newStage());
         if (file == null) {
             return;
         }
