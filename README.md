@@ -16,15 +16,15 @@
 
 这样我在写blog的时候，只需要两步`截图->粘贴`即可，而不用再去处理关于将图片上传到云环境的相关步骤。
 
-因此，在这个想法的前提下，逐渐诞生了这个截图工具————`JPnada Snapshot`。
+因此，在这个想法的前提下，逐渐诞生了这个截图工具————`JPanda Snapshot`。
 
 ## 特点
 
-1. `JPnada Snapshot`支持将截图上传到多种不同的环境中。
+1. `JPanda Snapshot`支持将截图上传到多种不同的环境中。
     
     目前包括: `阿里云`，`京东云`,`GITHUB`,`GITEE`,`OSCHINA`,`简书`以及`本地`和`不存储`。
     
-2. `JPnada Snapshot`在完成图片上传之后，允许将图片或图片地址处理成不同的数据类型。
+2. `JPanda Snapshot`在完成图片上传之后，允许将图片或图片地址处理成不同的数据类型。
 
     目前包括: `MARKDOWN语法`，`真实访问地址`,`图片本身`。
 
@@ -67,16 +67,16 @@
 
 如果用户设置了密码，且进行了相关的云服务配置，第二次启用时**未输入密码**或**输入错误的密码**，因为无法解密相关云服务配置，可能会导致图片上传异常。
 
-![初始启动可选择是否设置初始密码](https://jpanda-snapshot.s3.cn-north-1.jdcloud-oss.com/%E5%90%AF%E5%8A%A8%E7%95%8C%E9%9D%A2.gif)
+![初始启动可选择是否设置初始密码](https://s2.ax1x.com/2020/02/08/1WFbrR.gif)
 ### 全局快捷键配置
 
-借助于开源项目`com.1stleg.jnativehook`,`JPnada Snapshot`实现了全局快捷键的功能，即允许在后台运行`JPnada Snapshot`的同时，通过快捷键快速唤醒加载截图界面。
+借助于开源项目`com.1stleg.jnativehook`,`JPanda Snapshot`实现了全局快捷键的功能，即允许在后台运行`JPanda Snapshot`的同时，通过快捷键快速唤醒加载截图界面。
 
 默认的全局快捷键是`CTRL`+`SHITF`+`ALT`+`J`,该值可以在主窗口中进行修改。
-![全局快捷键](https://jpanda-snapshot.s3.cn-north-1.jdcloud-oss.com/%E5%85%A8%E5%B1%80%E5%BF%AB%E6%8D%B7%E9%94%AE.gif)
+![全局快捷键](https://s2.ax1x.com/2020/02/08/1WFqq1.gif)
 ### 存储方式
-目前`JPnada Snapshot`支持多种图片的存储方式，其中包括:
-![存储方式和剪切板内容](https://screenshot-oss.s3.cn-north-1.jdcloud-oss.com/98716d89-0408-4f54-b5e8-32971582e682.png)
+目前`JPanda Snapshot`支持多种图片的存储方式，其中包括:
+![存储方式和剪切板内容](https://s2.ax1x.com/2020/02/08/1WAf9U.png)
 - OS-CHINA(开源中国)
 > 开源中国的存储实现，依赖于`WebView`，实现原理是获取登录用户的`cookie`,并携带该`cookie`进行图片上传接口的调用，因为第三方的限制，该云存储方式不支持异步上传。
 
@@ -88,8 +88,8 @@
     <artifactId>org.eclipse.jgit</artifactId>
 </dependency>
 ```
-![创建GIT仓库](https://jpanda-snapshot.s3.cn-north-1.jdcloud-oss.com/%E5%88%9B%E5%BB%BAGIt%E4%BB%93%E5%BA%93.gif)
-![配置GITLAB](https://jpanda-snapshot.s3.cn-north-1.jdcloud-oss.com/%E9%85%8D%E7%BD%AEGIt%E4%BB%93%E5%BA%932.gif)
+![创建GIT仓库](https://s2.ax1x.com/2020/02/08/1WkCMd.gif)
+![配置GITLAB](https://s2.ax1x.com/2020/02/08/1WkSRe.gif)
 - 京东云存储
 > 京东云存储的实现借助于`com.amazonaws.aws-java-sdk-s3`包来实现，因此，理论上支持所有`aws3`协议的云存储服务。
 ```
@@ -99,7 +99,7 @@
    <version>1.11.490</version>
 </dependency>
 ```
-![配置京东云存储](https://jpanda-snapshot.s3.cn-north-1.jdcloud-oss.com/%E9%85%8D%E7%BD%AE%E4%BA%AC%E4%B8%9C%E4%BA%91%E5%AD%98%E5%82%A8.gif)
+![配置京东云存储](https://s2.ax1x.com/2020/02/08/1WkiqI.gif)
 - 阿里OSS
 > 阿里OSS的实现，依赖了阿里提供的`com.aliyun.oss.aliyun-sdk-oss`,因此该方式仅可用于阿里OSS。
 ```
@@ -110,7 +110,7 @@
 ```
 - 简书
 > 简书的存储实现，依赖于`WebView`，实现原理是获取登录用户的`cookie`,并携带该`cookie`进行图片上传接口的调用，因为第三方的限制，该云存储方式不支持异步上传。
-![配置简书](https://jpanda-snapshot.s3.cn-north-1.jdcloud-oss.com/%E9%85%8D%E7%BD%AE%E7%AE%80%E4%B9%A6.gif)
+![配置简书](https://s2.ax1x.com/2020/02/08/1WkmRg.gif)
 - 本地保存
 > 将图片存储到本地
 
@@ -119,14 +119,14 @@
 
 
 ###  剪切板内容
-目前`JPnada Snapshot`支持多种剪切板内容设置，主要包括:
+目前`JPanda Snapshot`支持多种剪切板内容设置，主要包括:
 - MARKDOWN语法
-> 在当前模式下，用户在上传图片后，`JPnada Snapshot`将自动将图片的访问地址包装成`MARKDOWN`语法，并回填到剪切板中，待用户使用。
+> 在当前模式下，用户在上传图片后，`JPanda Snapshot`将自动将图片的访问地址包装成`MARKDOWN`语法，并回填到剪切板中，待用户使用。
 
 - 图片
-> 在当前模式下，用户在上传图片后，`JPnada Snapshot`将自动将图片本身回填到剪切板中，待用户使用。
+> 在当前模式下，用户在上传图片后，`JPanda Snapshot`将自动将图片本身回填到剪切板中，待用户使用。
 - 地址
-> 在当前模式下，用户在上传图片后，`JPnada Snapshot`将自动将图片的访问地址回填到剪切板中，待用户使用。
+> 在当前模式下，用户在上传图片后，`JPanda Snapshot`将自动将图片的访问地址回填到剪切板中，待用户使用。
 
 ### 密码管理
 用户可以在主窗口中，通过访问`选项`-`密码管理`，点击具体的子菜单完成密码的管理工作。
@@ -148,7 +148,7 @@
 ## 截图窗口中的不同按钮功能以及模式
 
 ### 截图窗口拖拽
-![截图窗口展示](https://jpanda-snapshot.s3.cn-north-1.jdcloud-oss.com/%E6%88%AA%E5%9B%BE%E5%8A%9F%E8%83%BD%E5%B1%95%E7%A4%BA.gif)
+![截图窗口展示](https://s2.ax1x.com/2020/02/08/1Wk1Zq.gif)
 在拖拽模式，允许用户移动已选中的区域，拖拽不会变更已选中区域的大小。
 
 拖拽窗口，不允许超出屏幕边界，还会受限于截图区域中已有元素的位置。
@@ -193,19 +193,19 @@
 
 **需要注意的是，因为`Windows`的荧幕字体平滑工具`clearType`的原因，在对黑色文字进行马赛克标记时，可能会生成彩色的马赛克。**
 
-**马赛克不会作用于`JPnada Snapshot`创建的元素。**
+**马赛克不会作用于`JPanda Snapshot`创建的元素。**
 
 ### 取色器
 
-在取色器模式下，`JPnada Snapshot`将会在当前鼠标的适当位置，生成一个预览区域，该区域将会展示当前鼠标的位置，以及鼠标对应像素点的色值的`RGBA`和`HEX`表现形式。
+在取色器模式下，`JPanda Snapshot`将会在当前鼠标的适当位置，生成一个预览区域，该区域将会展示当前鼠标的位置，以及鼠标对应像素点的色值的`RGBA`和`HEX`表现形式。
 
 在该模式下，允许使用快捷键快速复制需要使用的数值，具体的快捷键，参见`快捷键`-`截图窗口快捷键`-`取色模式快捷键`。
 
 ### 图钉
 
-![图钉功能](https://jpanda-snapshot.s3.cn-north-1.jdcloud-oss.com/%E5%9B%BE%E9%92%89%E5%8A%9F%E8%83%BD2.gif)
+![图钉功能](https://s2.ax1x.com/2020/02/08/1WkRQH.gif)
 图钉模式，允许将当前截图区域固定到屏幕上，便于后续的操作使用。
-![](https://screenshot-oss.s3.cn-north-1.jdcloud-oss.com/72011b50-4a57-43e4-93db-fb659e246913.png)
+![图钉展示和图钉管理](https://s2.ax1x.com/2020/02/08/1WADXj.png)
 图钉模式支持右键菜单。
 图钉模式支持和快捷键,具体的快捷键参见`快捷键`-`图钉窗口快捷键`。
 
@@ -231,7 +231,7 @@
 
 #### 截图窗口快捷键
 > 全局快捷键在所有编辑模式下均生效
-![截图窗口快捷键](https://jpanda-snapshot.s3.cn-north-1.jdcloud-oss.com/%E5%B1%95%E7%A4%BA%E5%BF%AB%E6%8D%B7%E9%94%AE-%E6%88%AA%E5%9B%BE.gif)
+![截图窗口快捷键](https://s2.ax1x.com/2020/02/08/1WAVmR.gif)
 ##### 全局快捷键
 |功能|组合键|
 |---|---|
@@ -264,7 +264,7 @@
 |上传当前图片到云环境|`CTRL`+`U`|
 |上传当前窗口快照到云环境|`CTRL`+`ALT`+`U`|
 |展示快捷键列表|`CTRL`+`/`|
-![图钉快捷键](https://jpanda-snapshot.s3.cn-north-1.jdcloud-oss.com/%E5%B1%95%E7%A4%BA%E5%BF%AB%E6%8D%B7%E9%94%AE.gif)
+![图钉快捷键](https://s2.ax1x.com/2020/02/08/1WAutK.gif)
 
 
 ## 主要工作流程
