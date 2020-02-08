@@ -62,6 +62,7 @@ public class ClassicScreenshot implements Snapshot {
             // 执行截图操作
             // 处理ICON
             Stage stage = configuration.getViewContext().newStage();
+            stage.setOnCloseRequest(event -> configuration.getCutting().set(null));
             afterNewStage(stage);
             configuration.getCutting().set(stage);
             stage.initOwner(configuration.getViewContext().getStage());
@@ -97,7 +98,7 @@ public class ClassicScreenshot implements Snapshot {
             stage.showAndWait();
             stage.close();
             afterCut(stage);
-            configuration.getCutting().set(null);
+
         });
 
     }
