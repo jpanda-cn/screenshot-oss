@@ -67,6 +67,55 @@ public class LoadingShower {
         return loadingStage;
 
     }
+    public static Stage custom(Window parent,String message) {
+
+        Stage loadingStage = new Stage(StageStyle.TRANSPARENT);
+
+        loadingStage.initOwner(parent);
+        loadingStage.initModality(Modality.APPLICATION_MODAL);
+
+
+        ProgressIndicator progressIndicator = new ProgressIndicator();
+        progressIndicator.setStyle("  -fx-progress-color: WHITE ;");
+        progressIndicator.setProgress(-1F);
+
+        Label label = new Label(message);
+        label.setTextFill(Color.RED);
+        label.setBackground(Background.EMPTY);
+
+
+        VBox vBox = new VBox(progressIndicator, label);
+        vBox.setSpacing(10);
+        vBox.setStyle("-fx-background-color: transparent");
+        AnchorPane pane = new AnchorPane(vBox);
+        pane.setStyle("-fx-background-color:  rgba(0,0,0,0.3)");
+
+        Scene scene = new Scene(pane);
+        scene.setFill(Color.TRANSPARENT);
+        loadingStage.setScene(scene);
+
+        loadingStage.setX(parent.getX());
+        loadingStage.setY(parent.getY());
+
+        pane.layoutXProperty().set(0);
+        pane.layoutYProperty().set(0);
+
+        pane.prefWidthProperty().bind(parent.getScene().widthProperty());
+        pane.prefHeightProperty().bind(pane.getScene().heightProperty());
+        loadingStage.setWidth(parent.getWidth());
+        loadingStage.setHeight(parent.getHeight());
+
+        vBox.translateXProperty()
+                .bind(pane.widthProperty().subtract(vBox.widthProperty())
+                        .divide(2));
+
+        vBox.translateYProperty()
+                .bind(pane.heightProperty().subtract(vBox.heightProperty())
+                        .divide(2));
+
+        return loadingStage;
+
+    }
     public static Stage createUploading(Window parent) {
 
         Stage loadingStage = new Stage(StageStyle.TRANSPARENT);

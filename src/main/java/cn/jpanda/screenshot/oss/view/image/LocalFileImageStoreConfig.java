@@ -39,6 +39,7 @@ public class LocalFileImageStoreConfig implements Initializable {
 
         // 加载配置文件
         config = configuration.getPersistence(LocalImageStorePersistence.class);
+        // 修复存储地址不正确时，无法打开文件选择器的问题
         if (StringUtils.isEmpty(config.getPath())
                 || !Paths.get(config.getPath()).toFile().exists()
         ) {

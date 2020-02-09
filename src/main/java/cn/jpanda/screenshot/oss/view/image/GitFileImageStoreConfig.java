@@ -1,26 +1,26 @@
 package cn.jpanda.screenshot.oss.view.image;
 
 import cn.jpanda.screenshot.oss.common.toolkit.Callable;
+import cn.jpanda.screenshot.oss.common.toolkit.LoadingShower;
 import cn.jpanda.screenshot.oss.common.toolkit.PopDialogShower;
-import cn.jpanda.screenshot.oss.common.utils.AlertUtils;
 import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
 import cn.jpanda.screenshot.oss.store.ExceptionWrapper;
 import cn.jpanda.screenshot.oss.store.img.instances.git.GitImageStore;
 import cn.jpanda.screenshot.oss.store.img.instances.git.GitPersistence;
+import javafx.application.Platform;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.Stage;
 import lombok.SneakyThrows;
-import org.eclipse.jgit.api.AddCommand;
-import org.eclipse.jgit.api.CloneCommand;
-import org.eclipse.jgit.api.CreateBranchCommand;
-import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.*;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.JGitInternalException;
 import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.lib.Constants;
+import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.transport.RemoteConfig;
 import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
@@ -33,14 +33,17 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Controller
 public class GitFileImageStoreConfig implements Initializable {
     public static final String DEFAULT_REPOSITORY_DIRECTOR_NAME = "screenshot";
     public static final String DEFAULT_REMOTE_NAME = "origin";
     public static final String DEFAULT_BRANCH_NAME = "master";
-    public static final String BRANCH_NAME_PREFIX = "refs/heads/";
+    public static final String REMOTE_BRANCH_NAME_PREFIX = "refs/remotes/origin/";
     /**
      * 本地仓库地址
      */
@@ -87,7 +90,7 @@ public class GitFileImageStoreConfig implements Initializable {
 
         boolean update = false;
         GitPersistence gitPersistence = configuration.getPersistence(GitPersistence.class);
-
+        // 修复存储地址不正确时，无法打开文件选择器的问题
         if (StringUtils.isEmpty(gitPersistence.getLocalRepositoryDir()) || !Paths.get(gitPersistence.getLocalRepositoryDir()).toFile().exists()) {
             gitPersistence.setLocalRepositoryDir(Paths.get(configuration.getWorkPath()).toFile().getAbsolutePath());
             update = true;
@@ -123,7 +126,7 @@ public class GitFileImageStoreConfig implements Initializable {
 
         configuration.registryUniquePropertiesHolder(Callable.class.getCanonicalName() + "-" + GitImageStore.NAME, (Callable<Boolean, ButtonType>) a -> {
             if (a.equals(ButtonType.APPLY)) {
-                return save();
+                return saveWrapper();
             }
             return true;
         });
@@ -152,7 +155,31 @@ public class GitFileImageStoreConfig implements Initializable {
         return newPath;
     }
 
+    public boolean saveWrapper() {
+        Stage loading = LoadingShower.custom(username.getScene().getWindow(), "数据校验中，请耐心等待...");
+        AtomicBoolean res = new AtomicBoolean(false);
+        AtomicReference<RuntimeException> re = new AtomicReference<>(null);
+        new Thread(() -> {
+            try {
+                res.set(save());
+            } catch (RuntimeException e) {
+                e.printStackTrace();
+                re.set(e);
+            } finally {
+                Platform.runLater(loading::close);
+            }
+        }).start();
+
+        loading.showAndWait();
+        if (re.get() != null) {
+            message(re.get().getMessage());
+        }
+        return res.get();
+    }
+
     public boolean save() {
+
+
         GitPersistence old = configuration.getPersistence(GitPersistence.class);
         GitPersistence gitPersistence = new GitPersistence();
         String localRep = localRepositoryDir.textProperty().get();
@@ -166,13 +193,12 @@ public class GitFileImageStoreConfig implements Initializable {
         File localRepFile = Paths.get(localRep).toFile();
         if (!localRepFile.exists()) {
 
-            message("本地仓库目录不存在");
-            return false;
+            throw new RuntimeException("本地仓库目录不存在");
         }
         if (StringUtils.isEmpty(remote) || !Pattern.matches("^(https?)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]", remote)) {
-            message("远程仓库地址格式错误");
-            return false;
+            throw new RuntimeException("远程仓库地址格式错误");
         }
+
         gitPersistence.setLocalRepositoryDir(localRepFile.getAbsolutePath());
         if (StringUtils.isEmpty(subDirName)) {
             gitPersistence.setSubDir(subDirName);
@@ -187,11 +213,12 @@ public class GitFileImageStoreConfig implements Initializable {
         gitPersistence.setUsername(un);
         gitPersistence.setPassword(pd);
         gitPersistence.setAsync(asy);
-        if (gitPersistence.getBranch().trim().equals("")) {
+        if ("".equals(gitPersistence.getBranch().trim())) {
             gitPersistence.setBranch(DEFAULT_BRANCH_NAME);
         }
         // 生成访问口令
         UsernamePasswordCredentialsProvider usernamePasswordCredentialsProvider = new UsernamePasswordCredentialsProvider(gitPersistence.getUsername(), gitPersistence.getPassword());
+
         Git git;
         try {
             // 判断是否需要重新Clone工程
@@ -221,6 +248,7 @@ public class GitFileImageStoreConfig implements Initializable {
                 if (StringUtils.isEmpty(old.getBranch())) {
                     old.setBranch(gitPersistence.getBranch());
                 }
+
                 List<RemoteConfig> list = git.remoteList().call();
                 for (RemoteConfig rc : list) {
                     git.remoteRemove().setRemoteName(rc.getName()).call();
@@ -229,7 +257,8 @@ public class GitFileImageStoreConfig implements Initializable {
                 if (StringUtils.isEmpty(old.getBranch())) {
                     old.setBranch(DEFAULT_BRANCH_NAME);
                 }
-                if (git.branchList().call().stream().noneMatch((ref -> old.getBranch().equals(ref.getName().replaceFirst(BRANCH_NAME_PREFIX, ""))))) {
+                if (git.branchList().setListMode(ListBranchCommand.ListMode.REMOTE).call().stream().noneMatch((ref -> old.getBranch().equals(ref.getName().replaceFirst(REMOTE_BRANCH_NAME_PREFIX, ""))))) {
+                    // 旧分支不存在
                     git
                             .checkout()
                             .setCreateBranch(true)
@@ -246,11 +275,22 @@ public class GitFileImageStoreConfig implements Initializable {
 
             // 是否需要修改分支名称
             if (!gitPersistence.getBranch().equals(old.getBranch())) {
+                // 新旧名称不一致
 
-                if (git.branchList().call().stream().noneMatch((ref -> gitPersistence.getBranch().equals(ref.getName().replaceFirst(BRANCH_NAME_PREFIX, ""))))) {
-                    git.branchRename().setNewName(gitPersistence.getBranch()).call();
+                List<Ref> branchList = git.branchList().setListMode(ListBranchCommand.ListMode.REMOTE).call();
+                if (branchList.stream().anyMatch((ref -> gitPersistence.getBranch().equals(ref.getName().replaceFirst(REMOTE_BRANCH_NAME_PREFIX, ""))))) {
+                    // 有当前分支
+                    git
+                            .branchRename()
+                            .setNewName(gitPersistence.getBranch())
+                            .call();
                     old.setBranch(gitPersistence.getBranch());
                     anyChanged = true;
+                } else {
+                    // 无有效分支
+                    String message = "[".concat(branchList.stream().map(r -> r.getName().replaceFirst(REMOTE_BRANCH_NAME_PREFIX, "")).collect(Collectors.joining(","))).concat("]");
+
+                    throw new RuntimeException(String.format("分支：{%s},不在可用分支列表内:{%s}", gitPersistence.getBranch(), message));
                 }
             }
             git.lsRemote().setCredentialsProvider(usernamePasswordCredentialsProvider).call();
@@ -277,7 +317,7 @@ public class GitFileImageStoreConfig implements Initializable {
                     throw new RuntimeException(String.format("无法提交子目录到Git仓库，部分异常数据为:%s\"", e.getMessage()));
                 }
             }
-            String split = File.separator.equals("\\") ? "\\\\" : "/";
+            String split = "\\".equals(File.separator) ? "\\\\" : "/";
             String[] paths = gitPersistence.getSubDir().split(split);
             AddCommand addCommand = git.add();
             String subP = "";
@@ -294,8 +334,10 @@ public class GitFileImageStoreConfig implements Initializable {
         } catch (Exception e) {
             // 不能完成配置，执行弹窗提示
             e.printStackTrace();
-
-            AlertUtils.exception(new ExceptionWrapper(e)).showAndWait();
+            ExceptionWrapper exceptionWrapper = new ExceptionWrapper(e);
+           Platform.runLater(()->{
+               PopDialogShower.exception(exceptionWrapper.getMessage(), exceptionWrapper.getDetails()).showAndWait();
+           });
             configuration.storePersistence(old);
             return false;
         }

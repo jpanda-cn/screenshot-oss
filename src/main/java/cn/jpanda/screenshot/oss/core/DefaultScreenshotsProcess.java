@@ -49,7 +49,6 @@ public class DefaultScreenshotsProcess implements ScreenshotsProcess {
         // 获取当前
         Stage loading = LoadingShower.createUploading(window);
         ImageStore imageStore = configuration.getUniqueBean(ImageStoreRegisterManager.class).getImageStore(configuration.getPersistence(GlobalConfigPersistence.class).getImageStore());
-        System.out.println(imageStore.getClass().getCanonicalName());
         final String[] path = {null};
         new Thread(() -> {
             path[0] = imageStore.store(image);

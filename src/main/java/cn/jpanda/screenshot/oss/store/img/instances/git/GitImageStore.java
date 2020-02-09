@@ -231,7 +231,7 @@ public class GitImageStore extends AbstractConfigImageStore {
     private boolean gitAdd(Git git, GitPersistence gitPersistence, BufferedImage image, String path) {
         // 现将图片存放到本地仓库中
         try {
-            String split = File.separator.equals("\\") ? "\\\\" : "/";
+            String split = "\\".equals(File.separator) ? "\\\\" : "/";
             String[] paths = gitPersistence.getSubDir().split(split);
             AddCommand addCommand = git.add();
             String subP = "";
