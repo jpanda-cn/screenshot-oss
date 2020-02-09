@@ -37,7 +37,7 @@ import java.util.UUID;
  * @version 1.0
  * @since 2020/1/17 9:45
  */
-@ImgStore(name = JianShuImageStore.NAME, type = ImageType.HAS_PATH, builder = JianShuStoreBuilder.class)
+@ImgStore(name = JianShuImageStore.NAME, type = ImageType.HAS_PATH, builder = JianShuStoreBuilder.class,icon ="/images/stores/icons/jianshu.png")
 public class JianShuImageStore extends AbstractConfigImageStore {
 
     public static final String NAME = "简书";

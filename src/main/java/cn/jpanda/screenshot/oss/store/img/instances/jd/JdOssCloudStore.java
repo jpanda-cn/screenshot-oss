@@ -39,7 +39,7 @@ import java.util.UUID;
  * @version 1.0
  * @since 2019/12/10 11:35
  */
-@ImgStore(name = JdOssCloudStore.NAME, config = JdCloudFileImageStoreConfig.class)
+@ImgStore(name = JdOssCloudStore.NAME, config = JdCloudFileImageStoreConfig.class,icon = "/images/stores/icons/jdcloud.png")
 public class JdOssCloudStore extends AbstractConfigImageStore {
 
     public final static String NAME = "京东云存储";

@@ -31,7 +31,7 @@ import java.util.UUID;
 /**
  * 将图片存放到git中
  */
-@ImgStore(name = GitImageStore.NAME, config = GitFileImageStoreConfig.class)
+@ImgStore(name = GitImageStore.NAME, config = GitFileImageStoreConfig.class,icon ="/images/stores/icons/git.png" )
 public class GitImageStore extends AbstractConfigImageStore {
 
 

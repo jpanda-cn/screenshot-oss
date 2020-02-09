@@ -7,7 +7,7 @@ import javafx.scene.input.ClipboardContent;
 
 import java.awt.image.BufferedImage;
 
-@ClipType(name = "地址")
+@ClipType(name = "地址",icon ="/images/stores/icons/url.png")
 public class LocalPathClipboardCallback implements ClipboardCallback {
 
     @Override

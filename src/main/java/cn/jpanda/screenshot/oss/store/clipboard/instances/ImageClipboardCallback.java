@@ -12,7 +12,7 @@ import java.awt.image.BufferedImage;
 /**
  * 将图片放到剪切板
  */
-@ClipType(name = ImageClipboardCallback.NAME, type = ClipboardType.NOT_NEED)
+@ClipType(name = ImageClipboardCallback.NAME, type = ClipboardType.NOT_NEED,icon ="/images/stores/icons/image.png")
 public class ImageClipboardCallback implements ClipboardCallback {
     public static final String NAME = "图片";
 

@@ -6,6 +6,7 @@ import cn.jpanda.screenshot.oss.core.annotations.ImgStore;
 import cn.jpanda.screenshot.oss.core.log.Log;
 import cn.jpanda.screenshot.oss.store.ImageStoreConfigBuilder;
 import cn.jpanda.screenshot.oss.store.NoImageStoreConfigBuilder;
+import cn.jpanda.screenshot.oss.view.main.IconLabel;
 import javafx.fxml.Initializable;
 
 import java.util.ArrayList;
@@ -27,7 +28,7 @@ public class ImageStoreRegisterManager {
      */
     private Map<String, ImageStore> nameMap = new HashMap<>();
 
-    private Map<ImageType, List<String>> typeMap = new HashMap<>();
+    private Map<ImageType, List<IconLabel>> typeMap = new HashMap<>();
 
     /**
      * 渠道以及配置面板的关系
@@ -35,6 +36,10 @@ public class ImageStoreRegisterManager {
     private Map<String, Class<? extends Initializable>> configs = new HashMap<>();
     private Map<String, Class<? extends ImageStoreConfigBuilder>> builders = new HashMap<>();
     private Map<String, ImageType> name2type = new HashMap<>();
+    private Map<String, String> name2icon = new HashMap<>();
+
+    private Map<IconLabel, String> iconLabel2Name = new HashMap<>();
+    private Map<String, IconLabel> name2IconLabel = new HashMap<>();
 
     private Map<String, Boolean> canConfig = new HashMap<>();
 
@@ -45,17 +50,34 @@ public class ImageStoreRegisterManager {
         return new ArrayList<>(nameMap.keySet());
     }
 
+    /**
+     * 获取所有渠道名称
+     */
+    public List<IconLabel> getIconLabels() {
+        return new ArrayList<>(iconLabel2Name.keySet());
+    }
+
     public void registry(ImgStore imgStore, ImageStore imageStore) {
         String name = imgStore.name();
         ImageType type = imgStore.type();
         log.debug("registry new imageStore named:{0}, handle type is {1}.", name, type);
-        if (nameMap.keySet().contains(name)) {
+        if (nameMap.containsKey(name)) {
             log.err("find two beans with the same name :{0}", name);
             return;
         }
+
+        // 构建图标
+        IconLabel iconLabel = IconLabel.builder().text(name).icon(imgStore.icon()).build();
+        name2IconLabel.put(name, iconLabel);
+        iconLabel2Name.put(iconLabel, name);
+
+
         nameMap.put(name, imageStore);
-        List<String> names = typeMap.computeIfAbsent(type, k -> new ArrayList<>());
-        names.add(name);
+
+        List<IconLabel> boxes = typeMap.computeIfAbsent(type, k -> new ArrayList<>());
+        boxes.add(iconLabel);
+
+
         Class<? extends Initializable> config = imgStore.config();
         boolean can = false;
         if (!NoImageStoreConfig.class.equals(config)) {
@@ -84,7 +106,7 @@ public class ImageStoreRegisterManager {
         return builders.get(name);
     }
 
-    public List<String> getNamesByType(ImageType imageType) {
+    public List<IconLabel> getNamesByType(ImageType imageType) {
         return typeMap.getOrDefault(imageType, new ArrayList<>());
     }
 
@@ -95,4 +117,17 @@ public class ImageStoreRegisterManager {
     public ImageType getType(String name) {
         return name2type.get(name);
     }
+
+    public String getIcon(String name) {
+        return name2icon.get(name);
+    }
+
+    public IconLabel getIconLabel(String name) {
+        return name2IconLabel.get(name);
+    }
+
+    public String getName(IconLabel label) {
+        return iconLabel2Name.get(label);
+    }
+
 }

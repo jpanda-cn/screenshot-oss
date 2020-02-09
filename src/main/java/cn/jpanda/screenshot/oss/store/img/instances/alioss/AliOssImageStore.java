@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.UUID;
 
-@ImgStore(name = AliOssImageStore.NAME, config = AliOssFileImageStoreConfig.class)
+@ImgStore(name = AliOssImageStore.NAME, config = AliOssFileImageStoreConfig.class,icon ="/images/stores/icons/alioss.png")
 public class AliOssImageStore extends AbstractConfigImageStore {
     public static final String NAME = "阿里OSS";
 

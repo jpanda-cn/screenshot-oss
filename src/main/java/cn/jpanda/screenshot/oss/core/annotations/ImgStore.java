@@ -21,6 +21,11 @@ public @interface ImgStore {
     String name();
 
     /**
+     * 图标
+     */
+    String icon() default "/images/stores/icons/default.png";
+
+    /**
      * 处理图片的类型
      */
     ImageType type() default ImageType.HAS_PATH;

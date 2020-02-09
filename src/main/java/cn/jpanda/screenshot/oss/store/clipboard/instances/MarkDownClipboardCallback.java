@@ -10,7 +10,7 @@ import javafx.scene.input.ClipboardContent;
 
 import java.awt.image.BufferedImage;
 
-@ClipType(name = "MARKDOWN")
+@ClipType(name = "MARKDOWN" ,icon ="/images/stores/icons/markdown.png" )
 public class MarkDownClipboardCallback implements ClipboardCallback {
     private Configuration configuration;
 

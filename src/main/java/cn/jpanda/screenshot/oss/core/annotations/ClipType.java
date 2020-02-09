@@ -11,7 +11,13 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ClipType {
+
     String name();
 
-    ClipboardType type() default cn.jpanda.screenshot.oss.common.enums.ClipboardType.NEED_PATH;
+    /**
+     * 图标
+     */
+    String icon() default "/images/stores/icons/default.png";
+
+    ClipboardType type() default ClipboardType.NEED_PATH;
 }

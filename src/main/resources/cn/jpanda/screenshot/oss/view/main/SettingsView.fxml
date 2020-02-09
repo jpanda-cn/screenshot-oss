@@ -1,41 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.RowConstraints?>
-
-<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="134.0" prefWidth="285.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.jpanda.screenshot.oss.view.main.SettingsView">
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="134.0"
+          prefWidth="285.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+          fx:controller="cn.jpanda.screenshot.oss.view.main.SettingsView">
 
     <AnchorPane GridPane.columnIndex="0">
-        <Label layoutY="5.0" prefHeight="18.0" prefWidth="86.0" style="-fx-font-size: 14px;" text="存储方式" />
+        <Label layoutY="5.0" prefHeight="18.0" prefWidth="86.0" style="-fx-font-size: 14px;" text="存储方式"/>
     </AnchorPane>
     <AnchorPane GridPane.columnIndex="1">
-        <ComboBox fx:id="imageSave" layoutY="5.0" prefWidth="150.0" />
+        <ComboBox fx:id="imageSave" layoutY="5.0" prefWidth="150.0"/>
     </AnchorPane>
     <AnchorPane GridPane.columnIndex="2">
-        <Button fx:id="edit" layoutX="7.0" layoutY="5.0" mnemonicParsing="false" onMouseClicked="#editImageStore" text="编辑" />
+        <Button fx:id="edit" layoutX="7.0" layoutY="5.0" mnemonicParsing="false" onMouseClicked="#editImageStore"
+                text="编辑"/>
     </AnchorPane>
 
     <AnchorPane prefHeight="200.0" prefWidth="86.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
-        <Label prefHeight="15.0" prefWidth="86.0" style="-fx-font-size: 14px;" text="剪切板内容" />
+        <Label prefHeight="15.0" prefWidth="86.0" style="-fx-font-size: 14px;" text="剪切板内容"/>
     </AnchorPane>
     <AnchorPane prefHeight="61.0" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-        <ComboBox fx:id="clipboard" prefWidth="150.0" />
+        <ComboBox fx:id="clipboard" prefWidth="150.0"/>
     </AnchorPane>
     <columnConstraints>
-        <ColumnConstraints />
-        <ColumnConstraints />
-        <ColumnConstraints maxWidth="50.0" minWidth="45.0" prefWidth="50.0" />
-        <ColumnConstraints maxWidth="5.0" minWidth="0.0" prefWidth="0.0" />
+        <ColumnConstraints/>
+        <ColumnConstraints/>
+        <ColumnConstraints maxWidth="50.0" minWidth="45.0" prefWidth="50.0"/>
+        <ColumnConstraints maxWidth="5.0" minWidth="0.0" prefWidth="0.0"/>
     </columnConstraints>
     <rowConstraints>
-        <RowConstraints maxHeight="80.0" minHeight="28.0" prefHeight="63.0" />
-        <RowConstraints maxHeight="93.0" minHeight="29.0" prefHeight="71.0" />
-      <RowConstraints maxHeight="80.0" minHeight="0.0" prefHeight="0.0" />
-      <RowConstraints maxHeight="80.0" minHeight="0.0" prefHeight="0.0" />
+        <RowConstraints maxHeight="80.0" minHeight="28.0" prefHeight="63.0"/>
+        <RowConstraints maxHeight="93.0" minHeight="29.0" prefHeight="71.0"/>
+        <RowConstraints maxHeight="80.0" minHeight="0.0" prefHeight="0.0"/>
+        <RowConstraints maxHeight="80.0" minHeight="0.0" prefHeight="0.0"/>
     </rowConstraints>
 </GridPane>

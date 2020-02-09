@@ -36,7 +36,7 @@ import java.util.UUID;
  * @version 1.0
  * @since 2020/1/17 9:45
  */
-@ImgStore(name = OSChinaImageStore.NAME, type = ImageType.HAS_PATH, builder = OSChinaImageStoreBuilder.class)
+@ImgStore(name = OSChinaImageStore.NAME, type = ImageType.HAS_PATH, builder = OSChinaImageStoreBuilder.class,icon = "/images/stores/icons/oschina.png")
 public class OSChinaImageStore extends AbstractConfigImageStore {
 
     public static final String NAME = "OS-CHINA";

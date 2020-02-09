@@ -11,7 +11,7 @@ import java.awt.image.BufferedImage;
 /**
  * 不对图片进行实际的存储操作
  */
-@ImgStore(name = "不保存", type = ImageType.NO_PATH)
+@ImgStore(name = "不保存", type = ImageType.NO_PATH,icon ="/images/stores/icons/nothing.png" )
 public class NothingImageStore implements ImageStore {
     public static final String NAME = "不保存";
     @Override

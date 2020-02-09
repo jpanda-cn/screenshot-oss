@@ -27,7 +27,7 @@ import java.util.UUID;
 /**
  * 本地图片存储
  */
-@ImgStore(name = LocalImageStore.NAME, type = ImageType.HAS_PATH, config = LocalFileImageStoreConfig.class)
+@ImgStore(name = LocalImageStore.NAME, type = ImageType.HAS_PATH, config = LocalFileImageStoreConfig.class,icon = "/images/stores/icons/localImage.png")
 public class LocalImageStore extends AbstractConfigImageStore {
     public final static String NAME = "本地保存";
 
