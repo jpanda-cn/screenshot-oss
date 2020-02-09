@@ -103,6 +103,9 @@ public class RgbInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEvent
     }
 
     public void setValue(String text, String tips) {
+        if (imageView==null){
+            return;
+        }
         setClipboard(text);
         tips(tips);
     }
