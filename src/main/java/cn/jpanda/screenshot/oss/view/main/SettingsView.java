@@ -10,11 +10,12 @@ import cn.jpanda.screenshot.oss.store.img.ImageStore;
 import cn.jpanda.screenshot.oss.store.img.ImageStoreRegisterManager;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
 import javafx.stage.Window;
 
 import java.net.URL;
@@ -38,15 +39,27 @@ public class SettingsView implements Initializable {
     private ImageStoreRegisterManager imageStoreRegisterManager;
     private ClipboardCallbackRegistryManager clipboardCallbackRegistryManager;
     private GlobalConfigPersistence globalConfigPersistence;
+    private SimpleStringProperty cliProperty;
+    private SimpleStringProperty imageProperty;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        cliProperty = configuration.getUniquePropertiesHolder(GlobalConfigPersistence.class.getCanonicalName() + "-" + "clipboard-save",new SimpleStringProperty());
+        imageProperty = configuration.getUniquePropertiesHolder(GlobalConfigPersistence.class.getCanonicalName() + "-" + "image-save",new SimpleStringProperty());
         // 加载配置
         imageStoreRegisterManager = configuration.getUniqueBean(ImageStoreRegisterManager.class);
         clipboardCallbackRegistryManager = configuration.getUniqueBean(ClipboardCallbackRegistryManager.class);
         globalConfigPersistence = configuration.getPersistence(GlobalConfigPersistence.class);
         loadImageSave();
         loadClipboard();
+        cliProperty.addListener((observable, oldValue, newValue) -> {
+            //noinspection unchecked
+            clipboard.getSelectionModel().select(newValue);
+        });
+        imageProperty.addListener((observable, oldValue, newValue) -> {
+            //noinspection unchecked
+            imageSave.getSelectionModel().select(newValue);
+        });
 
     }
 
@@ -98,11 +111,11 @@ public class SettingsView implements Initializable {
                     globalConfigPersistence.setClipboardCallback((String) clipboard.getItems().get(0));
                 }
                 configuration.storePersistence(globalConfigPersistence);
-                SimpleStringProperty cliProperty=configuration.getUniquePropertiesHolder(GlobalConfigPersistence.class.getCanonicalName()+"-"+"clipboard-save",new SimpleStringProperty());
-                cliProperty.set(globalConfigPersistence.getClipboardCallback());
 
-                SimpleStringProperty imageProperty=configuration.getUniquePropertiesHolder(GlobalConfigPersistence.class.getCanonicalName()+"-"+"image-save",new SimpleStringProperty());
+
+                cliProperty.set(globalConfigPersistence.getClipboardCallback());
                 imageProperty.set(globalConfigPersistence.getImageStore());
+
 
             }
         });
@@ -118,6 +131,7 @@ public class SettingsView implements Initializable {
 
     @SuppressWarnings("unchecked")
     private void loadClipboard() {
+
         clipboard.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue instanceof String) {
                 if (!globalConfigPersistence.getClipboardCallback().equalsIgnoreCase((String) newValue)) {
@@ -150,10 +164,9 @@ public class SettingsView implements Initializable {
                         globalConfigPersistence.setImageStore((String) imageSave.getItems().get(0));
                     }
                     configuration.storePersistence(globalConfigPersistence);
-                    SimpleStringProperty cliProperty=configuration.getUniquePropertiesHolder(GlobalConfigPersistence.class.getCanonicalName()+"-"+"clipboard-save");
+
                     cliProperty.set(globalConfigPersistence.getClipboardCallback());
 
-                    SimpleStringProperty imageProperty=configuration.getUniquePropertiesHolder(GlobalConfigPersistence.class.getCanonicalName()+"-"+"image-save");
                     imageProperty.set(globalConfigPersistence.getImageStore());
                 }
             }
