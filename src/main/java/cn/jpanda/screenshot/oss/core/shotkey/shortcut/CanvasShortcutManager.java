@@ -32,11 +32,11 @@ public class CanvasShortcutManager {
     }
 
     public void add(EventTarget target, Object type, ShortCutExecutorHolder holder) {
-        if (type==null){
-            type=GLOBAL_FLAG;
+        if (type == null) {
+            type = GLOBAL_FLAG;
         }
         keyboardShortcutsManager.registryShortCut(target, holder);
-        List<ShortCutExecutorHolder> holderLis= holders.computeIfAbsent(type,(b)->new ArrayList<>());
+        List<ShortCutExecutorHolder> holderLis = holders.computeIfAbsent(type, (b) -> new ArrayList<>());
         holderLis.add(holder);
     }
 
@@ -54,7 +54,7 @@ public class CanvasShortcutManager {
     }
 
     public List<ShortCutExecutorHolder> loadWithGlobal(Object key) {
-        List<ShortCutExecutorHolder> result=new ArrayList<>();
+        List<ShortCutExecutorHolder> result = new ArrayList<>();
         List<ShortCutExecutorHolder> holders = load(key);
         result.addAll(holders);
         result.addAll(load(GLOBAL_FLAG));
@@ -63,5 +63,13 @@ public class CanvasShortcutManager {
 
     public List<ShortCutExecutorHolder> loadGlobal() {
         return load(GLOBAL_FLAG);
+    }
+
+    public void clear() {
+        holders.clear();
+    }
+
+    public void clear(Object type) {
+        holders.remove(type);
     }
 }

@@ -12,18 +12,16 @@ import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
 import cn.jpanda.screenshot.oss.core.log.Log;
 import cn.jpanda.screenshot.oss.core.mouse.GlobalMousePoint;
 import cn.jpanda.screenshot.oss.core.shotkey.DefaultGroupScreenshotsElements;
-import cn.jpanda.screenshot.oss.core.shotkey.ScreenshotsElementConvertor;
 import cn.jpanda.screenshot.oss.core.shotkey.shortcut.CanvasShortcutManager;
 import cn.jpanda.screenshot.oss.core.shotkey.shortcut.ShortCutExecutorHolder;
 import cn.jpanda.screenshot.oss.core.shotkey.shortcut.Shortcut;
-import cn.jpanda.screenshot.oss.core.shotkey.shortcut.ShortcutHelperShower;
 import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallback;
 import cn.jpanda.screenshot.oss.store.clipboard.ClipboardCallbackRegistryManager;
 import cn.jpanda.screenshot.oss.store.clipboard.instances.ImageClipboardCallback;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
-import cn.jpanda.screenshot.oss.view.tray.toolkits.CutInnerType;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.EventTarget;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -32,33 +30,46 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import lombok.Getter;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-public class SnapshotRegionKeyEventRegister  {
+public class SnapshotRegionKeyEventRegister {
     private Log log;
+    /**
+     * 窗口对象不会发生变化
+     */
     private EventTarget window;
-    private ScreenshotsElementConvertor screenshotsElementConvertor;
+    /**
+     * 全局配置对象
+     */
     private Configuration configuration;
-    private CanvasProperties canvasProperties;
+
+    /**
+     *
+     */
     private CanvasShortcutManager shortcutManager;
 
-    public SnapshotRegionKeyEventRegister(EventTarget window, ScreenshotsElementConvertor screenshotsElementConvertor, Configuration configuration, CanvasProperties canvasProperties, CanvasShortcutManager shortcutManager) {
-        this.window=window;
-        this.screenshotsElementConvertor = screenshotsElementConvertor;
+    @Getter
+    private ObjectProperty<CanvasProperties> canvasProperties;
+
+    public void updateCanvasProperties(CanvasProperties canvasProperties) {
+        this.canvasProperties.set(canvasProperties);
+    }
+
+    public SnapshotRegionKeyEventRegister(EventTarget window, Configuration configuration, CanvasProperties canvasProperties, CanvasShortcutManager shortcutManager) {
+        this.window = window;
         this.configuration = configuration;
-        this.canvasProperties = canvasProperties;
+        this.canvasProperties = new SimpleObjectProperty<>(canvasProperties);
         this.shortcutManager = shortcutManager;
         this.log = configuration.getLogFactory().getLog(getClass());
 
     }
-
 
 
     public void registry() {
@@ -67,7 +78,7 @@ public class SnapshotRegionKeyEventRegister  {
                         .builder()
                         .shortcut(Shortcut.Builder.create().ctrl(true).alt(false).addCode(KeyCode.Z).description("撤销上一步操作").build())
                         .match(shortcutManager.getShortcutMatch())
-                        .executor(e -> screenshotsElementConvertor.destroyOne())
+                        .executor(e -> canvasProperties.get().getScreenshotsElementConvertor().destroyOne())
                         .build()
         );
 
@@ -76,7 +87,7 @@ public class SnapshotRegionKeyEventRegister  {
                         .builder()
                         .shortcut(Shortcut.Builder.create().ctrl(true).alt(false).addCode(KeyCode.Y).description("恢复上一步撤销操作").build())
                         .match(shortcutManager.getShortcutMatch())
-                        .executor(e -> screenshotsElementConvertor.activateOne())
+                        .executor(e -> canvasProperties.get().getScreenshotsElementConvertor().activateOne())
                         .build()
         );
 
@@ -98,8 +109,8 @@ public class SnapshotRegionKeyEventRegister  {
                             if (canvasProperties == null) {
                                 return;
                             }
-                            Scene scene = canvasProperties.getCutPane().getScene();
-                            Rectangle rectangle = canvasProperties.getCutRectangle();
+                            Scene scene = canvasProperties.get().getCutPane().getScene();
+                            Rectangle rectangle = canvasProperties.get().getCutRectangle();
                             try {
                                 ScreenshotsProcess screenshotsProcess = configuration.getUniqueBean(ScreenshotsProcess.class);
                                 // 获取截图
@@ -122,7 +133,7 @@ public class SnapshotRegionKeyEventRegister  {
 
     private void paste() {
         log.info("will paste ...");
-        Rectangle rectangle = canvasProperties.getCutRectangle();
+        Rectangle rectangle = canvasProperties.get().getCutRectangle();
         GlobalMousePoint globalMousePoint = configuration.getUniqueBean(GlobalMousePoint.class);
         Point point = globalMousePoint.pointSimpleObjectProperty.get();
         // 处理坐标，将坐标转换为矩形
@@ -175,7 +186,7 @@ public class SnapshotRegionKeyEventRegister  {
                 // 添加变更大小事件
                 RectangleAddTag2ResizeBinding rectangleAddTag2ResizeBinding = new RectangleAddTag2ResizeBinding(currentRectangle, rectangle).bind();
 
-                canvasProperties.getConfiguration().getUniqueBean(DestroyGroupBeanHolder.class).set(() -> {
+                configuration.getUniqueBean(DestroyGroupBeanHolder.class).set(() -> {
                     // 鼠标按下时，清理之前生成的矩形组的事件
                     group.setMouseTransparent(true);
                     currentRectangle.visibleProperty().setValue(false);
@@ -210,14 +221,14 @@ public class SnapshotRegionKeyEventRegister  {
                 dragRec.heightProperty().bind(label.heightProperty().add(6));
                 group.getChildren().addAll(label, dragRec);
                 dragRec.addEventFilter(MouseEvent.ANY, new DragRectangleEventHandler(dragRec, rectangle));
-                canvasProperties.getConfiguration().getUniqueBean(DestroyGroupBeanHolder.class).set(() -> {
+                configuration.getUniqueBean(DestroyGroupBeanHolder.class).set(() -> {
                     // 鼠标按下时，清理之前生成的矩形组的事件
                     group.setMouseTransparent(true);
                     dragRec.visibleProperty().setValue(false);
                 });
             }
-            canvasProperties.getCutPane().getChildren().add(group);
-            canvasProperties.getScreenshotsElementsHolder().putEffectiveElement(new DefaultGroupScreenshotsElements(group, canvasProperties));
+            canvasProperties.get().getCutPane().getChildren().add(group);
+            canvasProperties.get().getScreenshotsElementsHolder().putEffectiveElement(new DefaultGroupScreenshotsElements(group, canvasProperties.get()));
         }
     }
 }
