@@ -19,6 +19,8 @@ public class CanvasShortcutManager {
 
     private Map<Object, List<ShortCutExecutorHolder>> holders;
 
+    private Map<ShortCutExecutorHolder, EventTarget> targetMap;
+
     private KeyboardShortcutsManager keyboardShortcutsManager;
 
     @Getter
@@ -27,6 +29,7 @@ public class CanvasShortcutManager {
 
     public CanvasShortcutManager(KeyboardShortcutsManager keyboardShortcutsManager, ShortcutMatch shortcutMatch) {
         holders = new HashMap<>();
+        targetMap = new HashMap<>();
         this.keyboardShortcutsManager = keyboardShortcutsManager;
         this.shortcutMatch = shortcutMatch;
     }
@@ -35,7 +38,10 @@ public class CanvasShortcutManager {
         if (type == null) {
             type = GLOBAL_FLAG;
         }
+
         keyboardShortcutsManager.registryShortCut(target, holder);
+
+        targetMap.put(holder, target);
         List<ShortCutExecutorHolder> holderLis = holders.computeIfAbsent(type, (b) -> new ArrayList<>());
         holderLis.add(holder);
     }
@@ -44,6 +50,7 @@ public class CanvasShortcutManager {
         keyboardShortcutsManager.registryShortCut(target, holder);
         List<ShortCutExecutorHolder> holderList = holders.computeIfAbsent(GLOBAL_FLAG, (b) -> new ArrayList<>());
         holderList.add(holder);
+        targetMap.put(holder, target);
     }
 
     public List<ShortCutExecutorHolder> load(Object key) {
@@ -70,6 +77,15 @@ public class CanvasShortcutManager {
     }
 
     public void clear(Object type) {
+
+        List<ShortCutExecutorHolder> hs = holders.get(type);
+        if (hs == null) {
+            return;
+        }
+
+        hs.forEach(h -> {
+            keyboardShortcutsManager.remove(targetMap.get(h), h);
+        });
         holders.remove(type);
     }
 }

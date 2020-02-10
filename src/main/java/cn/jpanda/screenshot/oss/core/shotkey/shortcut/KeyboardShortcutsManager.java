@@ -24,7 +24,7 @@ public class KeyboardShortcutsManager {
      * @return
      */
     public boolean registryShortCut(EventTarget eventTarget, ShortCutExecutorHolder holder) {
-        log.debug(String.format("will registry the short key with %s  and %s", eventTarget.toString(), holder.getShortcut().toString()));
+        log.debug(String.format("will registry the short key with %s  and %s ,%s", eventTarget.toString(),holder.getExecutor(), holder.getShortcut().toString()));
 
         if (eventTarget instanceof Window) {
             if (((Window) eventTarget).getScene() != null) {
@@ -35,11 +35,33 @@ public class KeyboardShortcutsManager {
             return true;
         }
         if (eventTarget instanceof Scene) {
-            ((Scene) eventTarget).addEventHandler(holder.getShortcut().getKeyEvent(), holder::exec);
+            ((Scene) eventTarget).addEventHandler(holder.getShortcut().getKeyEvent(), holder);
             return true;
         }
         if (eventTarget instanceof Node) {
-            ((Node) eventTarget).addEventHandler(holder.getShortcut().getKeyEvent(), holder::exec);
+            ((Node) eventTarget).addEventHandler(holder.getShortcut().getKeyEvent(), holder);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean remove(EventTarget eventTarget, ShortCutExecutorHolder holder) {
+        log.debug(String.format("will remove the short key with %s  and %s,%s", eventTarget.toString(), holder.getExecutor(), holder.getShortcut().toString()));
+
+        if (eventTarget instanceof Window) {
+            if (((Window) eventTarget).getScene() != null) {
+                remove(((Window) eventTarget).getScene(), holder);
+            } else {
+                ((Window) eventTarget).sceneProperty().addListener((observable, oldValue, newValue) -> remove(newValue, holder));
+            }
+            return true;
+        }
+        if (eventTarget instanceof Scene) {
+            ((Scene) eventTarget).removeEventHandler(holder.getShortcut().getKeyEvent(), holder);
+            return true;
+        }
+        if (eventTarget instanceof Node) {
+            ((Node) eventTarget).removeEventHandler(holder.getShortcut().getKeyEvent(), holder);
             return true;
         }
         return false;

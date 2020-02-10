@@ -101,6 +101,9 @@ public class RouterInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEv
 
                 break;
             }
+            default:{
+                break;
+            }
         }
     }
 }

@@ -43,14 +43,14 @@ import java.util.TimerTask;
  */
 public class RgbInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEventHandler {
     private Group group;
-    ImageView imageView;
-    BufferedImage imageCache;
-    Rectangle cursorRectangle;
-    Text pos;
-    Text rgba;
-    Text hex;
-    final int imageSize = 130;
-    final int cursorSize = 40;
+    private ImageView imageView;
+    private BufferedImage imageCache;
+    private Rectangle cursorRectangle;
+    private Text pos;
+    private Text rgba;
+    private Text hex;
+    private final int imageSize = 130;
+    private final int cursorSize = 40;
     private StringProperty posStr = new SimpleStringProperty();
     private StringProperty rgbaStr = new SimpleStringProperty();
     private StringProperty hexStr = new SimpleStringProperty();
@@ -59,8 +59,10 @@ public class RgbInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEvent
     public RgbInnerSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler, CanvasShortcutManager canvasShortcutManager) {
         super(canvasProperties, canvasDrawEventHandler, canvasShortcutManager);
         // 拦截外部事件
-        canvasDrawEventHandler.getPane().addEventHandler(MouseEvent.ANY, this);
+//        canvasDrawEventHandler.getPane().addEventHandler(MouseEvent.ANY, this);
         // 注册快捷键
+        canvasShortcutManager.clear(CutInnerType.RGB);
+
         addShortCut(canvasDrawEventHandler.getPane(),
                 CutInnerType.RGB
                 , ShortCutExecutorHolder
@@ -75,7 +77,9 @@ public class RgbInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEvent
                         .builder()
                         .shortcut(Shortcut.Builder.create().ctrl(true).alt(false).addCode(KeyCode.R).description("复制RGBA色值").build())
                         .match(getShortcutMatch())
-                        .executor(e -> setValue(rgbaStr.getValue(), String.format("已复制(RGBA):%s", rgbaStr.getValue())))
+                        .executor(e -> {
+                            setValue(rgbaStr.getValue(), String.format("已复制(RGBA):%s", rgbaStr.getValue()));
+                        })
                         .build());
         addShortCut(canvasDrawEventHandler.getPane(),
                 CutInnerType.RGB
@@ -96,6 +100,7 @@ public class RgbInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEvent
                             setValue(copyValue, String.format("已复制:\n%s", copyValue));
                         })
                         .build());
+
         // 补偿： 移除图片预览图
         canvasProperties.getCutRectangle().addEventHandler(MouseEvent.MOUSE_EXITED, event -> {
             exit();
@@ -103,7 +108,7 @@ public class RgbInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEvent
     }
 
     public void setValue(String text, String tips) {
-        if (imageView==null){
+        if (imageView == null) {
             return;
         }
         setClipboard(text);
@@ -130,7 +135,6 @@ public class RgbInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEvent
     }
 
     protected void enter() {
-
         rectangle.cursorProperty().set(Cursor.DEFAULT);
         if (imageCache == null) {
             imageCache = SwingFXUtils.fromFXImage(canvasProperties.getComputerImage(), null);
@@ -145,28 +149,32 @@ public class RgbInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEvent
             group = new Group();
             group.setMouseTransparent(true);
             group.getChildren().addAll(imageView);
+            // 添加十字准星
             addAim(imageView);
-
             // 添加十字准星下面的展示框
             newTextShower();
+            // 处理展示
             addShower();
 
-            // 处理展示
-            // 姜鼠标指针包装成矩形
+            // 将鼠标指针包装成矩形
             cursorRectangle = new Rectangle(cursorSize, cursorSize);
             cursorRectangle.fillProperty().set(Color.TRANSPARENT);
             cursorRectangle.setMouseTransparent(true);
             canvasProperties.getCutPane().getChildren().addAll(group, cursorRectangle);
-
         }
     }
 
     protected void exit() {
         if (group != null) {
             canvasProperties.getCutPane().getChildren().remove(group);
+
+        }
+        if (cursorRectangle != null) {
+            canvasProperties.getCutPane().getChildren().remove(cursorRectangle);
         }
         imageView = null;
         group = null;
+        cursorRectangle = null;
     }
 
     @Override
@@ -174,6 +182,8 @@ public class RgbInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEvent
         if (!canvasProperties.getCutInnerType().equals(CutInnerType.RGB)) {
             return;
         }
+
+        // 获取当前截图区域
         Rectangle rectangle = canvasProperties.getCutRectangle();
         if (!rectangle.contains(event.getSceneX(), event.getSceneY())) {
             exit();
@@ -262,9 +272,6 @@ public class RgbInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEvent
         rgba.textProperty().bind(Bindings.createStringBinding(() -> String.format("RGBA:(%s)", rgbaStr.getValue()), rgbaStr));
         hex.textProperty().bind(Bindings.createStringBinding(() -> String.format("HEX:(%s)", hexStr.getValue()), hexStr));
 
-//        posStr.addListener((observable, oldValue, newValue) -> pos.textProperty().setValue(String.format("POS:(%s)", newValue)));
-//        rgbaStr.addListener((observable, oldValue, newValue) -> rgba.textProperty().setValue(String.format("RGBA:(%s)", newValue)));
-//        hexStr.addListener((observable, oldValue, newValue) -> hex.textProperty().setValue(String.format("HEX:(%s)", newValue)));
     }
 
     private void addAim(ImageView imageView) {
@@ -305,8 +312,8 @@ public class RgbInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEvent
 
     private void updateCourserRectangle(MouseEvent event) {
         if (cursorRectangle != null) {
-            cursorRectangle.xProperty().set(event.getSceneX() - cursorSize / 2);
-            cursorRectangle.yProperty().set(event.getSceneY() - cursorSize / 2);
+            cursorRectangle.xProperty().set(event.getSceneX() - (cursorSize >> 1));
+            cursorRectangle.yProperty().set(event.getSceneY() - (cursorSize >> 1));
         }
     }
 
@@ -314,7 +321,7 @@ public class RgbInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEvent
         // 展示位置依次是外部右测下方，外部下右，外部下左，外部左下，外部上右，外部上左
         // 内部下右
         // 判断内部展示还是外部展示
-        Window window = cursorRectangle.getScene().getWindow();
+        Window window = canvasProperties.getCutPane().getScene().getWindow();
         double y = cursorRectangle.yProperty().getValue();
         double h = cursorRectangle.heightProperty().get();
         double x = cursorRectangle.xProperty().get();

@@ -106,6 +106,8 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
         ((WaitRemoveElementsHolder) (pane.getScene().getWindow().getProperties().get(WaitRemoveElementsHolder.class))).clear();
         // 重新绘制整个蒙版
         drawMasking(new Bounds(0, 0, graphicsContext.getCanvas().getWidth(), graphicsContext.getCanvas().getHeight()));
+
+
         // 生成一个截图区域
         // 为截图区域生成一个容器
         cutRec = new Rectangle(0, 0, 0, 0);
@@ -136,7 +138,7 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
 
         // 获取当前窗口
         Window window = pane.getScene().getWindow();
-
+        // 修复重新绘制截图区域为截图窗口多次注册截图快捷键的问题
         if (snapshotRegionKeyEventRegister == null) {
             // 获取截图区域窗口，批量注册快捷键
             snapshotRegionKeyEventRegister = new SnapshotRegionKeyEventRegister(

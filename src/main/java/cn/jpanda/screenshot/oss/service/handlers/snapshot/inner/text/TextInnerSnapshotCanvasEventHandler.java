@@ -42,6 +42,7 @@ public class TextInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEven
         clear();
         if (onShowing) {
             onShowing = false;
+            canvasProperties.getCutPane().requestFocus();
             return;
         }
         initText(event);

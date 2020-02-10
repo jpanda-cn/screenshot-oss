@@ -1,8 +1,10 @@
 package cn.jpanda.screenshot.oss.core.shotkey.shortcut;
 
 
+import javafx.event.EventHandler;
 import javafx.scene.input.KeyEvent;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 /**
@@ -12,7 +14,8 @@ import lombok.Getter;
  */
 @Builder
 @Getter
-public class ShortCutExecutorHolder {
+@EqualsAndHashCode
+public class ShortCutExecutorHolder implements EventHandler<KeyEvent> {
 
     private Shortcut shortcut;
 
@@ -20,7 +23,9 @@ public class ShortCutExecutorHolder {
 
     private ShortcutMatch match;
 
-    public void exec(KeyEvent event) {
+
+    @Override
+    public void handle(KeyEvent event) {
         if (match.isMatch(event, shortcut)) {
             executor.exec(event);
         }
