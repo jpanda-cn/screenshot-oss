@@ -18,6 +18,7 @@ import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -46,7 +47,7 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
     private ExternalComponentBinders externalComponentBinders;
     private boolean start = true;
     private SnapshotRegionKeyEventRegister snapshotRegionKeyEventRegister;
-
+    private final int cursorSize = 40;
     // 快捷键注册器
     public static final String GLOBAL_FLAG = "GLOBAL_FLAG";
     @Setter
@@ -57,6 +58,10 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
     private WritableImage backgroundImage;
     private WritableImage computerImage;
 
+    /**
+     * 展示截图区域大小
+     */
+    private Tooltip size;
 
     public CanvasDrawEventHandler(Paint masking, GraphicsContext graphicsContext, Configuration configuration, WritableImage writableImage, WritableImage computerImage) {
         // 蒙版清晰度
@@ -97,6 +102,9 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
         } else if (MouseEvent.MOUSE_RELEASED.equals(event.getEventType())) {
             // 生成一个截图区域
             // 这个区域下方生成一个工具组
+            if (size != null) {
+                size.hide();
+            }
             beforeDone(pane);
         } else {
         }
@@ -151,7 +159,12 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
         } else {
             snapshotRegionKeyEventRegister.updateCanvasProperties(canvasProperties);
         }
-
+        if (size != null) {
+            size.hide();
+        }
+        size = new Tooltip("0".concat(" * ".concat("0")));
+        size.getScene().setFill(Color.TRANSPARENT);
+        size.show(pane, startX, startY);
 
         // 存放截图相关数据
         window.getProperties().put(CanvasProperties.class, canvasProperties);
@@ -172,11 +185,13 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
         double height = subAbs(y, startY);
         // 计算需要进行绘制的区域
         Bounds newDraw = new Bounds(currentX, currentY, width, height);
+
         draw(newDraw);
         last = newDraw;
     }
 
     public void draw(Bounds bounds) {
+        updateImageView(bounds);
         doDraw(bounds);
     }
 
@@ -242,4 +257,36 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
         addShortCut(target, null, holder);
     }
 
+    private void updateImageView(Bounds bounds) {
+        size.setText(("" + bounds.getWidth()).concat(" * ").concat(("" + bounds.getHeight())));
+        // 展示位置依次是外部右测下方，外部下右，外部下左，外部左下，外部上右，外部上左
+        // 内部下右
+        // 判断内部展示还是外部展示
+
+
+        Window window = pane.getScene().getWindow();
+        // 屏幕的高度
+        double windowEndY = window.getY() + window.getHeight();
+        // 屏幕的宽度
+        double windowEndX = window.getX() + window.getWidth();
+
+        javafx.geometry.Bounds toolBarBounds = group.layoutBoundsProperty().get();
+        double toolW = toolBarBounds.getWidth();
+        double toolH = toolBarBounds.getHeight();
+
+        // 左上
+        double sw = size.getWidth();
+        double sh = size.getHeight();
+
+        // 鼠标长度
+        double cl = cursorSize / 4;
+        // 尽可能在正上方，当x距离屏幕尾端不够展示时，进行缩减
+        // double ax = bounds.getX() + cl >= sw ? bounds.getX() + cl - sw : bounds.getX() - cl;
+
+        double ax = windowEndX - cl >= sw ? bounds.getX() - cl : windowEndX - cl;
+        double ay = bounds.getY() + cl >= sh ? bounds.getY() + cl - sh : bounds.getY() - cl;
+        size.setX(ax);
+        size.setY(ay);
+
+    }
 }
