@@ -61,7 +61,7 @@ public class SnapshotView implements Initializable {
         graphicsContext.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
         // 黑化之后，剩余的就交给绘制处理器来完成了
-        canvasDrawEventHandler = new CanvasDrawEventHandler(Color.rgb(0, 0, 0, 0.3), graphicsContext, configuration, writableImage, computerImage);
+        canvasDrawEventHandler = new CanvasDrawEventHandler(Color.rgb(0, 0, 0, 0.4), graphicsContext, configuration, writableImage, computerImage);
         canvas.addEventHandler(MouseEvent.ANY, canvasDrawEventHandler);
 
         // 双击完成截图

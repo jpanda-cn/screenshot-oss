@@ -1,8 +1,10 @@
 package cn.jpanda.screenshot.oss.common.toolkit;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
-import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Window;
 
@@ -13,15 +15,25 @@ import javafx.stage.Window;
 public class ExternalComponentBinders {
     private Rectangle cutRec;
     private Node toolbar;
+    private ObjectProperty<Long> flush = new SimpleObjectProperty<>(0L);
 
-    public ExternalComponentBinders(Rectangle cutRec, Node toolbar) {
+    {
+        flush.addListener((observable, oldValue, newValue) -> response());
+    }
+
+    public ExternalComponentBinders(Rectangle cutRec, Node toolbar, ObjectProperty<Long> flushProperty) {
         this.cutRec = cutRec;
         this.toolbar = toolbar;
+        flush.bind(flushProperty);
+    }
 
+    public void flush() {
+        flush.set(System.currentTimeMillis());
     }
 
     public ExternalComponentBinders doRegistry() {
         toolbar.visibleProperty().bind(cutRec.visibleProperty());
+
         // 绑定数据
         cutRec.yProperty().addListener((observable, oldValue, newValue) -> {
             response();
@@ -52,7 +64,11 @@ public class ExternalComponentBinders {
         // 展示位置依次是外部右测下方，外部下右，外部下左，外部左下，外部上右，外部上左
         // 内部下右
         // 判断内部展示还是外部展示
+
         Window window = cutRec.getScene().getWindow();
+        if (window==null){
+            return;
+        }
         double y = cutRec.yProperty().getValue();
         double h = cutRec.heightProperty().get();
         double x = cutRec.xProperty().get();

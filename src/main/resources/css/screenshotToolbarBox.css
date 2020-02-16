@@ -1,0 +1,109 @@
+.button-box{
+    -fx-background-color: BLACK;
+}
+.button-bar{
+    -fx-border-style: solid none none none;
+    -fx-border-color: GRAY;
+    -fx-border-width: 1;
+    -fx-background-color:BLACK;
+}
+
+.separator{
+  -fx-background-color: rgba(0, 0, 0,0);
+  -fx-fill:WHITE;
+  -fx-background-radius: 2;
+}
+.tool-bar-button {
+      -fx-content-display: graphic-only;
+      -fx-background-color: rgba(0, 0, 0);
+      -fx-cursor: hand;
+ }
+ .tool-bar-button .svg {
+     -fx-fill: WHITE;
+ }
+.tool-bar-button-selected {
+     -fx-background-color:WHITE;
+ }
+
+.tool-bar-button-selected .svg{
+      -fx-fill: BLACK;
+ }
+
+.tool-bar-button:hover {
+    -fx-background-color:WHITE;
+}
+.tool-bar-button:hover .svg {
+    -fx-fill: BLACK;
+}
+
+.tool-bar-button:pressed .svg {
+    -fx-fill: rgba(198,47,47,1);
+}
+
+
+/* 选项组按钮 */
+.options-button {
+      -fx-content-display: graphic-only;
+      -fx-background-color: -fill;
+      -fx-cursor: hand;
+ }
+
+.options-button .svg {
+     -fx-fill: -fill;
+      -fx-background-color:-fill;
+ }
+
+.options-button-selected .svg{
+      -fx-fill: -fill;
+ }
+ .options-button:hover {
+     -fx-background-color:WHITE;
+ }
+ .options-button:hover .svg {
+     -fx-fill: -hover-fill;
+ }
+.options-button-selected {
+     -fx-background-color: -background-color-selected;
+ }
+
+.options-button:pressed .svg {
+    -fx-fill: -fill;
+}
+
+/* 大小按钮 */
+.options-dot-button {
+      -fx-content-display: graphic-only;
+      -fx-background-color: BLACK;
+      -fx-cursor: hand;
+ }
+
+.options-dot-button .svg {
+     -fx-fill: WHITE;
+ }
+
+ .options-dot-button:hover {
+     -fx-background-color:GRAY;
+ }
+ .options-dot-button:hover .svg {
+     -fx-fill: BLACK;
+ }
+.options-dot-button-selected {
+     -fx-background-color: WHITE;
+ }
+.options-dot-button-selected .svg{
+      -fx-fill: BLACK;
+ }
+
+.options-dot-button:pressed .svg {
+    -fx-fill: GRAY;
+}
+
+/* 颜色选择器 */
+.options-color-picker {
+  -fx-fill: -fill;
+  -fx-background-color: rgba(0,0,0,0);
+}
+
+ .options-color-picker-label {
+    -fx-fill: WHITE;
+}

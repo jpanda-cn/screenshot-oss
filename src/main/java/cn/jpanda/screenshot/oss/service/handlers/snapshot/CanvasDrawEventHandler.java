@@ -10,7 +10,10 @@ import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import cn.jpanda.screenshot.oss.view.snapshot.EveryScreenshotWaitRemoveElement;
 import cn.jpanda.screenshot.oss.view.snapshot.WaitRemoveElementsHolder;
 import cn.jpanda.screenshot.oss.view.tray.CanvasCutTrayView;
+import cn.jpanda.screenshot.oss.view.tray.ScreenshotToolbarBox;
 import cn.jpanda.screenshot.oss.view.tray.toolkits.CutInnerType;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.EventHandler;
 import javafx.event.EventTarget;
 import javafx.scene.Cursor;
@@ -58,6 +61,7 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
     private WritableImage backgroundImage;
     private WritableImage computerImage;
 
+    private ObjectProperty<Long> flushProperty = new SimpleObjectProperty<>(0L);
     /**
      * 展示截图区域大小
      */
@@ -78,9 +82,11 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
         this.configuration = configuration;
 
         // 加载工具托盘
-        Scene scene = configuration.getViewContext().getScene(CanvasCutTrayView.class, false, true, false);
-        toolbar = scene.getRoot();
-
+//        Scene scene = configuration.getViewContext().getScene(CanvasCutTrayView.class, false, true, false);
+//        toolbar = scene.getRoot();
+        ScreenshotToolbarBox box = new ScreenshotToolbarBox(configuration);
+        toolbar = box;
+        flushProperty.bind(box.getFlushProperty());
         // 截图区域快捷键管理器
         canvasShortcutManager = getCanvasShortcutManager();
 
@@ -126,7 +132,7 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
         // 添加工具托盘和截图位置
         pane.getChildren().addAll(group);
         // 绑定托盘和截图区域的关系
-        externalComponentBinders = new ExternalComponentBinders(cutRec, toolbar).doRegistry();
+        externalComponentBinders = new ExternalComponentBinders(cutRec, toolbar, flushProperty).doRegistry();
         //  在这里，截图区域单属一个容器，工具托盘和截图容器共同存放在一个容器内。
         // 获取鼠标点击位置，该位置用于初始化截图区域的坐标
         startX = event.getSceneX();
