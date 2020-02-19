@@ -6,7 +6,7 @@
 
     <groupId>cn.jpanda</groupId>
     <artifactId>screenshot-oss</artifactId>
-    <version>0.0.4-SNAPSHOT</version>
+    <version>1.0.2-SNAPSHOT</version>
 
     <!--配置资源属性-->
     <properties>
