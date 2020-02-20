@@ -14,6 +14,7 @@ public class CustomLogRecord extends LogRecord {
         needToInferCaller = true;
     }
 
+    @Override
     public String getSourceClassName() {
         if (needToInferCaller) {
             inferCaller();
@@ -21,6 +22,7 @@ public class CustomLogRecord extends LogRecord {
         return super.getSourceClassName();
     }
 
+    @Override
     public void setSourceClassName(String sourceClassName) {
         setSourceMethodName(sourceClassName);
         needToInferCaller = false;

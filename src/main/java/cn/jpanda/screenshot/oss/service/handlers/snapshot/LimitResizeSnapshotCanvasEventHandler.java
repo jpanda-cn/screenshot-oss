@@ -1,11 +1,11 @@
 package cn.jpanda.screenshot.oss.service.handlers.snapshot;
 
+import cn.jpanda.screenshot.oss.common.enums.ResizeType;
+import cn.jpanda.screenshot.oss.common.toolkit.Bounds;
 import cn.jpanda.screenshot.oss.common.toolkit.ShapeCovertHelper;
 import cn.jpanda.screenshot.oss.common.utils.MathUtils;
-import cn.jpanda.screenshot.oss.common.toolkit.Bounds;
 import cn.jpanda.screenshot.oss.core.shotkey.shortcut.CanvasShortcutManager;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
-import cn.jpanda.screenshot.oss.common.enums.ResizeType;
 import javafx.scene.Cursor;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
@@ -34,8 +34,10 @@ public class LimitResizeSnapshotCanvasEventHandler extends AbstractSnapshotCanva
     protected double ow;
     protected double oh;
 
+    private Cursor currentCursor = Cursor.DEFAULT;
+
     public LimitResizeSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler, CanvasShortcutManager canvasShortcutManager) {
-        super(canvasProperties, canvasDrawEventHandler,canvasShortcutManager);
+        super(canvasProperties, canvasDrawEventHandler, canvasShortcutManager);
     }
 
     @Override
@@ -91,9 +93,13 @@ public class LimitResizeSnapshotCanvasEventHandler extends AbstractSnapshotCanva
                 resizeType = onStartY ? ResizeType.N_VERTICAL : ResizeType.S_VERTICAL;
             }
             if (cursor != null) {
+                currentCursor = cursor;
                 rectangle.setCursor(cursor);
             }
         } else if (event.getEventType().equals(MouseEvent.MOUSE_PRESSED)) {
+            if(currentCursor!=null){
+                canvasProperties.getGlobalGraphicsContext().getCanvas().setCursor(currentCursor);
+            }
             subs = ShapeCovertHelper.toRectangles(canvasProperties.listGroups());
             // 鼠标开始节点
             x = event.getSceneX();
@@ -103,7 +109,11 @@ public class LimitResizeSnapshotCanvasEventHandler extends AbstractSnapshotCanva
             oy = rectangle.yProperty().get();
             ow = rectangle.widthProperty().get();
             oh = rectangle.heightProperty().get();
+            canvasDrawEventHandler.showSize();
         } else if (event.getEventType().equals(MouseEvent.MOUSE_DRAGGED)) {
+            if(currentCursor!=null){
+                canvasProperties.getGlobalGraphicsContext().getCanvas().setCursor(currentCursor);
+            }
             // 拖动
             // 获取需要移动的元素变更其展示位置
             double offsetX = event.getSceneX() - x;
@@ -159,12 +169,15 @@ public class LimitResizeSnapshotCanvasEventHandler extends AbstractSnapshotCanva
                 }
 
             }
+
             // 使用LimitRectangleEventHandler来修正数据
-            canvasDrawEventHandler.draw(new Bounds(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight()));
+            canvasDrawEventHandler.draw(new Bounds(rectangle.getX() - 1, rectangle.getY() - 1, rectangle.getWidth() + 2, rectangle.getHeight() + 2));
+        } else if (event.getEventType().equals(MouseEvent.MOUSE_RELEASED)) {
+            canvasProperties.getGlobalGraphicsContext().getCanvas().setCursor(Cursor.DEFAULT);
+            canvasDrawEventHandler.getSize().hide();
         }
 
     }
-
 
 
     protected boolean setRectangleX(double x) {

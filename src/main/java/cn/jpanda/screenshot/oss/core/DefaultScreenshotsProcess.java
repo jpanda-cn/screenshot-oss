@@ -35,7 +35,7 @@ public class DefaultScreenshotsProcess implements ScreenshotsProcess {
         // 将图片转为BufferedImage
         BufferedImage bufferedImage = SwingFXUtils.fromFXImage(wImage, null);
         // 同步红色边框
-        return bufferedImage.getSubimage(rectangle.xProperty().intValue() + 1, rectangle.yProperty().intValue() + 1, rectangle.widthProperty().intValue() - 2, rectangle.heightProperty().intValue() - 2);
+        return bufferedImage.getSubimage(rectangle.xProperty().intValue() , rectangle.yProperty().intValue() , rectangle.widthProperty().intValue(), rectangle.heightProperty().intValue());
     }
 
     @Override

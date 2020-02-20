@@ -1,12 +1,12 @@
-package cn.jpanda.screenshot.oss.store.img.instances.oschina;
+package cn.jpanda.screenshot.oss.store.img.instances.sm;
 
-import cn.jpanda.screenshot.oss.common.enums.ImageType;
 import cn.jpanda.screenshot.oss.common.toolkit.PopDialogShower;
-import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.ImgStore;
+import cn.jpanda.screenshot.oss.core.log.Log;
 import cn.jpanda.screenshot.oss.store.*;
 import cn.jpanda.screenshot.oss.store.img.AbstractConfigImageStore;
+import cn.jpanda.screenshot.oss.store.img.instances.oschina.OSChinaExceptionType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -30,20 +30,24 @@ import java.util.Collections;
 import java.util.UUID;
 
 /**
- * OSChina图片上传支持
+ * sm.ms 图床
  *
  * @author HanQi [Jpanda@aliyun.com]
  * @version 1.0
- * @since 2020/1/17 9:45
+ * @since 2020/2/20 15:33
  */
-@ImgStore(name = OSChinaImageStore.NAME, type = ImageType.HAS_PATH, builder = OSChinaImageStoreBuilder.class,icon = "/images/stores/icons/oschina.png")
-public class OSChinaImageStore extends AbstractConfigImageStore {
+@ImgStore(name = SmMsCloudStore.NAME, icon = "/images/stores/icons/qiniu.png")
+public class SmMsCloudStore extends AbstractConfigImageStore {
+    public final static String NAME = "图床-SM";
+    /**
+     * sm.ms上传地址
+     */
+    private static final String url = "https://sm.ms/api/v2/upload?inajax=1";
+    private Log log;
 
-    public static final String NAME = "OS-CHINA";
-
-
-    public OSChinaImageStore(Configuration configuration) {
+    public SmMsCloudStore(Configuration configuration) {
         super(configuration);
+        log = configuration.getLogFactory().getLog(getClass());
     }
 
     @Override
@@ -53,44 +57,47 @@ public class OSChinaImageStore extends AbstractConfigImageStore {
 
     @Override
     public String store(BufferedImage image) {
-        OSChinaPersistence persistence = configuration.getPersistence(OSChinaPersistence.class);
-        String url = loadUrl(persistence.getUid());
-        return upload(image, url, persistence);
+        return upload(image, url);
     }
 
     @Override
     public boolean retry(ImageStoreResultWrapper imageStoreResultWrapper, Window window) {
-        PopDialogShower.message("OSChina的图片上传功能不支持指定图片名称，重新上传获取到的图片访问地址并不一致，因此OSChina不支持重试功能", window);
+        PopDialogShower.message("sm.ms的图片上传功能不支持指定图片名称，重新上传获取到的图片访问地址并不一致，因此sm.ms不支持重试功能", window);
         return false;
     }
 
     @SneakyThrows
-    public String upload(BufferedImage image, String url, OSChinaPersistence persistence) {
-
+    private String upload(BufferedImage image, java.lang.String url) {
         SimpleStringProperty path = new SimpleStringProperty(UUID.randomUUID().toString().concat(".png"));
+
         try (CloseableHttpClient httpClient = HttpClients.custom()
                 .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36")
-                .setDefaultHeaders(Collections.singletonList(new BasicHeader("Cookie", persistence.getCookie()))).build();
+                .setDefaultHeaders(
+                        Collections.singletonList(
+                                new BasicHeader("x-requested-with", "XMLHttpRequest")
+                        )
+                )
+                .build();
              ByteArrayOutputStream os = new ByteArrayOutputStream();
         ) {
             ImageIO.write(image, "png", os);
             HttpPost post = new HttpPost(url);
             HttpEntity entity = MultipartEntityBuilder
                     .create()
-                    .addBinaryBody("upload",os.toByteArray(),ContentType.DEFAULT_BINARY,path.get())
+                    .addBinaryBody("smfile", os.toByteArray(), ContentType.DEFAULT_BINARY, path.get())
                     .build();
             post.setEntity(entity);
-
             HttpResponse response = httpClient.execute(post);
             int code = response.getStatusLine().getStatusCode();
             String result = EntityUtils.toString(response.getEntity());
             if (code != 200) {
                 throw new UploadException(OSChinaExceptionType.UPLOAD_FAILED);
             }
-            OSChinaUploadResult oschinaRequstResult = new ObjectMapper().readValue(result, OSChinaUploadResult.class);
-            return oschinaRequstResult.getUrl();
+            log.debug(result);
+            SmMsUploadResult smMsUploadResult = new ObjectMapper().readValue(result, SmMsUploadResult.class);
+            return smMsUploadResult.getData().getUrl();
         } catch (Exception e) {
-            ExceptionType exceptionType = OSChinaExceptionType.TIME_OUT;
+            ExceptionType exceptionType = SmMsExceptionType.CANT_UPLOAD;
             if (e instanceof UploadException) {
                 exceptionType = ((UploadException) e).getExceptionType();
             }
@@ -108,18 +115,4 @@ public class OSChinaImageStore extends AbstractConfigImageStore {
         }
 
     }
-
-    public String loadUrl(String id) {
-        return String.format("https://my.oschina.net/u/%s/space/ckeditor_dialog_img_upload", id);
-    }
-
-    @Override
-    public boolean canUse() {
-        OSChinaPersistence persistence = configuration.getPersistence(OSChinaPersistence.class);
-        return StringUtils.isNotEmpty(persistence.getUid());
-    }
-
-//    public void Test(){
-//        Document document=new HTMLDocument()
-//    }
 }

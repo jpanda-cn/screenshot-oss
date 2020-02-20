@@ -33,7 +33,7 @@ public class LimitDragInnerSnapshotCanvasEventHandler extends InnerSnapshotCanva
     protected double oh;
 
     public LimitDragInnerSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler, CanvasShortcutManager canvasShortcutManager) {
-        super(canvasProperties, canvasDrawEventHandler,canvasShortcutManager);
+        super(canvasProperties, canvasDrawEventHandler, canvasShortcutManager);
     }
 
     @Override
@@ -41,6 +41,7 @@ public class LimitDragInnerSnapshotCanvasEventHandler extends InnerSnapshotCanva
         if (event.getEventType().equals(MouseEvent.MOUSE_MOVED)) {
             rectangle.setCursor(Cursor.MOVE);
         } else if (event.getEventType().equals(MouseEvent.MOUSE_PRESSED)) {
+            canvasDrawEventHandler.showSize();
             DestroyGroupBeanHolder destroyGroupBeanHolder = canvasProperties.getConfiguration().getUniqueBean(DestroyGroupBeanHolder.class);
             destroyGroupBeanHolder.destroy();
             subs = ShapeCovertHelper.toRectangles(canvasProperties.listGroups());
@@ -59,8 +60,11 @@ public class LimitDragInnerSnapshotCanvasEventHandler extends InnerSnapshotCanva
             double offsetY = event.getSceneY() - y;
             setRectangleX(ox + offsetX);
             setRectangleY(oy + offsetY);
-            canvasDrawEventHandler.draw(new Bounds(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight()));
+            canvasDrawEventHandler.draw(new Bounds(rectangle.getX() - 1, rectangle.getY() - 1, rectangle.getWidth() + 2, rectangle.getHeight() + 2));
 
+        } else if (event.getEventType().equals(MouseEvent.MOUSE_RELEASED)) {
+            System.out.println("re");
+            canvasDrawEventHandler.getSize().hide();
         }
     }
 

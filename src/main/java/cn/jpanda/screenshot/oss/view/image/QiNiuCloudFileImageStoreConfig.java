@@ -5,8 +5,7 @@ import cn.jpanda.screenshot.oss.common.toolkit.PopDialogShower;
 import cn.jpanda.screenshot.oss.common.utils.StringUtils;
 import cn.jpanda.screenshot.oss.core.Configuration;
 import cn.jpanda.screenshot.oss.core.annotations.Controller;
-import cn.jpanda.screenshot.oss.store.img.instances.jd.JdOssCloudStore;
-import cn.jpanda.screenshot.oss.store.img.instances.jd.JdOssPersistence;
+import cn.jpanda.screenshot.oss.store.img.instances.qiniu.QiNiuOssCloudStore;
 import cn.jpanda.screenshot.oss.store.img.instances.qiniu.QiNiuOssPersistence;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ButtonType;
@@ -19,7 +18,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 /**
- * 京东云配置项
+ * 七牛云配置项
  *
  * @author HanQi [Jpanda@aliyun.com]
  * @version 1.0
@@ -65,7 +64,7 @@ public class QiNiuCloudFileImageStoreConfig implements Initializable {
 
         async.selectedProperty().set(qiNiuOssPersistence.isAsync());
 
-        configuration.registryUniquePropertiesHolder(Callable.class.getCanonicalName() + "-" + JdOssCloudStore.NAME, (Callable<Boolean, ButtonType>) a -> {
+        configuration.registryUniquePropertiesHolder(Callable.class.getCanonicalName() + "-" + QiNiuOssCloudStore.NAME, (Callable<Boolean, ButtonType>) a -> {
             if (a.equals(ButtonType.APPLY)) {
                 return save();
             }
@@ -81,18 +80,18 @@ public class QiNiuCloudFileImageStoreConfig implements Initializable {
         if (!check()) {
             return false;
         }
-        JdOssPersistence JdOssPersistence = configuration.getPersistence(JdOssPersistence.class);
-        JdOssPersistence.setEndpoint(endpoint.textProperty().get());
-        JdOssPersistence.setBucket(bucket.textProperty().get());
-        JdOssPersistence.setAccessKeyId(accessKeyId.textProperty().get());
-        JdOssPersistence.setAccessKeySecret(accessKeySecret.textProperty().get());
+        QiNiuOssPersistence qiNiuOssPersistence = configuration.getPersistence(QiNiuOssPersistence.class);
+        qiNiuOssPersistence.setEndpoint(endpoint.textProperty().get());
+        qiNiuOssPersistence.setBucket(bucket.textProperty().get());
+        qiNiuOssPersistence.setAccessKeyId(accessKeyId.textProperty().get());
+        qiNiuOssPersistence.setAccessKeySecret(accessKeySecret.textProperty().get());
         String access = accessUrl.textProperty().get();
         if (access.endsWith("\\")) {
             access = access.substring(0, access.length() - 1);
         }
-        JdOssPersistence.setAccessUrl(access);
-        JdOssPersistence.setAsync(async.isSelected());
-        configuration.storePersistence(JdOssPersistence);
+        qiNiuOssPersistence.setAccessUrl(access);
+        qiNiuOssPersistence.setAsync(async.isSelected());
+        configuration.storePersistence(qiNiuOssPersistence);
         return true;
     }
 

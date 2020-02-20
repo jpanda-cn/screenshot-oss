@@ -9,7 +9,6 @@ import cn.jpanda.screenshot.oss.core.shotkey.shortcut.ShortcutMatch;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
 import cn.jpanda.screenshot.oss.view.snapshot.EveryScreenshotWaitRemoveElement;
 import cn.jpanda.screenshot.oss.view.snapshot.WaitRemoveElementsHolder;
-import cn.jpanda.screenshot.oss.view.tray.CanvasCutTrayView;
 import cn.jpanda.screenshot.oss.view.tray.ScreenshotToolbarBox;
 import cn.jpanda.screenshot.oss.view.tray.toolkits.CutInnerType;
 import javafx.beans.property.ObjectProperty;
@@ -19,15 +18,16 @@ import javafx.event.EventTarget;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 import javafx.stage.Window;
 import lombok.Getter;
 import lombok.Setter;
@@ -65,7 +65,8 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
     /**
      * 展示截图区域大小
      */
-    private Tooltip size;
+    @Getter
+    public Tooltip size;
 
     public CanvasDrawEventHandler(Paint masking, GraphicsContext graphicsContext, Configuration configuration, WritableImage writableImage, WritableImage computerImage) {
         // 蒙版清晰度
@@ -165,16 +166,21 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
         } else {
             snapshotRegionKeyEventRegister.updateCanvasProperties(canvasProperties);
         }
-        if (size != null) {
-            size.hide();
-        }
-        size = new Tooltip("0".concat(" * ".concat("0")));
-        size.getScene().setFill(Color.TRANSPARENT);
-        size.show(pane, startX, startY);
+        showSize();
 
         // 存放截图相关数据
         window.getProperties().put(CanvasProperties.class, canvasProperties);
 
+    }
+
+    public void showSize() {
+        if (size != null) {
+            size.hide();
+        }
+        size = new Tooltip( String.format("%d * %d",0,0));
+        size.getScene().setFill(Color.TRANSPARENT);
+        size.show(pane, startX, startY);
+        updateImageView(last);
     }
 
 
@@ -219,8 +225,11 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
         graphicsContext.clearRect(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight());
         graphicsContext.setFill(Color.TRANSPARENT);
         graphicsContext.setStroke(Color.RED);
-        graphicsContext.setLineWidth(1);
+        graphicsContext.setLineWidth(2);
+        graphicsContext.setLineDashOffset(-2);
+        // 绘制边框
         graphicsContext.strokeRect(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight());
+        // 填充透明
         graphicsContext.fillRect(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight());
     }
 
@@ -228,17 +237,19 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
         if (start) {
             return;
         }
+        if (last.getWidth() <= 2 || last.getHeight() <= 2) {
+            // 不能展示图片
+            drawMasking(new Bounds(0, 0, graphicsContext.getCanvas().getWidth(), graphicsContext.getCanvas().getHeight()));
+            return;
+        }
         // 绘制完成
         // 鼠标划选了一个区域
-        if (last.getWidth() > 2 && last.getHeight() > 2) {
-            // 生成需要处理区域的矩形
-            cutRec.xProperty().set(last.getX() + 1);
-            cutRec.yProperty().set(last.getY() + 1);
-            cutRec.widthProperty().set(last.getWidth() - 2);
-            cutRec.heightProperty().set(last.getHeight() - 2);
-            cutRec.visibleProperty().setValue(true);
-        }
-
+        // 生成需要处理区域的矩形
+        cutRec.xProperty().set(last.getX() + 1);
+        cutRec.yProperty().set(last.getY() + 1);
+        cutRec.widthProperty().set(last.getWidth() - 2);
+        cutRec.heightProperty().set(last.getHeight() - 2);
+        cutRec.visibleProperty().setValue(true);
         ((WaitRemoveElementsHolder) (pane.getScene().getWindow().getProperties().get(WaitRemoveElementsHolder.class))).add(new EveryScreenshotWaitRemoveElement(group, pane, cutRec, routingSnapshotCanvasEventHandler, externalComponentBinders, cutRec.getScene().getWindow()));
     }
 
@@ -263,11 +274,16 @@ public class CanvasDrawEventHandler implements EventHandler<MouseEvent> {
         addShortCut(target, null, holder);
     }
 
+    private Text getText(String t, Color color) {
+        Text text = new Text(t);
+        text.setFill(color);
+        return text;
+    }
+
     private void updateImageView(Bounds bounds) {
-        size.setText(("" + bounds.getWidth()).concat(" * ").concat(("" + bounds.getHeight())));
-        // 展示位置依次是外部右测下方，外部下右，外部下左，外部左下，外部上右，外部上左
-        // 内部下右
-        // 判断内部展示还是外部展示
+        int w = (int) Math.max((bounds.getWidth() - 2), 0);
+        int h = (int) (Math.max((bounds.getHeight() - 2), 0));
+        size.setText(String.format("%d * %d",w,h));
 
 
         Window window = pane.getScene().getWindow();

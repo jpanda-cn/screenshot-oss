@@ -1,10 +1,10 @@
 package cn.jpanda.screenshot.oss.service.handlers.snapshot;
 
-import cn.jpanda.screenshot.oss.common.utils.MathUtils;
+import cn.jpanda.screenshot.oss.common.enums.ResizeType;
 import cn.jpanda.screenshot.oss.common.toolkit.Bounds;
+import cn.jpanda.screenshot.oss.common.utils.MathUtils;
 import cn.jpanda.screenshot.oss.core.shotkey.shortcut.CanvasShortcutManager;
 import cn.jpanda.screenshot.oss.view.snapshot.CanvasProperties;
-import cn.jpanda.screenshot.oss.common.enums.ResizeType;
 import javafx.scene.Cursor;
 import javafx.scene.input.MouseEvent;
 
@@ -13,8 +13,8 @@ public class ResizeSnapshotCanvasEventHandler extends AbstractSnapshotCanvasEven
     private double oh;
     private ResizeType resizeType;
 
-    public ResizeSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler,CanvasShortcutManager canvasShortcutManager) {
-        super(canvasProperties, canvasDrawEventHandler,canvasShortcutManager);
+    public ResizeSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler, CanvasShortcutManager canvasShortcutManager) {
+        super(canvasProperties, canvasDrawEventHandler, canvasShortcutManager);
     }
 
     @Override
@@ -77,6 +77,7 @@ public class ResizeSnapshotCanvasEventHandler extends AbstractSnapshotCanvasEven
             y = event.getScreenY();
             ow = rectangle.widthProperty().get();
             oh = rectangle.heightProperty().get();
+            canvasDrawEventHandler.showSize();
         } else if (event.getEventType().equals(MouseEvent.MOUSE_DRAGGED)) {
             // 拖动
             // 获取需要移动的元素变更其展示位置
@@ -128,6 +129,8 @@ public class ResizeSnapshotCanvasEventHandler extends AbstractSnapshotCanvasEven
             }
             // 使用LimitRectangleEventHandler来修正数据
             canvasDrawEventHandler.draw(new Bounds(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight()));
+        } else if (event.getEventType().equals(MouseEvent.MOUSE_RELEASED)) {
+            canvasDrawEventHandler.getSize().hide();
         }
 
     }
