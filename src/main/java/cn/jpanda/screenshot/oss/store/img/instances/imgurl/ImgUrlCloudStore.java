@@ -1,4 +1,4 @@
-package cn.jpanda.screenshot.oss.store.img.instances.sm;
+package cn.jpanda.screenshot.oss.store.img.instances.imgurl;
 
 import cn.jpanda.screenshot.oss.common.toolkit.PopDialogShower;
 import cn.jpanda.screenshot.oss.core.Configuration;
@@ -36,16 +36,16 @@ import java.util.UUID;
  * @version 1.0
  * @since 2020/2/20 15:33
  */
-@ImgStore(name = SmMsCloudStore.NAME, icon = "/images/stores/icons/qiniu.png")
-public class SmMsCloudStore extends AbstractConfigImageStore {
-    public final static String NAME = "图床-SM";
+@ImgStore(name = ImgUrlCloudStore.NAME, icon = "/images/stores/icons/imgurl.png")
+public class ImgUrlCloudStore extends AbstractConfigImageStore {
+    public final static String NAME = "图床-imgurl";
     /**
      * sm.ms上传地址
      */
-    private static final String url = "https://sm.ms/api/v2/upload?inajax=1";
+    private static final String url = "https://imgurl.org/upload/ftp";
     private Log log;
 
-    public SmMsCloudStore(Configuration configuration) {
+    public ImgUrlCloudStore(Configuration configuration) {
         super(configuration);
         log = configuration.getLogFactory().getLog(getClass());
     }
@@ -67,7 +67,7 @@ public class SmMsCloudStore extends AbstractConfigImageStore {
     }
 
     @SneakyThrows
-    private String upload(BufferedImage image, java.lang.String url) {
+    private String upload(BufferedImage image, String url) {
         SimpleStringProperty path = new SimpleStringProperty(UUID.randomUUID().toString().concat(".png"));
 
         try (CloseableHttpClient httpClient = HttpClients.custom()
@@ -84,8 +84,7 @@ public class SmMsCloudStore extends AbstractConfigImageStore {
             HttpPost post = new HttpPost(url);
             HttpEntity entity = MultipartEntityBuilder
                     .create()
-                    .addBinaryBody("smfile", os.toByteArray(), ContentType.DEFAULT_BINARY, path.get())
-                    .addTextBody("file_id","0")
+                    .addBinaryBody("file", os.toByteArray(), ContentType.DEFAULT_BINARY, path.get())
                     .build();
             post.setEntity(entity);
             HttpResponse response = httpClient.execute(post);
@@ -95,10 +94,10 @@ public class SmMsCloudStore extends AbstractConfigImageStore {
                 throw new UploadException(OSChinaExceptionType.UPLOAD_FAILED);
             }
             log.debug(result);
-            SmMsUploadResult smMsUploadResult = new ObjectMapper().readValue(result, SmMsUploadResult.class);
-            return smMsUploadResult.getData().getUrl();
+            ImgUrlUploadResult imgUrlUploadResult = new ObjectMapper().readValue(result, ImgUrlUploadResult.class);
+            return imgUrlUploadResult.getUrl();
         } catch (Exception e) {
-            ExceptionType exceptionType = SmMsExceptionType.CANT_UPLOAD;
+            ExceptionType exceptionType = ImgUrlExceptionType.CANT_UPLOAD;
             if (e instanceof UploadException) {
                 exceptionType = ((UploadException) e).getExceptionType();
             }
