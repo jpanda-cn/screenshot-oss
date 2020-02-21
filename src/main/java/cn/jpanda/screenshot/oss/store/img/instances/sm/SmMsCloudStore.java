@@ -36,7 +36,7 @@ import java.util.UUID;
  * @version 1.0
  * @since 2020/2/20 15:33
  */
-@ImgStore(name = SmMsCloudStore.NAME, icon = "/images/stores/icons/qiniu.png")
+@ImgStore(name = SmMsCloudStore.NAME, icon = "/images/stores/icons/smms.png")
 public class SmMsCloudStore extends AbstractConfigImageStore {
     public final static String NAME = "图床-SM";
     /**
