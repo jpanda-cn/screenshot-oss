@@ -3,7 +3,6 @@ package cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.pen;
 import cn.jpanda.screenshot.oss.common.utils.MathUtils;
 import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
 import cn.jpanda.screenshot.oss.core.shotkey.DefaultGroupScreenshotsElements;
-import cn.jpanda.screenshot.oss.core.shotkey.ScreenshotsElementsHolder;
 import cn.jpanda.screenshot.oss.core.shotkey.shortcut.CanvasShortcutManager;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.CanvasDrawEventHandler;
 import cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.InnerSnapshotCanvasEventHandler;
@@ -26,7 +25,7 @@ public class PathPenInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasE
     private Path path;
 
     public PathPenInnerSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler, CanvasShortcutManager canvasShortcutManager) {
-        super(canvasProperties, canvasDrawEventHandler,canvasShortcutManager);
+        super(canvasProperties, canvasDrawEventHandler, canvasShortcutManager);
     }
 
     @Override
@@ -46,8 +45,8 @@ public class PathPenInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasE
         path.getElements().add(new MoveTo(x, y));
         group = new Group(path);
         canvasProperties.getCutPane().getChildren().add(group);
-        canvasProperties.getScreenshotsElementsHolder().putEffectiveElement(new DefaultGroupScreenshotsElements(group,  canvasProperties));
-        TrayConfig config = canvasProperties.getTrayConfig(CutInnerType.PEN);
+        canvasProperties.getScreenshotsElementsHolder().putEffectiveElement(new DefaultGroupScreenshotsElements(group, canvasProperties));
+        TrayConfig config = canvasProperties.getTrayConfig(CutInnerType.PEN,false);
         path.strokeWidthProperty().set(config.getStroke().getValue());
         path.strokeWidthProperty().bind(config.getStroke());
         path.strokeProperty().set(config.getStrokeColor().getValue());

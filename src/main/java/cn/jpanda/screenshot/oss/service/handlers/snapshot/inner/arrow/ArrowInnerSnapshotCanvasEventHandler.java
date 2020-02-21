@@ -1,5 +1,6 @@
 package cn.jpanda.screenshot.oss.service.handlers.snapshot.inner.arrow;
 
+import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBean;
 import cn.jpanda.screenshot.oss.core.destroy.DestroyGroupBeanHolder;
 import cn.jpanda.screenshot.oss.core.shotkey.DefaultGroupScreenshotsElements;
 import cn.jpanda.screenshot.oss.core.shotkey.shortcut.CanvasShortcutManager;
@@ -24,7 +25,7 @@ public class ArrowInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEve
     private Group group;
 
     public ArrowInnerSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler, CanvasShortcutManager canvasShortcutManager) {
-        super(canvasProperties, canvasDrawEventHandler,canvasShortcutManager);
+        super(canvasProperties, canvasDrawEventHandler, canvasShortcutManager);
     }
 
 
@@ -35,22 +36,25 @@ public class ArrowInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEve
 
     @Override
     protected void press(MouseEvent event) {
-        clear();
+
         DestroyGroupBeanHolder destroyGroupBeanHolder = canvasProperties.getConfiguration().getUniqueBean(DestroyGroupBeanHolder.class);
         destroyGroupBeanHolder.destroy();
-        if (group != null) {
-            group.setMouseTransparent(true);
-        }
+
         x = event.getSceneX();
         y = event.getSceneY();
         arrow = new Arrow();
         group = arrow.getGroup();
+        if (group != null) {
+            group.setMouseTransparent(true);
+        }
+        clear();
         canvasProperties.getScreenshotsElementsHolder().putEffectiveElement(new DefaultGroupScreenshotsElements(group, canvasProperties));
-        TrayConfig config = canvasProperties.getTrayConfig(CutInnerType.ARROW);
+        TrayConfig config = canvasProperties.getTrayConfig(CutInnerType.ARROW, false);
         // 生成一个新的矩形
         // 配置矩形颜色和宽度
         arrow.strokeWidthProperty().bind(config.getStroke());
         arrow.strokeProperty().bind(config.getStrokeColor());
+
         arrow.startXProperty().set(x);
         arrow.startYProperty().set(y);
         arrow.endXProperty().set(x);
@@ -76,11 +80,30 @@ public class ArrowInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEve
     }
 
     private void clear() {
-        canvasProperties.getConfiguration().getUniqueBean(DestroyGroupBeanHolder.class).set(() -> {
+        System.out.println(group);
+        System.out.println(arrow);
+        canvasProperties.getConfiguration().getUniqueBean(DestroyGroupBeanHolder.class).set(new ArrowDestroyGroupBean(group, arrow));
+    }
+
+    public class ArrowDestroyGroupBean implements DestroyGroupBean {
+        private Group group;
+        private Arrow arrow;
+
+        @Override
+        public void destroy() {
             if (group != null) {
                 group.setMouseTransparent(true);
             }
-        });
-    }
+            if (arrow != null) {
+                arrow.strokeWidthProperty().unbind();
+                arrow.strokeProperty().unbind();
+            }
 
+        }
+
+        public ArrowDestroyGroupBean(Group group, Arrow arrow) {
+            this.group = group;
+            this.arrow = arrow;
+        }
+    }
 }

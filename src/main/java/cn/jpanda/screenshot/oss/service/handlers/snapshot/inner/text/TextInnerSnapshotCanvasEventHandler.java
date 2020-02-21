@@ -27,9 +27,12 @@ public class TextInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEven
     private Group group;
     private TextRectangle text;
     private boolean onShowing = false;
+    // 当前配置对象
+    private TrayConfig config;
+    private ChangeListener<Paint> colorChangeListener;
 
     public TextInnerSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler, CanvasShortcutManager canvasShortcutManager) {
-        super(canvasProperties, canvasDrawEventHandler,canvasShortcutManager);
+        super(canvasProperties, canvasDrawEventHandler, canvasShortcutManager);
     }
 
     @Override
@@ -51,19 +54,24 @@ public class TextInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEven
 
 
     private void initText(MouseEvent event) {
-        // 配置类
-        TrayConfig config = canvasProperties.getTrayConfig(CutInnerType.TEXT);
+        // 获取当前配置类
+        config = canvasProperties.getTrayConfig(CutInnerType.TEXT, false);
+
         text = new TextRectangle(rectangle);
         // 需要手动初始化一下颜色
-        text.getTextArea().setStyle(String.format("-fx-text-fill: %s", color2RGBA(config.getStrokeColor().get())));
+        colorChangeListener = (observable, oldValue, newValue) -> {
+            text.getTextArea().setStyle(String.format("-fx-text-fill: %s", color2RGBA((Color) newValue)));
+        };
+        config.getStrokeColor().addListener(
+                (observable, oldValue, newValue) -> text.getTextArea().setStyle(String.format("-fx-text-fill: %s", newValue))
+        );
         text.getTextArea().fontProperty().set(config.getFont().getValue());
 
-        // 绑定
-        config.getStrokeColor().addListener((ChangeListener<Paint>) (observable, oldValue, newValue) -> {
-            text.getTextArea().setStyle(String.format("-fx-text-fill: %s", color2RGBA((Color) newValue)));
-        });
+        config.getStrokeColor().addListener(colorChangeListener);
+        // 字体
         text.getTextArea().fontProperty().bind(config.getFont());
 
+        text.getTextArea().setStyle(String.format("-fx-text-fill: %s", color2RGBA(config.getStrokeColor().get())));
 
         // 放置文本框
         text.getExtBorder().xProperty().set(event.getSceneX());
@@ -89,7 +97,11 @@ public class TextInnerSnapshotCanvasEventHandler extends InnerSnapshotCanvasEven
                 text.getExtBorder().visibleProperty().setValue(false);
                 text.getTextArea().deselect();
             }
+            if (config!=null&&colorChangeListener!=null){
+            config.getStrokeColor().removeListener(colorChangeListener);
 
+            }
+            config = null;
         });
     }
 

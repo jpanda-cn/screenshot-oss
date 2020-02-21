@@ -41,7 +41,7 @@ public class DrawRectangleInnerSnapshotCanvasEventHandler extends InnerSnapshotC
         // 鼠标按下时，清理之前生成的矩形组的事件
         clear();
 
-        TrayConfig config = canvasProperties.getTrayConfig(CutInnerType.RECTANGLE);
+        TrayConfig config = canvasProperties.getTrayConfig(CutInnerType.RECTANGLE, false);
         // 生成一个新的矩形
         currentRectangle = new Rectangle(0, 0);
         // 配置矩形颜色和宽度

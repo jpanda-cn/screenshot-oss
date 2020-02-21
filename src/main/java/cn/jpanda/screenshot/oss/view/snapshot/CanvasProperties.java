@@ -76,7 +76,15 @@ public class CanvasProperties {
 
     @SneakyThrows
     public TrayConfig getTrayConfig(CutInnerType key) {
-        return getCurrentConfig(key).shallowClone();
+        return getTrayConfig(key, true);
+    }
+
+    @SneakyThrows
+    public TrayConfig getTrayConfig(CutInnerType key, boolean clone) {
+        if (clone) {
+            return getCurrentConfig(key).shallowClone();
+        }
+        return getCurrentConfig(key);
     }
 
     private TrayConfig getCurrentConfig(CutInnerType key) {

@@ -31,7 +31,7 @@ public class RoundnessInnerSnapshotCanvasEventHandler extends InnerSnapshotCanva
     private EventHandler<MouseEvent> dragRectangleEventHandler;
 
     public RoundnessInnerSnapshotCanvasEventHandler(CanvasProperties canvasProperties, CanvasDrawEventHandler canvasDrawEventHandler, CanvasShortcutManager canvasShortcutManager) {
-        super(canvasProperties, canvasDrawEventHandler,canvasShortcutManager);
+        super(canvasProperties, canvasDrawEventHandler, canvasShortcutManager);
 
     }
 
@@ -46,7 +46,7 @@ public class RoundnessInnerSnapshotCanvasEventHandler extends InnerSnapshotCanva
     protected void press(MouseEvent event) {
         // 鼠标按下时，确认
         clear();
-        TrayConfig config = canvasProperties.getTrayConfig(CutInnerType.ROUNDNESS);
+        TrayConfig config = canvasProperties.getTrayConfig(CutInnerType.ROUNDNESS, false);
         ellipse = new Ellipse(0, 0, 0, 0);
         ellipse.setFill(Color.rgb(0, 0, 0, 0));
         ellipse.strokeProperty().bind(config.getStrokeColor());
@@ -112,13 +112,15 @@ public class RoundnessInnerSnapshotCanvasEventHandler extends InnerSnapshotCanva
                 ellipseGroup.setMouseTransparent(true);
                 if (outRectangle != null) {
                     outRectangle.visibleProperty().setValue(false);
-                    ellipse.strokeProperty().unbind();
-                    ellipse.strokeWidthProperty().unbind();
                     if (dragRectangleEventHandler != null) {
                         outRectangle.removeEventFilter(MouseEvent.ANY, dragRectangleEventHandler);
-                        dragRectangleEventHandler=null;
+                        dragRectangleEventHandler = null;
                     }
                 }
+            }
+            if (ellipse != null) {
+                ellipse.strokeProperty().unbind();
+                ellipse.strokeWidthProperty().unbind();
             }
             if (rectangleAddTag2ResizeBinding != null) {
                 rectangleAddTag2ResizeBinding.unbind();
