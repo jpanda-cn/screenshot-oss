@@ -112,7 +112,6 @@ public class JianShuStoreBuilder implements ImageStoreConfigBuilder {
                 return true;
             }
             String cookie = getCookie();
-            System.out.println(cookie);
             if (StringUtils.isEmpty(cookie)) {
                 PopDialogShower.message("无法获取Cookie，请联系开发人员", webView.getScene().getWindow());
                 return false;

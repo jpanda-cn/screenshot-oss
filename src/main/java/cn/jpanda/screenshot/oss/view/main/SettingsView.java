@@ -86,7 +86,9 @@ public class SettingsView implements Initializable {
                 return;
             }
             // 判断是否有对应的配置界面，决定是否展示配置按钮
-            edit.disableProperty().setValue((!imageStoreRegisterManager.canConfig(name)));
+            boolean canConfig=imageStoreRegisterManager.canConfig(name);
+            edit.disableProperty().setValue((!canConfig));
+            edit.visibleProperty().setValue((canConfig));
             ImageType type = imageStoreRegisterManager.getType(name);
             List<IconLabel> cls;
             switch (type) {
@@ -127,8 +129,9 @@ public class SettingsView implements Initializable {
         imageSave.getItems().addAll(imageStoreRegisterManager.getIconLabels());
         imageSave.getSelectionModel().select(imageStoreRegisterManager.getIconLabel(globalConfigPersistence.getImageStore()));
         // 判断是否有对应的配置界面，决定是否展示配置按钮
-        edit.visibleProperty().setValue(imageStoreRegisterManager.canConfig(globalConfigPersistence.getImageStore()));
-
+        boolean canConfig=imageStoreRegisterManager.canConfig(globalConfigPersistence.getImageStore());
+        edit.disableProperty().setValue((!canConfig));
+        edit.visibleProperty().setValue((canConfig));
     }
 
     @SuppressWarnings("unchecked")
