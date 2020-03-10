@@ -21,6 +21,8 @@ import javafx.stage.StageStyle;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * 经典样式的截图实现
@@ -28,6 +30,7 @@ import java.util.List;
 public class ClassicScreenshot implements Snapshot {
     private Log log;
     private Configuration configuration;
+    private AtomicReference<Stage> CutStage = new AtomicReference<>();
     /**
      * 快捷键注册表
      */
@@ -44,9 +47,9 @@ public class ClassicScreenshot implements Snapshot {
 
     @Override
     public synchronized void cut() {
-        if (configuration.getCutting().get() != null) {
+        if (configuration.getCutting().get()) {
             Platform.runLater(() -> {
-                configuration.getCutting().get().toFront();
+                Optional.ofNullable(CutStage.get()).ifPresent(Stage::toFront);
             });
             log.info("is cutting ...");
             return;
@@ -62,10 +65,12 @@ public class ClassicScreenshot implements Snapshot {
             // 执行截图操作
             // 处理ICON
             Stage stage = configuration.getViewContext().newStage();
-            stage.setOnCloseRequest(event -> configuration.getCutting().set(null));
+            CutStage.set(stage);
+            stage.setOnCloseRequest(event -> configuration.getCutting().set(false));
 
             afterNewStage(stage);
-            configuration.getCutting().set(stage);
+
+            configuration.getCutting().bind(stage.showingProperty());
             stage.initOwner(configuration.getViewContext().getStage());
             stage.initStyle(StageStyle.UNDECORATED);
             Scene scene = configuration.getViewContext().getScene(SnapshotView.class, false, true, false);
@@ -98,7 +103,8 @@ public class ClassicScreenshot implements Snapshot {
             stage.setAlwaysOnTop(true);
             stage.showAndWait();
             stage.close();
-            configuration.getCutting().set(null);
+            configuration.getCutting().unbind();
+            CutStage.set(null);
             afterCut(stage);
 
         });

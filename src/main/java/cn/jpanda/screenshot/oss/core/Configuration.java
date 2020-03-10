@@ -11,8 +11,6 @@ import cn.jpanda.screenshot.oss.core.scan.AfterBootstrapLoaderProcess;
 import cn.jpanda.screenshot.oss.core.toolkit.BeanInstance;
 import cn.jpanda.screenshot.oss.core.toolkit.DefaultBeanInstance;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.stage.Stage;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -54,7 +52,7 @@ public class Configuration {
      * 正在截图中
      */
     @Getter
-    private volatile SimpleObjectProperty<Stage> cutting = new SimpleObjectProperty<>();
+    private volatile SimpleBooleanProperty cutting = new SimpleBooleanProperty(false);
     /**
      * 上下文是否已加载完毕
      */
@@ -126,6 +124,7 @@ public class Configuration {
     public <T> void registryUniquePropertiesHolder(Object key, Object value) {
         uniquePropertiesHolder.put(key, value);
     }
+
     public <T> void removeUniquePropertiesHolder(Object key) {
         uniquePropertiesHolder.remove(key);
     }
