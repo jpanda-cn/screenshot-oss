@@ -61,51 +61,58 @@ public class ClassicScreenshot implements Snapshot {
         }
         Platform.runLater(() -> {
             beforeCut();
-            // 调用截图操作
-            // 执行截图操作
-            // 处理ICON
             Stage stage = configuration.getViewContext().newStage();
-            CutStage.set(stage);
-            stage.setOnCloseRequest(event -> configuration.getCutting().set(false));
+            try {
+                // 调用截图操作
+                // 执行截图操作
+                // 处理ICON
 
-            afterNewStage(stage);
+                CutStage.set(stage);
+                stage.setOnCloseRequest(event -> configuration.getCutting().set(false));
 
-            configuration.getCutting().bind(stage.showingProperty());
-            stage.initOwner(configuration.getViewContext().getStage());
-            stage.initStyle(StageStyle.UNDECORATED);
-            Scene scene = configuration.getViewContext().getScene(SnapshotView.class, false, true, false);
-            stage.setScene(scene);
+                afterNewStage(stage);
 
-            // 添加屏幕跟随，截哪个屏幕就在哪个屏幕上展示
-            ScreenCapture screenCapture = configuration.getUniqueBean(ScreenCapture.class);
-            stage.setX(screenCapture.minx());
-            stage.setY(screenCapture.miny());
-            EventHandler<KeyEvent> keyEventEventHandler = new KeyExitStageEventHandler(KeyCode.ESCAPE, stage);
-            stage.addEventHandler(KeyEvent.KEY_RELEASED, keyEventEventHandler);
-            addShortCut(stage, ShortCutExecutorHolder
-                    .builder()
-                    .shortcut(Shortcut.Builder.create().addCode(KeyCode.ESCAPE).description("退出截图").build())
-                    .match(canvasShortcutManager.getShortcutMatch())
-                    .executor(keyEventEventHandler::handle)
-                    .build());
+                configuration.getCutting().bind(stage.showingProperty());
+                stage.initOwner(configuration.getViewContext().getStage());
+                stage.initStyle(StageStyle.UNDECORATED);
+                Scene scene = configuration.getViewContext().getScene(SnapshotView.class, false, true, false);
+                stage.setScene(scene);
 
-            addShortCut(
-                    stage
-                    , ShortCutExecutorHolder
-                            .builder()
-                            .shortcut(Shortcut.Builder.create().ctrl(true).alt(false).addCode(KeyCode.SLASH).description("展示快捷键列表").build())
-                            .match(canvasShortcutManager.getShortcutMatch())
-                            .executor(event -> ShortcutHelperShower.show(canvasShortcutManager.loadWithGlobal(configuration.getUniquePropertiesHolder(CutInnerType.class)), stage).show())
-                            .build()
-            );
-            stage.toFront();
-            stage.setResizable(false);
-            stage.setAlwaysOnTop(true);
-            stage.showAndWait();
-            stage.close();
-            configuration.getCutting().unbind();
-            CutStage.set(null);
-            afterCut(stage);
+                // 添加屏幕跟随，截哪个屏幕就在哪个屏幕上展示
+                ScreenCapture screenCapture = configuration.getUniqueBean(ScreenCapture.class);
+                stage.setX(screenCapture.minx());
+                stage.setY(screenCapture.miny());
+                EventHandler<KeyEvent> keyEventEventHandler = new KeyExitStageEventHandler(KeyCode.ESCAPE, stage);
+                stage.addEventHandler(KeyEvent.KEY_RELEASED, keyEventEventHandler);
+                addShortCut(stage, ShortCutExecutorHolder
+                        .builder()
+                        .shortcut(Shortcut.Builder.create().addCode(KeyCode.ESCAPE).description("退出截图").build())
+                        .match(canvasShortcutManager.getShortcutMatch())
+                        .executor(keyEventEventHandler::handle)
+                        .build());
+
+                addShortCut(
+                        stage
+                        , ShortCutExecutorHolder
+                                .builder()
+                                .shortcut(Shortcut.Builder.create().ctrl(true).alt(false).addCode(KeyCode.SLASH).description("展示快捷键列表").build())
+                                .match(canvasShortcutManager.getShortcutMatch())
+                                .executor(event -> ShortcutHelperShower.show(canvasShortcutManager.loadWithGlobal(configuration.getUniquePropertiesHolder(CutInnerType.class)), stage).show())
+                                .build()
+                );
+
+                stage.toFront();
+                stage.setResizable(false);
+                stage.setAlwaysOnTop(true);
+                stage.showAndWait();
+                stage.close();
+
+                configuration.getCutting().unbind();
+            } finally {
+                afterCut(stage);
+                CutStage.set(null);
+            }
+
 
         });
 
