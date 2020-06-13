@@ -27,7 +27,6 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.util.Collections;
-import java.util.UUID;
 
 /**
  * sm.ms 图床
@@ -55,9 +54,10 @@ public class ImgUrlCloudStore extends AbstractConfigImageStore {
         return NAME;
     }
 
+
     @Override
-    public String store(BufferedImage image) {
-        return upload(image, url);
+    public String store(BufferedImage image, String extensionName) {
+        return upload(image, url, extensionName);
     }
 
     @Override
@@ -67,8 +67,8 @@ public class ImgUrlCloudStore extends AbstractConfigImageStore {
     }
 
     @SneakyThrows
-    private String upload(BufferedImage image, String url) {
-        SimpleStringProperty path = new SimpleStringProperty(UUID.randomUUID().toString().concat(".png"));
+    private String upload(BufferedImage image, String url, String extendsName) {
+        SimpleStringProperty path = new SimpleStringProperty(fileNameGenerator(extendsName));
 
         try (CloseableHttpClient httpClient = HttpClients.custom()
                 .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36")
@@ -80,7 +80,7 @@ public class ImgUrlCloudStore extends AbstractConfigImageStore {
                 .build();
              ByteArrayOutputStream os = new ByteArrayOutputStream();
         ) {
-            ImageIO.write(image, "png", os);
+            ImageIO.write(image, extendsName, os);
             HttpPost post = new HttpPost(url);
             HttpEntity entity = MultipartEntityBuilder
                     .create()

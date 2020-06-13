@@ -26,12 +26,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.UUID;
 
 /**
  * 将图片存放到git中
  */
-@ImgStore(name = GitImageStore.NAME, config = GitFileImageStoreConfig.class,icon ="/images/stores/icons/git.png" )
+@ImgStore(name = GitImageStore.NAME, config = GitFileImageStoreConfig.class, icon = "/images/stores/icons/git.png")
 public class GitImageStore extends AbstractConfigImageStore {
 
 
@@ -58,13 +57,14 @@ public class GitImageStore extends AbstractConfigImageStore {
         return NAME;
     }
 
+
     @Override
-    public String store(BufferedImage image) {
+    public String store(BufferedImage image, String extensionName) {
         GitPersistence gitPersistence = configuration.getPersistence(GitPersistence.class);
 
-        String suffix = "png";
-        String name = fileNameGenerator();
-        String subPath = gitPersistence.getSubDir() + "/" + name + "." + suffix;
+        String suffix = extensionName;
+        String name = fileNameGenerator(extensionName);
+        String subPath = gitPersistence.getSubDir() + "/" + name;
         String path = Paths.get(gitPersistence.getLocalRepositoryDir(), subPath).toAbsolutePath().toString();
         if (gitPersistence.isAsync()) {
             // 开辟新线程执行保存操作
@@ -280,9 +280,6 @@ public class GitImageStore extends AbstractConfigImageStore {
         return file.exists() && file.isDirectory();
     }
 
-    protected String fileNameGenerator() {
-        return UUID.randomUUID().toString();
-    }
 
     protected void save(BufferedImage image, String suffix, String path) throws IOException {
         // 本地图片存储

@@ -20,6 +20,7 @@ public interface ScreenshotsProcess {
      * 完成截屏操作
      */
     void done(Window window, BufferedImage image);
+    void done(Window window, BufferedImage image,String extendsName);
 
 
 }

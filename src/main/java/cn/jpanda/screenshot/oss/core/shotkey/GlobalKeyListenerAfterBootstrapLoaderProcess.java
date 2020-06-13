@@ -41,6 +41,7 @@ public class GlobalKeyListenerAfterBootstrapLoaderProcess implements AfterBootst
 
             @Override
             public void nativeKeyPressed(NativeKeyEvent nativeKeyEvent) {
+
                 KeyCode code = NativeCodeKeyCodeConvert.getKeyCode(nativeKeyEvent.getKeyCode());
                 if (code.equals(KeyCode.ALT) || code.equals(KeyCode.SHIFT) || code.equals(KeyCode.CONTROL)) {
                     // 移除

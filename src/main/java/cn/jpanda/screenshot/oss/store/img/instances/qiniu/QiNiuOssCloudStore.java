@@ -53,17 +53,17 @@ public class QiNiuOssCloudStore extends AbstractConfigImageStore {
         return NAME;
     }
 
+
     @Override
-    @SneakyThrows
-    public String store(BufferedImage image) {
+    public String store(BufferedImage image, String extensionName) {
         QiNiuOssPersistence qiNiuOssPersistence = configuration.getPersistence(QiNiuOssPersistence.class);
-        String name = fileNameGenerator();
+        String name = fileNameGenerator(extensionName);
         if (qiNiuOssPersistence.isAsync()) {
             new Thread(() -> {
-                upload(image, qiNiuOssPersistence, name);
+                upload(image, qiNiuOssPersistence, name,extensionName);
             }).start();
         } else {
-            upload(image, qiNiuOssPersistence, name);
+            upload(image, qiNiuOssPersistence, name,extensionName);
         }
 
         return String.format("%s/%s"
@@ -82,10 +82,10 @@ public class QiNiuOssCloudStore extends AbstractConfigImageStore {
         }
         String path = imageStoreResultWrapper.getPath();
         String name = path.substring((int) MathUtils.max(path.lastIndexOf("/"), path.lastIndexOf("\\")) + 1);
-        return upload(bufferedImage, configuration.getPersistence(QiNiuOssPersistence.class), name);
+        return upload(bufferedImage, configuration.getPersistence(QiNiuOssPersistence.class), name,getFileSuffix(path));
     }
 
-    public boolean upload(BufferedImage image, QiNiuOssPersistence qiNiuOssPersistence, String name) {
+    public boolean upload(BufferedImage image, QiNiuOssPersistence qiNiuOssPersistence, String name,String extendsName) {
 
         OSSClient ossClient = new OSSClient(qiNiuOssPersistence.getEndpoint(), qiNiuOssPersistence.getAccessKeyId(), qiNiuOssPersistence.getAccessKeySecret());
 
@@ -100,7 +100,7 @@ public class QiNiuOssCloudStore extends AbstractConfigImageStore {
                 .build();
 
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
-            ImageIO.write(image, "png", os);
+            ImageIO.write(image, extendsName, os);
             ObjectMetadata objectMetadata = new ObjectMetadata();
             objectMetadata.setContentType("image/jpg");
             PutObjectResult result = s3.putObject(qiNiuOssPersistence.getBucket(), name, new ByteArrayInputStream(os.toByteArray()), objectMetadata);

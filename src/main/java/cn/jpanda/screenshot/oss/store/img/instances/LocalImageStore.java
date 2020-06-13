@@ -36,8 +36,9 @@ public class LocalImageStore extends AbstractConfigImageStore {
     }
 
 
+
     @Override
-    public String store(BufferedImage image) {
+    public String store(BufferedImage image, String extensionName) {
         LocalImageStorePersistence localImageStorePersistence = configuration.getPersistence(LocalImageStorePersistence.class);
         if (StringUtils.isEmpty(localImageStorePersistence.getPath())) {
             localImageStorePersistence.setPath(configuration.getWorkPath());
@@ -45,11 +46,10 @@ public class LocalImageStore extends AbstractConfigImageStore {
         }
         // 获取保存图片类型
         String path = localImageStorePersistence.getPath();
-        String name = fileNameGenerator();
-        String suffix = "png";
-        path = path + File.separator + name + "." + suffix;
+        String name = fileNameGenerator(extensionName);
+        path = path + File.separator + name ;
         // 本地图片存储
-        save(image, suffix, path);
+        save(image, extensionName, path);
         return path;
     }
 
@@ -70,7 +70,7 @@ public class LocalImageStore extends AbstractConfigImageStore {
                 file.mkdirs();
                 file.createNewFile();
             }
-            ImageIO.write(image, "PNG", file);
+            ImageIO.write(image, suffix, file);
         } catch (Exception e) {
             configuration.getUniqueBean(ImageStoreResultHandler.class).add(ImageStoreResult
                     .builder()

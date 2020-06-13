@@ -32,14 +32,13 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.UUID;
 
 /**
  * @author HanQi [Jpanda@aliyun.com]
  * @version 1.0
  * @since 2019/12/10 11:35
  */
-@ImgStore(name = JdOssCloudStore.NAME, config = JdCloudFileImageStoreConfig.class,icon = "/images/stores/icons/jdcloud.png")
+@ImgStore(name = JdOssCloudStore.NAME, config = JdCloudFileImageStoreConfig.class, icon = "/images/stores/icons/jdcloud.png")
 public class JdOssCloudStore extends AbstractConfigImageStore {
 
     public final static String NAME = "京东云存储";
@@ -54,16 +53,15 @@ public class JdOssCloudStore extends AbstractConfigImageStore {
     }
 
     @Override
-    @SneakyThrows
-    public String store(BufferedImage image) {
+    public String store(BufferedImage image, String extensionName) {
         JdOssPersistence jdOssPersistence = configuration.getPersistence(JdOssPersistence.class);
-        String name = fileNameGenerator();
+        String name = fileNameGenerator(extensionName);
         if (jdOssPersistence.isAsync()) {
             new Thread(() -> {
-                upload(image, jdOssPersistence, name);
+                upload(image, jdOssPersistence, name, extensionName);
             }).start();
         } else {
-            upload(image, jdOssPersistence, name);
+            upload(image, jdOssPersistence, name, extensionName);
         }
 
         return String.format("%s/%s"
@@ -82,10 +80,10 @@ public class JdOssCloudStore extends AbstractConfigImageStore {
         }
         String path = imageStoreResultWrapper.getPath();
         String name = path.substring((int) MathUtils.max(path.lastIndexOf("/"), path.lastIndexOf("\\")) + 1);
-        return upload(bufferedImage, configuration.getPersistence(JdOssPersistence.class), name);
+        return upload(bufferedImage, configuration.getPersistence(JdOssPersistence.class), name,getFileSuffix(path));
     }
 
-    public boolean upload(BufferedImage image, JdOssPersistence jdOssPersistence, String name) {
+    public boolean upload(BufferedImage image, JdOssPersistence jdOssPersistence, String name, String extensionName) {
 
         OSSClient ossClient = new OSSClient(jdOssPersistence.getEndpoint(), jdOssPersistence.getAccessKeyId(), jdOssPersistence.getAccessKeySecret());
 
@@ -100,10 +98,10 @@ public class JdOssCloudStore extends AbstractConfigImageStore {
                 .build();
 
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
-            ImageIO.write(image, "png", os);
-            ObjectMetadata objectMetadata=new ObjectMetadata();
+            ImageIO.write(image, extensionName, os);
+            ObjectMetadata objectMetadata = new ObjectMetadata();
             objectMetadata.setContentType("image/jpg");
-            PutObjectResult result = s3.putObject(jdOssPersistence.getBucket(), name, new ByteArrayInputStream(os.toByteArray()),objectMetadata );
+            PutObjectResult result = s3.putObject(jdOssPersistence.getBucket(), name, new ByteArrayInputStream(os.toByteArray()), objectMetadata);
         } catch (Exception e) {
             e.printStackTrace();
             configuration.getUniqueBean(ImageStoreResultHandler.class).add(ImageStoreResult
@@ -122,9 +120,6 @@ public class JdOssCloudStore extends AbstractConfigImageStore {
         return true;
     }
 
-    protected String fileNameGenerator() {
-        return UUID.randomUUID().toString() + ".png";
-    }
 
     @Override
     public boolean canUse() {

@@ -37,7 +37,7 @@ import java.util.UUID;
  * @version 1.0
  * @since 2020/1/17 9:45
  */
-@ImgStore(name = JianShuImageStore.NAME, type = ImageType.HAS_PATH, builder = JianShuStoreBuilder.class,icon ="/images/stores/icons/jianshu.png")
+@ImgStore(name = JianShuImageStore.NAME, type = ImageType.HAS_PATH, builder = JianShuStoreBuilder.class, icon = "/images/stores/icons/jianshu.png")
 public class JianShuImageStore extends AbstractConfigImageStore {
 
     public static final String NAME = "简书";
@@ -52,10 +52,11 @@ public class JianShuImageStore extends AbstractConfigImageStore {
         return NAME;
     }
 
+
     @Override
-    public String store(BufferedImage image) {
+    public String store(BufferedImage image, String extensionName) {
         JianShuPersistence persistence = configuration.getPersistence(JianShuPersistence.class);
-        return upload(image, persistence);
+        return upload(image, persistence, extensionName);
     }
 
     @Override
@@ -65,7 +66,7 @@ public class JianShuImageStore extends AbstractConfigImageStore {
     }
 
     @SneakyThrows
-    public String upload(BufferedImage image, JianShuPersistence persistence) {
+    public String upload(BufferedImage image, JianShuPersistence persistence, String extendsName) {
 
 
         SimpleStringProperty path = new SimpleStringProperty(UUID.randomUUID().toString().concat(".png"));
@@ -88,7 +89,7 @@ public class JianShuImageStore extends AbstractConfigImageStore {
             String key = jIanShuTokenResult.getKey();
 
             // 上传图片
-            ImageIO.write(image, "png", os);
+            ImageIO.write(image, extendsName, os);
             byte[] bytes = os.toByteArray();
             HttpPost post = new HttpPost("https://upload.qiniup.com/");
             HttpEntity entity = MultipartEntityBuilder

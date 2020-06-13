@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.UUID;
 
-@ImgStore(name = AliOssImageStore.NAME, config = AliOssFileImageStoreConfig.class,icon ="/images/stores/icons/alioss.png")
+@ImgStore(name = AliOssImageStore.NAME, config = AliOssFileImageStoreConfig.class, icon = "/images/stores/icons/alioss.png")
 public class AliOssImageStore extends AbstractConfigImageStore {
     public static final String NAME = "阿里OSS";
 
@@ -39,18 +39,18 @@ public class AliOssImageStore extends AbstractConfigImageStore {
         return NAME;
     }
 
+
+
     @Override
-    @SneakyThrows
-    public String store(BufferedImage image) {
-        System.out.println(NAME);
+    public String store(BufferedImage image, String extensionName) {
         AliOssPersistence aliOssPersistence = configuration.getPersistence(AliOssPersistence.class);
-        String name = fileNameGenerator();
+        String name = fileNameGenerator(extensionName);
         if (aliOssPersistence.isAsync()) {
             new Thread(() -> {
-                upload(image, aliOssPersistence, name);
+                upload(image, aliOssPersistence, name, extensionName);
             }).start();
         } else {
-            upload(image, aliOssPersistence, name);
+            upload(image, aliOssPersistence, name, extensionName);
         }
 
         return String.format("%s/%s"
@@ -69,15 +69,15 @@ public class AliOssImageStore extends AbstractConfigImageStore {
         }
         String path = imageStoreResultWrapper.getPath();
         String name = path.substring((int) MathUtils.max(path.lastIndexOf("/"), path.lastIndexOf("\\")) + 1);
-        return upload(bufferedImage, configuration.getPersistence(AliOssPersistence.class), name);
+        return upload(bufferedImage, configuration.getPersistence(AliOssPersistence.class), name, getFileSuffix(path));
     }
 
-    public boolean upload(BufferedImage image, AliOssPersistence aliOssPersistence, String name) {
+    public boolean upload(BufferedImage image, AliOssPersistence aliOssPersistence, String name, String extensionName) {
 
         OSSClient ossClient = new OSSClient(aliOssPersistence.getEndpoint(), aliOssPersistence.getAccessKeyId(), aliOssPersistence.getAccessKeySecret());
 
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
-            ImageIO.write(image, "png", os);
+            ImageIO.write(image, extensionName, os);
             PutObjectResult result = ossClient.putObject(aliOssPersistence.getBucket(), name, new ByteArrayInputStream(os.toByteArray()));
         } catch (Exception e) {
             configuration.getUniqueBean(ImageStoreResultHandler.class).add(ImageStoreResult
@@ -94,10 +94,6 @@ public class AliOssImageStore extends AbstractConfigImageStore {
             ossClient.shutdown();
         }
         return true;
-    }
-
-    protected String fileNameGenerator() {
-        return UUID.randomUUID().toString() + ".png";
     }
 
     @Override

@@ -105,7 +105,7 @@ public class ImageShower extends Stage {
     }
 
     public ImageShower registySelf(ImageShowerManager imageShowers) {
-        imageShowerManager=imageShowers;
+        imageShowerManager = imageShowers;
         return this;
     }
 
@@ -152,14 +152,14 @@ public class ImageShower extends Stage {
     }
 
     public void showAndRegistry(Image image, ImageShowerManager imageShowers) {
-        imageShowerManager=imageShowers;
+        imageShowerManager = imageShowers;
         load(image);
         show();
     }
 
     public ImageShower load(Image image) {
         init(image);
-        if(imageShowerManager!=null){
+        if (imageShowerManager != null) {
             imageShowerManager.add(this);
         }
         return this;
@@ -616,8 +616,8 @@ public class ImageShower extends Stage {
 
     }
 
-    public void doClose(){
-        if(imageShowerManager!=null){
+    public void doClose() {
+        if (imageShowerManager != null) {
             imageShowerManager.remove(this);
         }
         close();
@@ -805,7 +805,8 @@ public class ImageShower extends Stage {
                     public Boolean apply(ButtonType buttonType) {
                         if (upload.equals(buttonType)) {
                             // 上传
-                            toUpload(configuration, body.getScene().getWindow(), SwingFXUtils.fromFXImage(image, null));
+                            BufferedImage image2=null;
+                            toUpload(configuration, body.getScene().getWindow(), SwingFXUtils.fromFXImage(image, image2));
                         } else if (change.equals(buttonType)) {
                             // 变更设置
                             showConfig(configuration, body.getScene().getWindow());
@@ -839,7 +840,13 @@ public class ImageShower extends Stage {
 
     public void toUpload(Configuration configuration, Window window, BufferedImage image) {
         ScreenshotsProcess screenshotsProcess = configuration.getUniqueBean(ScreenshotsProcess.class);
-        screenshotsProcess.done(window, image);
+        // 获取图片名称
+        String title = getTitle();
+        String extendsName = "png";
+        if (StringUtils.isNotEmpty(title)&&title.contains(".")) {
+            extendsName = getFileSuffix(title);
+        }
+        screenshotsProcess.done(window, image, extendsName);
     }
 
     protected KeyboardShortcutsManager getKeyboardShortcutsManager() {
@@ -848,5 +855,9 @@ public class ImageShower extends Stage {
 
     protected ShortcutMatch getShortcutMatch() {
         return new SimpleShortcutMatch();
+    }
+
+    String getFileSuffix(String name) {
+        return name.substring(name.lastIndexOf(".") + 1);
     }
 }

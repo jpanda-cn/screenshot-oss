@@ -35,23 +35,29 @@ public class DefaultScreenshotsProcess implements ScreenshotsProcess {
         // 将图片转为BufferedImage
         BufferedImage bufferedImage = SwingFXUtils.fromFXImage(wImage, null);
         // 同步红色边框
-        return bufferedImage.getSubimage(rectangle.xProperty().intValue() , rectangle.yProperty().intValue() , rectangle.widthProperty().intValue(), rectangle.heightProperty().intValue());
+        return bufferedImage.getSubimage(rectangle.xProperty().intValue(), rectangle.yProperty().intValue(), rectangle.widthProperty().intValue(), rectangle.heightProperty().intValue());
     }
 
     @Override
     public void done(Window window, BufferedImage image) {
-        handlerClipboardContent(image, saveImage(window, image));
+        done(window, image, "png");
 
     }
 
+    @Override
+    public void done(Window window, BufferedImage image, String extendsName) {
+        handlerClipboardContent(image, saveImage(window, image, extendsName));
+    }
+
     @SneakyThrows
-    public String saveImage(Window window, BufferedImage image) {
+    public String saveImage(Window window, BufferedImage image, String extendsName) {
+
         // 获取当前
         Stage loading = LoadingShower.createUploading(window);
         ImageStore imageStore = configuration.getUniqueBean(ImageStoreRegisterManager.class).getImageStore(configuration.getPersistence(GlobalConfigPersistence.class).getImageStore());
         final String[] path = {null};
         new Thread(() -> {
-            path[0] = imageStore.store(image);
+            path[0] = imageStore.store(image, extendsName);
             Platform.runLater(loading::close);
         }).start();
 

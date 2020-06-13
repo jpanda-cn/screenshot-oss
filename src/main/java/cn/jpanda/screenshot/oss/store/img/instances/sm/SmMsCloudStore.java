@@ -55,9 +55,10 @@ public class SmMsCloudStore extends AbstractConfigImageStore {
         return NAME;
     }
 
+
     @Override
-    public String store(BufferedImage image) {
-        return upload(image, url);
+    public String store(BufferedImage image, String extensionName) {
+        return upload(image, url, extensionName);
     }
 
     @Override
@@ -67,8 +68,8 @@ public class SmMsCloudStore extends AbstractConfigImageStore {
     }
 
     @SneakyThrows
-    private String upload(BufferedImage image, java.lang.String url) {
-        SimpleStringProperty path = new SimpleStringProperty(UUID.randomUUID().toString().concat(".png"));
+    private String upload(BufferedImage image, java.lang.String url, String extendsName) {
+        SimpleStringProperty path = new SimpleStringProperty(fileNameGenerator(extendsName));
 
         try (CloseableHttpClient httpClient = HttpClients.custom()
                 .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36")
@@ -80,12 +81,12 @@ public class SmMsCloudStore extends AbstractConfigImageStore {
                 .build();
              ByteArrayOutputStream os = new ByteArrayOutputStream();
         ) {
-            ImageIO.write(image, "png", os);
+            ImageIO.write(image, extendsName, os);
             HttpPost post = new HttpPost(url);
             HttpEntity entity = MultipartEntityBuilder
                     .create()
                     .addBinaryBody("smfile", os.toByteArray(), ContentType.DEFAULT_BINARY, path.get())
-                    .addTextBody("file_id","0")
+                    .addTextBody("file_id", "0")
                     .build();
             post.setEntity(entity);
             HttpResponse response = httpClient.execute(post);

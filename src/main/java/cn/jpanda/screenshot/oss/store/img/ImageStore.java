@@ -6,6 +6,7 @@ import javafx.scene.image.WritableImage;
 import javafx.stage.Window;
 
 import java.awt.image.BufferedImage;
+import java.util.UUID;
 
 /**
  * 图片存储实现类
@@ -31,9 +32,13 @@ public interface ImageStore {
      *
      * @param image 图片
      */
-    String store(BufferedImage image);
+    default String store(BufferedImage image) {
+        return store(image, "png");
+    }
 
-    boolean retry(ImageStoreResultWrapper imageStoreResultWrapper,Window window);
+    String store(BufferedImage image, String extensionName);
+
+    boolean retry(ImageStoreResultWrapper imageStoreResultWrapper, Window window);
 
     /**
      * 执行存储图片的操作
@@ -43,4 +48,17 @@ public interface ImageStore {
     default String store(WritableImage image) {
         return store(SwingFXUtils.fromFXImage(image, null));
     }
+
+    default String store(WritableImage image, String extensionName) {
+        return store(SwingFXUtils.fromFXImage(image, null), extensionName);
+    }
+
+    default String getFileSuffix(String name) {
+        return name.substring(name.lastIndexOf(".") + 1);
+    }
+
+    default String fileNameGenerator(String extensionName) {
+        return UUID.randomUUID().toString().concat(".").concat(extensionName);
+    }
+
 }

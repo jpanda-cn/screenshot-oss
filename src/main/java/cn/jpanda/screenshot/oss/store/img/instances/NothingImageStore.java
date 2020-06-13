@@ -14,9 +14,9 @@ import java.awt.image.BufferedImage;
 @ImgStore(name = "不保存", type = ImageType.NO_PATH,icon ="/images/stores/icons/nothing.png" )
 public class NothingImageStore implements ImageStore {
     public static final String NAME = "不保存";
+
     @Override
-    public String store(BufferedImage image) {
-        // !! 鉴于该模式的特殊性质，选择该模式进行存储的时候,不会产生地址供使用
+    public String store(BufferedImage image, String extensionName) {
         return "图片未被存储";
     }
 

@@ -72,7 +72,7 @@ public class ImageStoreResultHandler {
                         parent.mkdirs();
                     }
                 }
-                ImageIO.write(imageStoreResult.getImage().get(), "PNG", file);
+                ImageIO.write(imageStoreResult.getImage().get(), getFileSuffix(path), file);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -131,4 +131,9 @@ public class ImageStoreResultHandler {
             }
         }
     }
+
+    public String getFileSuffix(String name) {
+        return name.substring(name.lastIndexOf(".") + 1);
+    }
+
 }

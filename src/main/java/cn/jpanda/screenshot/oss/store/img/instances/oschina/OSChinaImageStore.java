@@ -51,11 +51,12 @@ public class OSChinaImageStore extends AbstractConfigImageStore {
         return NAME;
     }
 
+
     @Override
-    public String store(BufferedImage image) {
+    public String store(BufferedImage image, String extensionName) {
         OSChinaPersistence persistence = configuration.getPersistence(OSChinaPersistence.class);
         String url = loadUrl(persistence.getUid());
-        return upload(image, url, persistence);
+        return upload(image, url, persistence,extensionName);
     }
 
     @Override
@@ -65,15 +66,15 @@ public class OSChinaImageStore extends AbstractConfigImageStore {
     }
 
     @SneakyThrows
-    public String upload(BufferedImage image, String url, OSChinaPersistence persistence) {
+    public String upload(BufferedImage image, String url, OSChinaPersistence persistence,String extendsName) {
 
-        SimpleStringProperty path = new SimpleStringProperty(UUID.randomUUID().toString().concat(".png"));
+        SimpleStringProperty path = new SimpleStringProperty(fileNameGenerator(extendsName));
         try (CloseableHttpClient httpClient = HttpClients.custom()
                 .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36")
                 .setDefaultHeaders(Collections.singletonList(new BasicHeader("Cookie", persistence.getCookie()))).build();
              ByteArrayOutputStream os = new ByteArrayOutputStream();
         ) {
-            ImageIO.write(image, "png", os);
+            ImageIO.write(image, extendsName, os);
             HttpPost post = new HttpPost(url);
             HttpEntity entity = MultipartEntityBuilder
                     .create()

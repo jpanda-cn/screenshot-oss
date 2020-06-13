@@ -42,10 +42,14 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -201,6 +205,7 @@ public class IndexCutView implements Initializable {
         MenuItem stopUsePwd = new MenuItem("停用密码");
         MenuItem usePwd = new MenuItem("启用密码");
         MenuItem cpwd = new MenuItem("修改密码");
+        MenuItem uploadLocal = new MenuItem("本地图片上传");
 
         stopUsePwd.setOnAction(event -> {
             BootstrapPersistence bootstrapPersistence = configuration.getPersistence(BootstrapPersistence.class);
@@ -276,6 +281,61 @@ public class IndexCutView implements Initializable {
             // 展示失败列表设置页面
             toDrawingPinManager();
         });
+
+        options.getItems().add(uploadLocal);
+
+        uploadLocal.setOnAction(event -> {
+            uploadLocal();
+        });
+
+    }
+
+    private void uploadLocal() {
+        // 加载文件框,展示一个窗口,用于拖拽文件上传
+        Button choose = new Button("选择图片");
+        HBox box = new HBox(choose);
+        box.setPrefWidth(200);
+        box.setPrefHeight(200);
+
+
+        PopDialog popDialog = PopDialog.create()
+
+                .setHeader("本地文件上传")
+                .setContent(box)
+                .callback(buttonType -> true)
+                .buttonTypes(ButtonType.CLOSE);
+
+        choose.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("图片","*.png","*.jpg","*.jpeg"));
+
+                fileChooser.setTitle("请选择图片");
+                File f = fileChooser.showOpenDialog(popDialog.getOwner());
+                if (f == null) {
+                    return;
+                }
+                String name = f.getName();
+                Image image = null;
+                // 文件转图片
+                try {
+                    image = new Image(new FileInputStream(f));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return;
+                }
+                // 创建一个图片预览窗口
+                ImageShower imageShower = ImageShower.hidenTaskBar().setTopTitle(name).registySelf(configuration.getUniqueBean(ImageShowerManager.class));
+                imageShower.show(image);
+            }
+        });
+
+        Stage stage = (Stage) popDialog.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(new Image("/images/icon-red.png"));
+        popDialog.titleProperty().set("本地文件上传");
+        popDialog.initModality(Modality.WINDOW_MODAL);
+        popDialog.showAndWait();
 
     }
 
